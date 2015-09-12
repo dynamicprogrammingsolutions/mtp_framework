@@ -12,7 +12,11 @@
 
 class CMTPSymbolInfo : public CSymbolInfo
 {
+   private:
+      CEventHandlerBase* event;
+      
    public:
+   
       //CEventHandler* event;
       //double m_lotroundup;
       double lot_extradigits;
@@ -25,8 +29,17 @@ class CMTPSymbolInfo : public CSymbolInfo
       bool roundup_to_minlot_close;
 
    public:
+      
+      void CMTPSymbolInfo::CMTPSymbolInfo()
+      {
+         event = this.app.GetService(srvEvent);
+         lotroundup = LOTROUNDUP_DEF;
+         lot_extradigits = 0;
+         roundup_to_minlot = false;
+      }
+      
       virtual bool Name(string name);
-      void CMTPSymbolInfo();
+
       double TickSizeR() { return(TickSize()==0?CMTPSymbolInfo::m_point:TickSize()); }
       int InTicks(double price) { return((int)MathRound(price/TickSizeR())); }
       double InTicksD(double price) { return(price/TickSizeR()); }
@@ -51,21 +64,14 @@ bool CMTPSymbolInfo::Name(string name)
       //event.Info("object already initalized for symbol "+name,__FUNCTION__);
       return(true);
    }
-   if (app().event.Info ()) app().event.Info ("initalizing symbol "+name,__FUNCTION__);
+   if (event.Info ()) event.Info ("initalizing symbol "+name,__FUNCTION__);
    if (!CSymbolInfo::Name(name)) {
-      if (app().event.Error ()) app().event.Error ("Invalid Symbol "+name,__FUNCTION__);
+      if (event.Error ()) event.Error ("Invalid Symbol "+name,__FUNCTION__);
       m_name = "";
       return(false);
    } else {
       return(true);
    }
-}
-
-void CMTPSymbolInfo::CMTPSymbolInfo()
-{
-   lotroundup = LOTROUNDUP_DEF;
-   lot_extradigits = 0;
-   roundup_to_minlot = false;
 }
 
 bool CMTPSymbolInfo::IsFractional(double treshold = FRACTIONAL_TRESHOLD)

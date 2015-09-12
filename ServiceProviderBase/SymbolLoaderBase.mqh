@@ -8,6 +8,7 @@ public:
    CSymbolLoaderBase()
    {
       name = "symbolloader";
+      srv = srvSymbolLoader;
    }
    virtual CSymbolInfoBase* LoadByIndex(int nIndex){
       return NULL;
@@ -17,7 +18,7 @@ public:
    {
       return NULL;
    }
-   bool LoadSymbol(const string in_symbol, CSymbolInfoBase*& _symbolinfo)
+   virtual bool LoadSymbol(const string in_symbol, CSymbolInfoBase*& _symbolinfo)
    {
       return false;
    }

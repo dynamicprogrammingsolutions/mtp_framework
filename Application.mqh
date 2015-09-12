@@ -23,34 +23,48 @@ public:
 
    CEventHandlerBase* event;
    CSymbolLoaderBase* symbolloader;
-   
-   /*void RegisterDefaultServices()
-   {
-      if (!ServiceIsRegistered("event")) RegisterService(new CEventHandler());
-   }*/
-   
+
    void RegisterService(CServiceProvider* service)
    {
-      if (services.IsRegistered(service.name)) {
-         //Print(__FUNCTION__,": Service '",service.name,"' is already registered.");
-         CServiceProvider* oldservice = DeregisterService(service.name);
+      if (service.srv != srvNone && services.IsRegistered(service.srv)) {
+         CServiceProvider* oldservice = DeregisterService(service.srv);
          if (CheckPointer(oldservice) == POINTER_DYNAMIC) delete oldservice;
       }
+      Print("Registering Service ",EnumToString(service.srv)," '",service.name,"'");
+            
       service.app = GetPointer(this);
       services.Add(service);
+
+      if (service.srv == srvEvent) event = service;
+      if (service.srv == srvSymbolLoader) symbolloader = service;
       
-      if (service.name == "event") event = service;
-      if (service.name == "symbolloader") symbolloader = service;
    }
    
-   CServiceProvider* DeregisterService(string service)
+   void InitalizeServices()
    {
-      return (CServiceProvider*)services.Detach(services.FindService(service));
+      services.InitalizeServices();
+   }
+   
+   CServiceProvider* DeregisterService(ENUM_APPLICATION_SERVICE srv)
+   {
+      return (CServiceProvider*)services.Detach(services.FindService(srv));
    }
 
-   bool ServiceIsRegistered(string service)
+   bool ServiceIsRegistered(ENUM_APPLICATION_SERVICE srv)
    {
-      return services.IsRegistered(service);
+      return services.IsRegistered(srv);
+   }
+
+   virtual CObject* GetService(string name) {
+      return (CObject*)services.GetService(name);
+   }
+   
+   virtual CObject* GetService(ENUM_APPLICATION_SERVICE srv) {
+      switch (srv) {
+         case srvEvent: return (CObject*)event;
+         case srvSymbolLoader: return (CObject*)symbolloader;
+      }   
+      return NULL;
    }
 
    void OnInit()

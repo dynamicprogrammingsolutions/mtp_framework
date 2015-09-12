@@ -1,7 +1,7 @@
 //
-#include <Object.mqh>
+#include "..\AppObject.mqh"
 
-class CSymbolInfoBase : public CObject
+class CSymbolInfoBase : public CAppObject
 {
    public:
       virtual string Name() const { return NULL; }

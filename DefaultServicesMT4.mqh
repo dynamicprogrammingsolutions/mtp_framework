@@ -4,6 +4,6 @@
 
 void register_services()
 {
-  if (!app().ServiceIsRegistered("event")) app().RegisterService(new CEventHandler());
-  if (!app().ServiceIsRegistered("symbolloader")) app().RegisterService(new CSymbolLoader());
+  if (!app().ServiceIsRegistered(srvEvent)) app().RegisterService(new CEventHandler());
+  if (!app().ServiceIsRegistered(srvSymbolLoader)) app().RegisterService(new CSymbolLoader());
 }

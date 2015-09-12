@@ -1,13 +1,14 @@
 //
-#include "..\ApplicationBase.mqh"
+#include "..\AppObject.mqh"
 
-#include <Object.mqh>
-
-class CServiceProvider : protected CObject
+class CServiceProvider : public CAppObject
 {
 public:
    string name;
-   CApplicationBase* app;
+   ENUM_APPLICATION_SERVICE srv;
+   
+   virtual void InitalizeService() {}
+   
    bool use_oninit;
    bool use_ontick;
    bool use_ondeinit;

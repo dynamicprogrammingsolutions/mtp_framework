@@ -7,6 +7,7 @@ public:
    CEventHandlerBase()
    {
       name = "event";
+      srv = srvEvent;
    }
    
    virtual void SetLogLevel(ushort _loglevel)

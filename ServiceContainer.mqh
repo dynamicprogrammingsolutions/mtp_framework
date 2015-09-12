@@ -25,14 +25,46 @@ public:
       return -1;
    }
    
-   bool IsRegistered(string name)
+   int FindService(ENUM_APPLICATION_SERVICE srv)
    {
       int count = Total();
       for (int i = 0; i < count; i++) {
          CServiceProvider* service = ServiceProvider(i);
-         if (service.name == name) return true;
+         if (service.srv == srv) return i;
+      }
+      Print(__FUNCTION__,": Cannot Find Service: ",EnumToString(srv));
+      return -1;
+   }
+   
+   CServiceProvider* GetService(string name)
+   {
+      int count = Total();
+      for (int i = 0; i < count; i++) {
+         CServiceProvider* service = ServiceProvider(i);
+         if (service.name == name) return service;
+      }
+      return NULL;
+   }
+   
+   bool IsRegistered(ENUM_APPLICATION_SERVICE srv)
+   {
+      if (srv == srvNone) return false;
+      int count = Total();
+      for (int i = 0; i < count; i++) {
+         CServiceProvider* service = ServiceProvider(i);
+         if (service.srv == srv) return true;
       }
       return false;
+   }
+   
+   void InitalizeServices()
+   {
+      int count = Total();
+      for (int i = 0; i < count; i++) {
+         CServiceProvider* service = ServiceProvider(i);
+         Print("Initalizing Service ",EnumToString(service.srv)," '",service.name,"'");
+         service.InitalizeService();
+      }
    }
    
    void OnInit()
