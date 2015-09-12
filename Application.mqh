@@ -8,6 +8,7 @@
 
 #include "ServiceProviderBase\EventHandlerBase.mqh"
 #include "ServiceProviderBase\SymbolLoaderBase.mqh"
+#include "ServiceProviderBase\OrderManagerBase.mqh"
 
 class CApplication : public CApplicationBase
 {
@@ -23,6 +24,7 @@ public:
 
    CEventHandlerBase* event;
    CSymbolLoaderBase* symbolloader;
+   COrderManagerBase* ordermanager;
 
    void RegisterService(CServiceProvider* service)
    {
@@ -37,6 +39,7 @@ public:
 
       if (service.srv == srvEvent) event = service;
       if (service.srv == srvSymbolLoader) symbolloader = service;
+      if (service.srv == srvOrderManager) ordermanager = service;
       
    }
    
@@ -63,6 +66,7 @@ public:
       switch (srv) {
          case srvEvent: return (CObject*)event;
          case srvSymbolLoader: return (CObject*)symbolloader;
+         case srvOrderManager: return (CObject*)ordermanager;
       }   
       return NULL;
    }
