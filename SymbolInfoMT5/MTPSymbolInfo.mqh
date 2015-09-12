@@ -1,9 +1,18 @@
-//
-#include "..\Application.mqh"
+//+------------------------------------------------------------------+
+//|                                                SymbolInfoExt.mqh |
+//|                        Copyright 2011, MetaQuotes Software Corp. |
+//|                                              http://www.mql5.com |
+//+------------------------------------------------------------------+
+#property copyright "Copyright 2011, MetaQuotes Software Corp."
+#property link      "http://www.mql5.com"
+#property version   "1.00"
 
+#include "..\Application.mqh"
 #include "SymbolInfo.mqh"
+
+//#include "..\libraries\eventhandler.mqh"
+//#include "..\trade\SymbolInfo.mqh"
 #include "..\libraries\math.mqh"
-#include "..\libraries\commonfunctions.mqh"
 
 #include <Arrays\ArrayObj.mqh>
 
@@ -16,8 +25,6 @@ class CMTPSymbolInfo : public CSymbolInfo
       CEventHandlerBase* event;
       
    public:
-   
-      //CEventHandler* event;
       //double m_lotroundup;
       double lot_extradigits;
       //double m_roundup_to_minlot;
@@ -29,17 +36,8 @@ class CMTPSymbolInfo : public CSymbolInfo
       bool roundup_to_minlot_close;
 
    public:
-      
-      void CMTPSymbolInfo::CMTPSymbolInfo()
-      {
-         event = this.app.GetService(srvEvent);
-         lotroundup = LOTROUNDUP_DEF;
-         lot_extradigits = 0;
-         roundup_to_minlot = false;
-      }
-      
       virtual bool Name(string name);
-
+      void CMTPSymbolInfo();
       double TickSizeR() { return(TickSize()==0?CMTPSymbolInfo::m_point:TickSize()); }
       int InTicks(double price) { return((int)MathRound(price/TickSizeR())); }
       double InTicksD(double price) { return(price/TickSizeR()); }
@@ -48,7 +46,6 @@ class CMTPSymbolInfo : public CSymbolInfo
       int MinTakeProfit() { return(StopsLevelInTicks()); }
       int MinStopLoss() { return(SpreadInTicks() + StopsLevelInTicks()); }
       int SpreadInTicks() { return(Spread()/TickSizeInPoints()); }
-      double SpreadInPrice() { return(Spread()*this.Point()); }
       double LotValue() { return(TickValue()/TickSize()); }
       bool IsFractional(double treshold = FRACTIONAL_TRESHOLD);
       double PriceRound(double price) { return(InTicks(price)*TickSizeR()); }
@@ -60,18 +57,54 @@ class CMTPSymbolInfo : public CSymbolInfo
 
 bool CMTPSymbolInfo::Name(string name)
 {
-   if (name != "" && m_name == name) {
+   if (m_name == name) {
       //event.Info("object already initalized for symbol "+name,__FUNCTION__);
       return(true);
    }
-   if (event.Info ()) event.Info ("initalizing symbol "+name,__FUNCTION__);
+   event.Info("initalizing symbol "+name,__FUNCTION__);
    if (!CSymbolInfo::Name(name)) {
-      if (event.Error ()) event.Error ("Invalid Symbol "+name,__FUNCTION__);
+      event.Error("Invalid Symbol "+name,__FUNCTION__);
       m_name = "";
       return(false);
    } else {
       return(true);
    }
+}
+
+void CMTPSymbolInfo::CMTPSymbolInfo()
+{
+   event = this.app.GetService(srvEvent);
+   m_name              ="";
+   m_point             =0.0;
+   m_tick_value        =0.0;
+   m_tick_value_profit =0.0;
+   m_tick_value_loss   =0.0;
+   m_tick_size         =0.0;
+   m_contract_size     =0.0;
+   m_lots_min          =0.0;
+   m_lots_max          =0.0;
+   m_lots_step         =0.0;
+   m_swap_long         =0.0;
+   m_swap_short        =0.0;
+   m_digits            =0;
+   m_trade_execution   =0;
+   m_trade_calcmode    =0;
+   m_trade_mode        =0;
+   m_swap_mode         =0;
+   m_swap3             =0;
+   m_margin_initial    =0.0;
+   m_margin_maintenance=0.0;
+   m_margin_long       =0.0;
+   m_margin_short      =0.0;
+   m_margin_limit      =0.0;
+   m_margin_stop       =0.0;
+   m_margin_stoplimit  =0.0;
+   m_trade_time_flags  =0;
+   m_trade_fill_flags  =0;
+   
+   lotroundup = LOTROUNDUP_DEF;
+   lot_extradigits = 0;
+   roundup_to_minlot = false;
 }
 
 bool CMTPSymbolInfo::IsFractional(double treshold = FRACTIONAL_TRESHOLD)
@@ -82,21 +115,16 @@ bool CMTPSymbolInfo::IsFractional(double treshold = FRACTIONAL_TRESHOLD)
 double CMTPSymbolInfo::LotRound(double lotreq, bool close = false)
 {
    double _lotstep = LotsStep()/MathPow(10,lot_extradigits);
-
-   if (_lotstep <= 0) _lotstep = 0.01; // to avoid zero divide
-   if (m_lots_max <= 0) m_lots_max = 100;
-   if (m_lots_min <= 0) m_lots_min = 0.01;
-
    double lotquotient = lotreq/_lotstep;
    
-   double lotwhole = MathFloor(lotquotient);
-   /*if (l(lotwhole, lotquotient))
-      lotwhole--;*/
+   double lotwhole = MathRound(lotquotient);
+   if (l(lotwhole, lotquotient))
+      lotwhole--;
    double lotdecimal = lotquotient-lotwhole;
    
    if (!close && lq(lotdecimal, lotroundup))
       lotwhole++;
-   if (close && l(lotdecimal, lotroundup_close))
+   if (close && lq(lotdecimal, lotroundup_close))
       lotwhole++;
 
    double lot = lotwhole*_lotstep;
