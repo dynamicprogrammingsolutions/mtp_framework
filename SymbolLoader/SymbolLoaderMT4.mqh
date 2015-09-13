@@ -18,7 +18,7 @@ public:
 };
 
 
-CMTPSymbolInfo *_symbol;
+/*CMTPSymbolInfo *_symbol;
 
 bool loadsymbol(const string in_symbol, const string function = "")
 {
@@ -35,4 +35,4 @@ bool loadsymbol(const string in_symbol, CMTPSymbolInfo*& _symbolinfo, const stri
       Print(__FUNCTION__,": Invalid Symbol: \""+in_symbol+"\"");
       return(false);
    }
-}
+}*/

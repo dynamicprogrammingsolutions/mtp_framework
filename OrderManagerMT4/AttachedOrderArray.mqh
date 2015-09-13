@@ -1,5 +1,5 @@
 // *** CAttachedOrderArray ***
-#include "AttachedOrder.mqh"
+//#include "AttachedOrder.mqh"
 
 class CAttachedOrderArray : public CArrayObj
 {

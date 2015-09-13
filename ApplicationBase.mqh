@@ -1,7 +1,4 @@
 //
-#include <Object.mqh>
-#include "EnumApplicationService.mqh"
-
 class CApplicationBase : private CObject
 {
 public:

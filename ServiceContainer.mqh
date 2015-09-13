@@ -1,8 +1,4 @@
 //
-#include <Arrays\ArrayObj.mqh>
-
-#include "ServiceProviderBase\ServiceProvider.mqh"
-
 class CServiceContainer : public CArrayObj
 {
 public:

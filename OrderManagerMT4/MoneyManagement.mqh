@@ -1,8 +1,7 @@
 //
 #include "moneymanagement_helper.mqh"
-#include "StopsCalc.mqh"
 
-class CMoneyManagement : public CObject {
+class CMoneyManagement : public CAppObjectWithServices {
 public:
    string symbol;
    CStopLoss* stoploss;
@@ -68,7 +67,7 @@ public:
    }
    virtual double GetLotsize() {
       loadsymbol(this.symbol);
-      moneymanagement_init();
+      moneymanagement_init(this.symbol);
       if (use_equity) accountbalance = accountequity;
       return mmgetlot_stoploss(stoploss.GetTicks(), riskpercent);
   }
@@ -86,7 +85,7 @@ public:
       money = _money;
    }
    virtual double GetLotsize() {
-      moneymanagement_init();
+      moneymanagement_init(this.symbol);
       if (use_equity) accountbalance = accountequity;
       return mmgetlot_ref_balance(lot, money);
   }

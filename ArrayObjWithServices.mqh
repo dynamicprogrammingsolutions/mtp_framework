@@ -1,14 +1,15 @@
 //
+#include "Loader.mqh"
 
-class CServiceProviderArrayObj : public CServiceProviderArray
+class CArrayObjWithServices : public CArrayWithServices
   {
 protected:
    CObject          *m_data[];           // data array
    bool              m_free_mode;        // flag of necessity of "physical" deletion of object
 
 public:
-                     CServiceProviderArrayObj(void);
-                    ~CServiceProviderArrayObj(void);
+                     CArrayObjWithServices(void);
+                    ~CArrayObjWithServices(void);
    //--- methods of access to protected data
    bool              FreeMode(void) const { return(m_free_mode); }
    void              FreeMode(const bool mode) { m_free_mode=mode; }
@@ -25,10 +26,10 @@ public:
    bool              Shutdown(void);
    //--- methods of filling the array
    bool              Add(CObject *element);
-   bool              AddArray(const CServiceProviderArrayObj *src);
+   bool              AddArray(const CArrayObjWithServices *src);
    bool              Insert(CObject *element,const int pos);
-   bool              InsertArray(const CServiceProviderArrayObj *src,const int pos);
-   bool              AssignArray(const CServiceProviderArrayObj *src);
+   bool              InsertArray(const CArrayObjWithServices *src,const int pos);
+   bool              AssignArray(const CArrayObjWithServices *src);
    //--- method of access to thre array
    CObject          *At(const int index) const;
    //--- methods of changing
@@ -40,7 +41,7 @@ public:
    bool              DeleteRange(int from,int to);
    void              Clear(void);
    //--- method for comparing arrays
-   bool              CompareArray(const CServiceProviderArrayObj *Array) const;
+   bool              CompareArray(const CArrayObjWithServices *Array) const;
    //--- methods for working with the sorted array
    bool              InsertSort(CObject *element);
    int               Search(const CObject *element) const;
@@ -59,7 +60,7 @@ protected:
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
 //+------------------------------------------------------------------+
-CServiceProviderArrayObj::CServiceProviderArrayObj(void) : m_free_mode(true)
+CArrayObjWithServices::CArrayObjWithServices(void) : m_free_mode(true)
   {
 //--- initialize protected data
    m_data_max=ArraySize(m_data);
@@ -67,7 +68,7 @@ CServiceProviderArrayObj::CServiceProviderArrayObj(void) : m_free_mode(true)
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
-CServiceProviderArrayObj::~CServiceProviderArrayObj(void)
+CArrayObjWithServices::~CArrayObjWithServices(void)
   {
    if(m_data_max!=0)
       Shutdown();
@@ -75,7 +76,7 @@ CServiceProviderArrayObj::~CServiceProviderArrayObj(void)
 //+------------------------------------------------------------------+
 //| Moving the memory within a single array                          |
 //+------------------------------------------------------------------+
-int CServiceProviderArrayObj::MemMove(const int dest,const int src,const int count)
+int CArrayObjWithServices::MemMove(const int dest,const int src,const int count)
   {
    int i;
 //--- check
@@ -125,7 +126,7 @@ int CServiceProviderArrayObj::MemMove(const int dest,const int src,const int cou
 //| number of free elements already exists; allocates additional     |
 //| memory with a given step                                         |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::Reserve(const int size)
+bool CArrayObjWithServices::Reserve(const int size)
   {
    int new_size;
 //--- check
@@ -150,7 +151,7 @@ bool CServiceProviderArrayObj::Reserve(const int size)
 //+------------------------------------------------------------------+
 //| Resizing (with removal of elements on the right)                 |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::Resize(const int size)
+bool CArrayObjWithServices::Resize(const int size)
   {
    int new_size;
 //--- check
@@ -181,7 +182,7 @@ bool CServiceProviderArrayObj::Resize(const int size)
 //+------------------------------------------------------------------+
 //| Complete cleaning of the array with the release of memory        |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::Shutdown(void)
+bool CArrayObjWithServices::Shutdown(void)
   {
 //--- check
    if(m_data_max==0)
@@ -197,7 +198,7 @@ bool CServiceProviderArrayObj::Shutdown(void)
 //+------------------------------------------------------------------+
 //| Adding an element to the end of the array                        |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::Add(CObject *element)
+bool CArrayObjWithServices::Add(CObject *element)
   {
 //--- check
    if(!CheckPointer(element))
@@ -214,7 +215,7 @@ bool CServiceProviderArrayObj::Add(CObject *element)
 //+------------------------------------------------------------------+
 //| Adding an element to the end of the array from another array     |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::AddArray(const CServiceProviderArrayObj *src)
+bool CArrayObjWithServices::AddArray(const CArrayObjWithServices *src)
   {
    int num;
 //--- check
@@ -234,7 +235,7 @@ bool CServiceProviderArrayObj::AddArray(const CServiceProviderArrayObj *src)
 //+------------------------------------------------------------------+
 //| Inserting an element in the specified position                   |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::Insert(CObject *element,const int pos)
+bool CArrayObjWithServices::Insert(CObject *element,const int pos)
   {
 //--- check
    if(pos<0 || !CheckPointer(element))
@@ -258,7 +259,7 @@ bool CServiceProviderArrayObj::Insert(CObject *element,const int pos)
 //+------------------------------------------------------------------+
 //| Inserting elements in the specified position                     |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::InsertArray(const CServiceProviderArrayObj *src,const int pos)
+bool CArrayObjWithServices::InsertArray(const CArrayObjWithServices *src,const int pos)
   {
    int num;
 //--- check
@@ -278,7 +279,7 @@ bool CServiceProviderArrayObj::InsertArray(const CServiceProviderArrayObj *src,c
 //+------------------------------------------------------------------+
 //| Assignment (copying) of another array                            |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::AssignArray(const CServiceProviderArrayObj *src)
+bool CArrayObjWithServices::AssignArray(const CArrayObjWithServices *src)
   {
    int num;
 //--- check
@@ -307,7 +308,7 @@ bool CServiceProviderArrayObj::AssignArray(const CServiceProviderArrayObj *src)
 //+------------------------------------------------------------------+
 //| Access to data in the specified position                         |
 //+------------------------------------------------------------------+
-CObject *CServiceProviderArrayObj::At(const int index) const
+CObject *CArrayObjWithServices::At(const int index) const
   {
 //--- check
    if(index<0 || index>=m_data_total)
@@ -318,7 +319,7 @@ CObject *CServiceProviderArrayObj::At(const int index) const
 //+------------------------------------------------------------------+
 //| Updating element in the specified position                       |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::Update(const int index,CObject *element)
+bool CArrayObjWithServices::Update(const int index,CObject *element)
   {
 //--- check
    if(index<0 || !CheckPointer(element) || index>=m_data_total)
@@ -336,7 +337,7 @@ bool CServiceProviderArrayObj::Update(const int index,CObject *element)
 //| Moving element from the specified position                       |
 //| on the specified shift                                           |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::Shift(const int index,const int shift)
+bool CArrayObjWithServices::Shift(const int index,const int shift)
   {
    CObject *tmp_node;
 //--- check
@@ -359,7 +360,7 @@ bool CServiceProviderArrayObj::Shift(const int index,const int shift)
 //+------------------------------------------------------------------+
 //| Deleting element from the specified position                     |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::Delete(const int index)
+bool CArrayObjWithServices::Delete(const int index)
   {
 //--- check
    if(index>=m_data_total)
@@ -380,7 +381,7 @@ bool CServiceProviderArrayObj::Delete(const int index)
 //+------------------------------------------------------------------+
 //| Detach element from the specified position                       |
 //+------------------------------------------------------------------+
-CObject *CServiceProviderArrayObj::Detach(const int index)
+CObject *CArrayObjWithServices::Detach(const int index)
   {
    CObject *result;
 //--- check
@@ -399,7 +400,7 @@ CObject *CServiceProviderArrayObj::Detach(const int index)
 //+------------------------------------------------------------------+
 //| Deleting range of elements                                       |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::DeleteRange(int from,int to)
+bool CArrayObjWithServices::DeleteRange(int from,int to)
   {
 //--- check
    if(from<0 || to<0)
@@ -419,7 +420,7 @@ bool CServiceProviderArrayObj::DeleteRange(int from,int to)
 //+------------------------------------------------------------------+
 //| Clearing of array without the release of memory                  |
 //+------------------------------------------------------------------+
-void CServiceProviderArrayObj::Clear(void)
+void CArrayObjWithServices::Clear(void)
   {
 //--- "physical" removal of the object (if necessary and possible)
    if(m_free_mode)
@@ -436,7 +437,7 @@ void CServiceProviderArrayObj::Clear(void)
 //+------------------------------------------------------------------+
 //| Equality comparison of two arrays                                |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::CompareArray(const CServiceProviderArrayObj *Array) const
+bool CArrayObjWithServices::CompareArray(const CArrayObjWithServices *Array) const
   {
 //--- check
    if(!CheckPointer(Array))
@@ -453,7 +454,7 @@ bool CServiceProviderArrayObj::CompareArray(const CServiceProviderArrayObj *Arra
 //+------------------------------------------------------------------+
 //| Method QuickSort                                                 |
 //+------------------------------------------------------------------+
-void CServiceProviderArrayObj::QuickSort(int beg,int end,const int mode)
+void CArrayObjWithServices::QuickSort(int beg,int end,const int mode)
   {
    int      i,j;
    CObject *p_node;
@@ -501,7 +502,7 @@ void CServiceProviderArrayObj::QuickSort(int beg,int end,const int mode)
 //+------------------------------------------------------------------+
 //| Inserting element in a sorted array                              |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::InsertSort(CObject *element)
+bool CArrayObjWithServices::InsertSort(CObject *element)
   {
    int pos;
 //--- check
@@ -531,7 +532,7 @@ bool CServiceProviderArrayObj::InsertSort(CObject *element)
 //+------------------------------------------------------------------+
 //| Quick search of position of element in a sorted array            |
 //+------------------------------------------------------------------+
-int CServiceProviderArrayObj::QuickSearch(const CObject *element) const
+int CArrayObjWithServices::QuickSearch(const CObject *element) const
   {
    int      i,j,m=-1;
    CObject *t_node;
@@ -558,7 +559,7 @@ int CServiceProviderArrayObj::QuickSearch(const CObject *element) const
 //+------------------------------------------------------------------+
 //| Search of position of element in a sorted array                  |
 //+------------------------------------------------------------------+
-int CServiceProviderArrayObj::Search(const CObject *element) const
+int CArrayObjWithServices::Search(const CObject *element) const
   {
    int pos;
 //--- check
@@ -575,7 +576,7 @@ int CServiceProviderArrayObj::Search(const CObject *element) const
 //| Search position of the first element which is greater than       |
 //| specified in a sorted array                                      |
 //+------------------------------------------------------------------+
-int CServiceProviderArrayObj::SearchGreat(const CObject *element) const
+int CArrayObjWithServices::SearchGreat(const CObject *element) const
   {
    int pos;
 //--- check
@@ -593,7 +594,7 @@ int CServiceProviderArrayObj::SearchGreat(const CObject *element) const
 //| Search position of the first element which is less than          |
 //| specified in the sorted array                                    |
 //+------------------------------------------------------------------+
-int CServiceProviderArrayObj::SearchLess(const CObject *element) const
+int CArrayObjWithServices::SearchLess(const CObject *element) const
   {
    int pos;
 //--- check
@@ -611,7 +612,7 @@ int CServiceProviderArrayObj::SearchLess(const CObject *element) const
 //| Search position of the first element which is greater than or    |
 //| equal to the specified in a sorted array                         |
 //+------------------------------------------------------------------+
-int CServiceProviderArrayObj::SearchGreatOrEqual(const CObject *element) const
+int CArrayObjWithServices::SearchGreatOrEqual(const CObject *element) const
   {
 //--- check
    if(m_data_total==0 || !CheckPointer(element) || m_sort_mode==-1)
@@ -627,7 +628,7 @@ int CServiceProviderArrayObj::SearchGreatOrEqual(const CObject *element) const
 //| Search position of the first element which is less than or equal |
 //| to the specified in a sorted array                               |
 //+------------------------------------------------------------------+
-int CServiceProviderArrayObj::SearchLessOrEqual(const CObject *element) const
+int CArrayObjWithServices::SearchLessOrEqual(const CObject *element) const
   {
 //--- check
    if(m_data_total==0 || !CheckPointer(element) || m_sort_mode==-1)
@@ -642,7 +643,7 @@ int CServiceProviderArrayObj::SearchLessOrEqual(const CObject *element) const
 //+------------------------------------------------------------------+
 //| Find position of first appearance of element in a sorted array   |
 //+------------------------------------------------------------------+
-int CServiceProviderArrayObj::SearchFirst(const CObject *element) const
+int CArrayObjWithServices::SearchFirst(const CObject *element) const
   {
    int pos;
 //--- check
@@ -663,7 +664,7 @@ int CServiceProviderArrayObj::SearchFirst(const CObject *element) const
 //+------------------------------------------------------------------+
 //| Find position of last appearance of element in a sorted array    |
 //+------------------------------------------------------------------+
-int CServiceProviderArrayObj::SearchLast(const CObject *element) const
+int CArrayObjWithServices::SearchLast(const CObject *element) const
   {
    int pos;
 //--- check
@@ -684,11 +685,11 @@ int CServiceProviderArrayObj::SearchLast(const CObject *element) const
 //+------------------------------------------------------------------+
 //| Writing array to file                                            |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::Save(const int file_handle)
+bool CArrayObjWithServices::Save(const int file_handle)
   {
    int i=0;
 //--- check
-   if(!CServiceProviderArray::Save(file_handle))
+   if(!CArrayWithServices::Save(file_handle))
       return(false);
 //--- write array length
    if(FileWriteInteger(file_handle,m_data_total,INT_VALUE)!=INT_VALUE)
@@ -703,11 +704,11 @@ bool CServiceProviderArrayObj::Save(const int file_handle)
 //+------------------------------------------------------------------+
 //| Reading array from file                                          |
 //+------------------------------------------------------------------+
-bool CServiceProviderArrayObj::Load(const int file_handle)
+bool CArrayObjWithServices::Load(const int file_handle)
   {
    int i=0,num;
 //--- check
-   if(!CServiceProviderArray::Load(file_handle))
+   if(!CArrayWithServices::Load(file_handle))
       return(false);
 //--- read array length
    num=FileReadInteger(file_handle,INT_VALUE);

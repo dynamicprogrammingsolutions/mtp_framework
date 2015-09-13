@@ -1,14 +1,7 @@
 //
 #define MTP_FRAMEWORK_VERSION 1.1
 
-#include <Arrays\ArrayObj.mqh>
-#include "ApplicationBase.mqh"
-#include "ServiceProviderBase\ServiceProvider.mqh"
-#include "ServiceContainer.mqh"
-
-#include "ServiceProviderBase\EventHandlerBase.mqh"
-#include "ServiceProviderBase\SymbolLoaderBase.mqh"
-#include "ServiceProviderBase\OrderManagerBase.mqh"
+#include "Loader.mqh"
 
 class CApplication : public CApplicationBase
 {

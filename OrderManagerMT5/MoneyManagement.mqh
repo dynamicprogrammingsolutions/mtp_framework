@@ -1,6 +1,6 @@
 //
 #include "moneymanagement_helper.mqh"
-#include "StopsCalc.mqh"
+#include "..\OrderManager\StopsCalc.mqh"
 
 class CMoneyManagement : public CObject {
 public:

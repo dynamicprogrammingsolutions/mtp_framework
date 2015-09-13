@@ -1,9 +1,5 @@
-#include <Arrays\ArrayObj.mqh>
+#include "..\Loader.mqh"
 
-#include "..\ServiceProviderBase\OrderBaseBase.mqh"
-#include "..\ServiceProviderBase\OrderManagerBase.mqh"
-
-#include "tradefunctions.mqh"
 #include "Trade\Trade.mqh"
 #include "Trade\OrderInfoV.mqh"
 #include "Trade\HistoryOrderInfoV.mqh"

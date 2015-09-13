@@ -1,5 +1,5 @@
 //
-#include "..\Application.mqh"
+#include "..\Loader.mqh"
 #include "SymbolInfo.mqh"
 #include "..\libraries\math.mqh"
 #include "..\libraries\commonfunctions.mqh"
@@ -11,9 +11,6 @@
 
 class CMTPSymbolInfo : public CSymbolInfo
 {
-   private:
-      CEventHandlerBase* event;
-      
    public:
    
       //CEventHandler* event;
@@ -31,7 +28,6 @@ class CMTPSymbolInfo : public CSymbolInfo
       
       void CMTPSymbolInfo::CMTPSymbolInfo()
       {
-         event = this.app.GetService(srvEvent);
          lotroundup = LOTROUNDUP_DEF;
          lot_extradigits = 0;
          roundup_to_minlot = false;

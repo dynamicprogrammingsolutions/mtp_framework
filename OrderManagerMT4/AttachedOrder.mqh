@@ -1,5 +1,4 @@
-// *** CAttachedOrder ***
-#include "OrderBase.mqh"
+//
 
 class CAttachedOrder : public COrderBase
 {

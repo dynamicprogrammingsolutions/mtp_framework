@@ -1,6 +1,4 @@
 //
-#include "ServiceProvider.mqh"
-
 class CEventHandlerBase : private CServiceProvider
 {
 public:

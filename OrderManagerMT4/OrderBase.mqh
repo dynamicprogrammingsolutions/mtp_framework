@@ -1,26 +1,23 @@
 //
 //
+/*
 #include "MoneyManagement.mqh"
-#include "StopsCalc.mqh"
-#include "tradefunctions.mqh"
 #include "Trade.mqh"
 #include "MT4OrderInfo.mqh"
-#include "..\libraries\objectfunctions.mqh"
-#include "..\libraries\commonfunctions.mqh"
-#include "..\libraries\file.mqh"
-
 #include "..\ServiceProviderBase\OrderBaseBase.mqh"
 #include "..\ServiceProviderBase\OrderManagerBase.mqh"
 #include "EnumActivity.mqh"
 #include "EnumExecuteState.mqh"
+*/
+
+#include "..\libraries\objectfunctions.mqh"
+#include "..\libraries\commonfunctions.mqh"
+#include "..\libraries\file.mqh"
 
 class COrderBase : public COrderBaseBase
 {
 public:
    static ushort activity;
-
-protected:
-   CEventHandlerBase* event;
 
 public:      
    static CTrade* trade_default;
@@ -72,7 +69,7 @@ public:
    string symbol;
    
 protected: // order parameters that may change by other parties
-   int ordertype;
+   ENUM_ORDER_TYPE ordertype;
    double volume;   
    double price;
    double sl;
@@ -106,8 +103,6 @@ protected:
 public:
 
    COrderBase() {
-      event = this.app.GetService(srvEvent);
-   
       this.id = maxid+1;
       maxid = this.id;
       
@@ -193,7 +188,7 @@ public:
    }
    
    // Change After State Change:
-   int GetType() { if (!CheckOrderInfo()) return(this.ordertype); else return(orderinfo.GetType()); }
+   ENUM_ORDER_TYPE GetType() { if (!CheckOrderInfo()) return(this.ordertype); else return(orderinfo.GetType()); }
    
    datetime GetOpenTime() { if (!CheckOrderInfo()) return(MathMax(this.executetime,this.filltime)); else return(orderinfo.GetOpenTime()); }
    
@@ -219,7 +214,7 @@ public:
    //ENUM_ORDER_STATE State() { if (!CheckOrderInfo()) return(this.state); else return(orderinfo.State()); }
    datetime GetExpiration() { if (!CheckOrderInfo()) return(this.expiration); else return(orderinfo.GetExpiration()); }
 
-   void SetOrderType(const int value) { if (executestate == ES_NOT_EXECUTED) ordertype=value; else Print("Cannot change executed order data (ordertype)"); }
+   void SetOrderType(const ENUM_ORDER_TYPE value) { if (executestate == ES_NOT_EXECUTED) ordertype=value; else Print("Cannot change executed order data (ordertype)"); }
    void SetMagic(const int value) { if (executestate == ES_NOT_EXECUTED) magic=value; else Print("Cannot change executed order data (magic)"); }
    void SetSymbol(const string value) { if (executestate == ES_NOT_EXECUTED) symbol=value; else Print("Cannot change executed order data (symbol)"); }
    void SetComment(const string value) { if (executestate == ES_NOT_EXECUTED) comment=value; else Print("Cannot change executed order data (comment)"); }
@@ -308,7 +303,9 @@ public:
       state = (ENUM_ORDER_STATE) int_state;
       if (!file.ReadInteger(ticket)) return file.Error("ticket",__FUNCTION__);
       if (!file.ReadString(symbol)) return file.Error("symbol",__FUNCTION__);
-      if (!file.ReadInteger(ordertype)) return file.Error("ordertype",__FUNCTION__);
+      int _ordertype;
+      if (!file.ReadInteger(_ordertype)) return file.Error("ordertype",__FUNCTION__);
+      ordertype = (ENUM_ORDER_TYPE)_ordertype;
       if (!file.ReadDouble(volume)) return file.Error("ordertype",__FUNCTION__);
       if (!file.ReadDouble(price)) return file.Error("price",__FUNCTION__);
       if (!file.ReadDouble(sl)) return file.Error("sl",__FUNCTION__);

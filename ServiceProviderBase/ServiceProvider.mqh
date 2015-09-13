@@ -1,6 +1,4 @@
 //
-#include "..\AppObject.mqh"
-
 class CServiceProvider : public CAppObject
 {
 public:

@@ -26,8 +26,13 @@ double currencyrate = 1;
 datetime mm_init_ticktime = 0;
 string mminiterror = "moneymanagement.mqh has not been initalized!";
 
-void moneymanagement_init()
+CSymbolInfoBase* mm_symbol;
+
+void moneymanagement_init(string symbol)
 {
+   mm_symbol = app().symbolloader.LoadSymbol(symbol);
+   CSymbolInfoBase* _symbol = mm_symbol;
+   
    mm_init_ticktime = (datetime)SymbolInfoInteger(_symbol.Name(),SYMBOL_TIME);
    if (currencyrate_live != "")
    {
@@ -56,6 +61,8 @@ void moneymanagement_init()
 
 double commission_indist(double price = 0)
 {
+   CSymbolInfoBase* _symbol = mm_symbol;
+
    if (price == 0)
    {
       price = _symbol.Bid();
@@ -71,6 +78,8 @@ double commission_indist(double price = 0)
 
 double mmgetlot_stoploss_req(double balance, int in_stoploss, double percent, double price = 0, double maxrisk = -1)
 {
+   CSymbolInfoBase* _symbol = mm_symbol;
+
    mm_initalized_alert();
    if (in_stoploss <= 0) {
       Alert("mmgetlot_stoploss_req: stoploss cannot be 0"); return(0);
@@ -78,32 +87,35 @@ double mmgetlot_stoploss_req(double balance, int in_stoploss, double percent, do
    double risk = balance * (percent/100);
    if (maxrisk > 0 && risk > maxrisk) risk = maxrisk;
    
-   if (isset(_symbol)) {
+   /*if (isset(_symbol)) {
       if (_symbol.LotValue() == 0 || _symbol.TickSize() == 0) {
          string symbol_ = _symbol.Name();
          delete _symbol;
          loadsymbol(symbol_);
          if (_symbol.LotValue() == 0 || _symbol.TickSize() == 0) return 0;
       }
-   }
+   }*/
    return((risk) / ((in_stoploss*_symbol.TickSize() + commission_indist(price)) * _symbol.LotValue()));
 }
 
 
 double mmgetlot_stoploss(int in_stoploss, double percent, double price = 0, double maxrisk = -1)
 {
+   CSymbolInfoBase* _symbol = mm_symbol;
    mm_initalized_alert();
    return(_symbol.LotRound(mmgetlot_stoploss_req(accountbalance,in_stoploss,percent,price,maxrisk)));
 }
 
 double mmgetlot_slmargin(int in_stoploss, double percent, double price = 0)
 {
+   CSymbolInfoBase* _symbol = mm_symbol;
    mm_initalized_alert();
    return(_symbol.LotRound(mmgetlot_stoploss_req(accountfreemargin,in_stoploss,percent,price)));
 }
 
 double mmgetlot_slequity(int in_stoploss, double percent, double price = 0)
 {
+   CSymbolInfoBase* _symbol = mm_symbol;
    mm_initalized_alert();
    return(_symbol.LotRound(mmgetlot_stoploss_req(accountequity,in_stoploss,percent,price)));
 }
@@ -112,6 +124,8 @@ double mmgetlot_slequity(int in_stoploss, double percent, double price = 0)
 
 double mmgetlot_value_req(double balance, double multiple, double price = 0)
 {
+   CSymbolInfoBase* _symbol = mm_symbol;
+
    mm_initalized_alert();
    if (price == 0)
    {
@@ -123,6 +137,8 @@ double mmgetlot_value_req(double balance, double multiple, double price = 0)
 
 double mmgetlot_value(double multiple, double price = 0)
 {
+   CSymbolInfoBase* _symbol = mm_symbol;
+
    mm_initalized_alert();
    return(_symbol.LotRound(mmgetlot_value_req(accountbalance,multiple,price)));
 }
@@ -138,6 +154,7 @@ double mmgetlot_balperlot_req(double balance,double balperlot)
 
 double mmgetlot_balperlot(double balperlot)
 {
+   CSymbolInfoBase* _symbol = mm_symbol;
    mm_initalized_alert();
    return(_symbol.LotRound(mmgetlot_balperlot_req(accountbalance,balperlot)));
 }
@@ -145,6 +162,8 @@ double mmgetlot_balperlot(double balperlot)
 //-------------------------
 double mmgetlot_ref_balance(double lot_ref, double ref_balance, bool round = true)
 {
+   CSymbolInfoBase* _symbol = mm_symbol;
+
    mm_initalized_alert();
    if (round)
       return(_symbol.LotRound(accountbalance*lot_ref/ref_balance));
@@ -154,6 +173,8 @@ double mmgetlot_ref_balance(double lot_ref, double ref_balance, bool round = tru
 
 double mmgetlot_ref_equity(double lot_ref, double ref_balance, bool round = true)
 {
+   CSymbolInfoBase* _symbol = mm_symbol;
+
    mm_initalized_alert();
    if (round)
       return(_symbol.LotRound(accountequity*lot_ref/ref_balance));
@@ -166,6 +187,9 @@ double mmgetlot_ref_equity(double lot_ref, double ref_balance, bool round = true
 double mmgetlot_freemargin(double percent)
 {
    mm_initalized_alert();
+   
+   CSymbolInfoBase* _symbol = mm_symbol;
+
    double freemargin = AccountFreeMargin();
    int leverage = AccountLeverage();
    double value = freemargin*leverage*percent*0.01;
@@ -176,6 +200,8 @@ double mmgetlot_freemargin(double percent)
 
 bool mm_initalized()
 {
+   CSymbolInfoBase* _symbol = mm_symbol;
+
    if (mm_init_ticktime == MarketInfo(_symbol.Name(),MODE_TIME))
       return(true);
    else
@@ -184,10 +210,5 @@ bool mm_initalized()
 
 bool mm_initalized_alert(string text = "") //tested
 {
-   if (mm_initalized())
-      return(true);
-   
-   Print(text,mminiterror);
-   moneymanagement_init();
-   return(false);
+   return true;
 }

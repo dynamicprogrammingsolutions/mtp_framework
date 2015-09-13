@@ -4,16 +4,10 @@
 //|                                       http://www.metaquotes.net/ |
 //|                                              Revision 2010.08.01 |
 //+------------------------------------------------------------------+
+/*
 #include <Object.mqh>
 #include "..\SymbolInfoMT4\SymbolInfo.mqh"
-
-enum ENUM_ORDER_STATE {
-   ORDER_STATE_UNKNOWN = 0,
-   ORDER_STATE_PLACED = 1,
-   ORDER_STATE_FILLED = 2,
-   ORDER_STATE_CLOSED = 3,
-   ORDER_STATE_DELETED = 4
-};
+*/
 
 bool orderinfo_log = false;
 ulong COrderInfo_SelectedTicket = -1;
@@ -61,7 +55,7 @@ public:
    string GetComment() { if (m_comment!="" || no_comment) return(m_comment); else { if (CheckTicket()) m_comment=OrderComment(); no_comment=(m_comment==""); return(m_comment); } }
    
    // Change After State Change:
-   int GetType() { return((m_ordertype!=-1 ? m_ordertype : (CheckTicket()?(m_ordertype=OrderType()):m_ordertype))); }
+   ENUM_ORDER_TYPE GetType() { return((ENUM_ORDER_TYPE)(m_ordertype!=-1 ? m_ordertype : (CheckTicket()?(m_ordertype=OrderType()):m_ordertype))); }
    datetime GetOpenTime() { return(m_opentime!=-1 ? m_opentime : (CheckTicket()?m_opentime=OrderOpenTime():m_opentime)); }
    double GetOpenPrice() { return(m_openprice!=0 ? m_openprice : (CheckTicket()?m_openprice=OrderOpenPrice():m_openprice)); }
    double GetLots() { return(m_lots!=0 ? m_lots : (CheckTicket()?m_lots=OrderLots():m_lots)); }

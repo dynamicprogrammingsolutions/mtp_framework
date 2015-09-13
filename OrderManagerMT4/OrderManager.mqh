@@ -15,8 +15,10 @@
 //Compare to MT5 version and port the modifications that are applicable there
 //If removed or MT4 closed: handle the attached orders: cannot have attached SL if have hard SL.
 
+#include "Loader.mqh"
+
 #include "..\libraries\file.mqh"
-#include "Order.mqh"
+//#include "Order.mqh"
 
 class COrderManager : public COrderManagerBase
 {
@@ -27,8 +29,6 @@ public:
 
    bool ontick_has_run;
 
-   CEventHandlerBase* event;
-      
    COrderArray orders;
    COrderArray historyorders;
    CAttachedOrderArray attachedorders;
@@ -51,8 +51,6 @@ public:
       
    COrderManager()
    {
-      event = this.app.GetService(srvEvent);      
-   
       trade = NULL;
       custom_order_defaults = false;
       retrainhistory = 2592000;
@@ -72,14 +70,14 @@ public:
    virtual bool Save(const int handle);
    virtual bool Load(const int handle);
 
-   virtual COrder* NewOrder(const string in_symbol,const int _ordertype,const double _volume,const double _price,
+   virtual COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,
       const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0);   
-   virtual COrder* NewOrder(COrder* _order, const string in_symbol,const int _ordertype,const double _volume,const double _price,
+   virtual COrder* NewOrder(COrder* _order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,
                                     const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0);
-   virtual COrder* NewOrder(const string in_symbol,const int _ordertype,const double _volume, CEntry* _price,
+   virtual COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume, CEntry* _price,
                                     CStopLoss* _stoploss, CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0);
 
-   virtual COrder* NewOrder(const string in_symbol,const int _ordertype,CMoneyManagement* mm, CEntry* _price,
+   virtual COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagement* mm, CEntry* _price,
                                     CStopLoss* _stoploss, CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0);
   
    COrder* ExistingOrder(int ticket, bool add = true);
@@ -206,7 +204,7 @@ public:
       return(true);
    }
 
-   COrder* COrderManager::NewOrder(const string in_symbol,const int _ordertype,const double _volume,const double _price,
+   COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,
                                     const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0)
    {
       COrder* _order = NewOrderObject();
@@ -224,7 +222,7 @@ public:
       return(_order);
    }
    
-   COrder* COrderManager::NewOrder(COrder* _order, const string in_symbol,const int _ordertype,const double _volume,const double _price,
+   COrder* COrderManager::NewOrder(COrder* _order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,
                                     const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0)
    {
       if (custom_order_defaults) {
@@ -240,7 +238,7 @@ public:
       return(_order);
    }
    
-   COrder* COrderManager::NewOrder(const string in_symbol,const int _ordertype,const double _volume,CEntry* _price,
+   COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,CEntry* _price,
                                     CStopLoss* _stoploss,CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0)
    {
       COrder* _order = NewOrderObject();
@@ -273,7 +271,7 @@ public:
       return(_order);
    }
    
-   COrder* COrderManager::NewOrder(const string in_symbol,const int _ordertype,CMoneyManagement* _mm,CEntry* _price,
+   COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagement* _mm,CEntry* _price,
                                     CStopLoss* _stoploss,CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0)
    {
       COrder* _order = NewOrderObject();

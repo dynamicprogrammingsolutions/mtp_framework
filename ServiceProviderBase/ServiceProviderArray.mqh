@@ -1,6 +1,4 @@
 //
-#include "ServiceProvider.mqh"
-
 class CServiceProviderArray : public CServiceProvider
   {
 protected:

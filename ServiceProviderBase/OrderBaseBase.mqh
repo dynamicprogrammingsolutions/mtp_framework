@@ -1,7 +1,5 @@
 //
-#include "..\AppObject.mqh"
-
-class COrderBaseBase : public CAppObject
+class COrderBaseBase : public CAppObjectWithBaseServices
 {
 
 };
