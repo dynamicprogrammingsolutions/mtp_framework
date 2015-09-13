@@ -10,8 +10,8 @@ public:
    bool use_oninit;
    bool use_ontick;
    bool use_ondeinit;
-   virtual void OnInit() {}
-   virtual void OnTick() {}
-   virtual void OnDeinit() {}
+   virtual void OnInit() { Print("Calling abstract function: "+__FUNCTION__); }
+   virtual void OnTick() { Print("Calling abstract function: "+__FUNCTION__); }
+   virtual void OnDeinit() { Print("Calling abstract function: "+__FUNCTION__); }
    
 };

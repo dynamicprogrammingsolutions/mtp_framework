@@ -1,4 +1,6 @@
 //
+#include "Loader.mqh"
+
 class CServiceContainer : public CArrayObj
 {
 public:
@@ -77,7 +79,9 @@ public:
       int count = Total();
       for (int i = 0; i < count; i++) {
          CServiceProvider* service = ServiceProvider(i);
-         if (service.use_ontick) service.OnTick();
+         if (service.use_ontick) {
+            service.OnTick();
+         }
       }
    }
    

@@ -1,4 +1,6 @@
 //
+#include "..\Loader.mqh"
+
 class COrderManagerBase : public CServiceProvider
 {
    protected:
@@ -13,6 +15,7 @@ class COrderManagerBase : public CServiceProvider
          srv = srvOrderManager;
          event = app.GetService(srvEvent);
          symbolloader = app.GetService(srvSymbolLoader);
+         use_ontick = true;
       }
       
       void loadsymbol(string symbol)
