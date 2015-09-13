@@ -1,6 +1,6 @@
 //
 
-class CAttachedOrderArray : public CArrayObjWithServices
+class CAttachedOrderArray : public CAppObjectArrayObj
 {
 public:
    CAttachedOrder    *AttachedOrder(int nIndex){return((CAttachedOrder*)At(nIndex));}  

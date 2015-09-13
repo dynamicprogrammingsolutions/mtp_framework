@@ -1,15 +1,15 @@
 //
 #include "..\Loader.mqh"
 
-class CArrayObjWithServices : public CArrayWithServices
+class CAppObjectArrayObj : public CAppObjectArray
   {
 protected:
    CObject          *m_data[];           // data array
    bool              m_free_mode;        // flag of necessity of "physical" deletion of object
 
 public:
-                     CArrayObjWithServices(void);
-                    ~CArrayObjWithServices(void);
+                     CAppObjectArrayObj(void);
+                    ~CAppObjectArrayObj(void);
    //--- methods of access to protected data
    bool              FreeMode(void) const { return(m_free_mode); }
    void              FreeMode(const bool mode) { m_free_mode=mode; }
@@ -26,10 +26,10 @@ public:
    bool              Shutdown(void);
    //--- methods of filling the array
    bool              Add(CObject *element);
-   bool              AddArray(const CArrayObjWithServices *src);
+   bool              AddArray(const CAppObjectArrayObj *src);
    bool              Insert(CObject *element,const int pos);
-   bool              InsertArray(const CArrayObjWithServices *src,const int pos);
-   bool              AssignArray(const CArrayObjWithServices *src);
+   bool              InsertArray(const CAppObjectArrayObj *src,const int pos);
+   bool              AssignArray(const CAppObjectArrayObj *src);
    //--- method of access to thre array
    CObject          *At(const int index) const;
    //--- methods of changing
@@ -41,7 +41,7 @@ public:
    bool              DeleteRange(int from,int to);
    void              Clear(void);
    //--- method for comparing arrays
-   bool              CompareArray(const CArrayObjWithServices *Array) const;
+   bool              CompareArray(const CAppObjectArrayObj *Array) const;
    //--- methods for working with the sorted array
    bool              InsertSort(CObject *element);
    int               Search(const CObject *element) const;
@@ -60,7 +60,7 @@ protected:
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
 //+------------------------------------------------------------------+
-CArrayObjWithServices::CArrayObjWithServices(void) : m_free_mode(true)
+CAppObjectArrayObj::CAppObjectArrayObj(void) : m_free_mode(true)
   {
 //--- initialize protected data
    m_data_max=ArraySize(m_data);
@@ -68,7 +68,7 @@ CArrayObjWithServices::CArrayObjWithServices(void) : m_free_mode(true)
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
-CArrayObjWithServices::~CArrayObjWithServices(void)
+CAppObjectArrayObj::~CAppObjectArrayObj(void)
   {
    if(m_data_max!=0)
       Shutdown();
@@ -76,7 +76,7 @@ CArrayObjWithServices::~CArrayObjWithServices(void)
 //+------------------------------------------------------------------+
 //| Moving the memory within a single array                          |
 //+------------------------------------------------------------------+
-int CArrayObjWithServices::MemMove(const int dest,const int src,const int count)
+int CAppObjectArrayObj::MemMove(const int dest,const int src,const int count)
   {
    int i;
 //--- check
@@ -126,7 +126,7 @@ int CArrayObjWithServices::MemMove(const int dest,const int src,const int count)
 //| number of free elements already exists; allocates additional     |
 //| memory with a given step                                         |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::Reserve(const int size)
+bool CAppObjectArrayObj::Reserve(const int size)
   {
    int new_size;
 //--- check
@@ -151,7 +151,7 @@ bool CArrayObjWithServices::Reserve(const int size)
 //+------------------------------------------------------------------+
 //| Resizing (with removal of elements on the right)                 |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::Resize(const int size)
+bool CAppObjectArrayObj::Resize(const int size)
   {
    int new_size;
 //--- check
@@ -182,7 +182,7 @@ bool CArrayObjWithServices::Resize(const int size)
 //+------------------------------------------------------------------+
 //| Complete cleaning of the array with the release of memory        |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::Shutdown(void)
+bool CAppObjectArrayObj::Shutdown(void)
   {
 //--- check
    if(m_data_max==0)
@@ -198,7 +198,7 @@ bool CArrayObjWithServices::Shutdown(void)
 //+------------------------------------------------------------------+
 //| Adding an element to the end of the array                        |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::Add(CObject *element)
+bool CAppObjectArrayObj::Add(CObject *element)
   {
 //--- check
    if(!CheckPointer(element))
@@ -215,7 +215,7 @@ bool CArrayObjWithServices::Add(CObject *element)
 //+------------------------------------------------------------------+
 //| Adding an element to the end of the array from another array     |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::AddArray(const CArrayObjWithServices *src)
+bool CAppObjectArrayObj::AddArray(const CAppObjectArrayObj *src)
   {
    int num;
 //--- check
@@ -235,7 +235,7 @@ bool CArrayObjWithServices::AddArray(const CArrayObjWithServices *src)
 //+------------------------------------------------------------------+
 //| Inserting an element in the specified position                   |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::Insert(CObject *element,const int pos)
+bool CAppObjectArrayObj::Insert(CObject *element,const int pos)
   {
 //--- check
    if(pos<0 || !CheckPointer(element))
@@ -259,7 +259,7 @@ bool CArrayObjWithServices::Insert(CObject *element,const int pos)
 //+------------------------------------------------------------------+
 //| Inserting elements in the specified position                     |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::InsertArray(const CArrayObjWithServices *src,const int pos)
+bool CAppObjectArrayObj::InsertArray(const CAppObjectArrayObj *src,const int pos)
   {
    int num;
 //--- check
@@ -279,7 +279,7 @@ bool CArrayObjWithServices::InsertArray(const CArrayObjWithServices *src,const i
 //+------------------------------------------------------------------+
 //| Assignment (copying) of another array                            |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::AssignArray(const CArrayObjWithServices *src)
+bool CAppObjectArrayObj::AssignArray(const CAppObjectArrayObj *src)
   {
    int num;
 //--- check
@@ -308,7 +308,7 @@ bool CArrayObjWithServices::AssignArray(const CArrayObjWithServices *src)
 //+------------------------------------------------------------------+
 //| Access to data in the specified position                         |
 //+------------------------------------------------------------------+
-CObject *CArrayObjWithServices::At(const int index) const
+CObject *CAppObjectArrayObj::At(const int index) const
   {
 //--- check
    if(index<0 || index>=m_data_total)
@@ -319,7 +319,7 @@ CObject *CArrayObjWithServices::At(const int index) const
 //+------------------------------------------------------------------+
 //| Updating element in the specified position                       |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::Update(const int index,CObject *element)
+bool CAppObjectArrayObj::Update(const int index,CObject *element)
   {
 //--- check
    if(index<0 || !CheckPointer(element) || index>=m_data_total)
@@ -337,7 +337,7 @@ bool CArrayObjWithServices::Update(const int index,CObject *element)
 //| Moving element from the specified position                       |
 //| on the specified shift                                           |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::Shift(const int index,const int shift)
+bool CAppObjectArrayObj::Shift(const int index,const int shift)
   {
    CObject *tmp_node;
 //--- check
@@ -360,7 +360,7 @@ bool CArrayObjWithServices::Shift(const int index,const int shift)
 //+------------------------------------------------------------------+
 //| Deleting element from the specified position                     |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::Delete(const int index)
+bool CAppObjectArrayObj::Delete(const int index)
   {
 //--- check
    if(index>=m_data_total)
@@ -381,7 +381,7 @@ bool CArrayObjWithServices::Delete(const int index)
 //+------------------------------------------------------------------+
 //| Detach element from the specified position                       |
 //+------------------------------------------------------------------+
-CObject *CArrayObjWithServices::Detach(const int index)
+CObject *CAppObjectArrayObj::Detach(const int index)
   {
    CObject *result;
 //--- check
@@ -400,7 +400,7 @@ CObject *CArrayObjWithServices::Detach(const int index)
 //+------------------------------------------------------------------+
 //| Deleting range of elements                                       |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::DeleteRange(int from,int to)
+bool CAppObjectArrayObj::DeleteRange(int from,int to)
   {
 //--- check
    if(from<0 || to<0)
@@ -420,7 +420,7 @@ bool CArrayObjWithServices::DeleteRange(int from,int to)
 //+------------------------------------------------------------------+
 //| Clearing of array without the release of memory                  |
 //+------------------------------------------------------------------+
-void CArrayObjWithServices::Clear(void)
+void CAppObjectArrayObj::Clear(void)
   {
 //--- "physical" removal of the object (if necessary and possible)
    if(m_free_mode)
@@ -437,7 +437,7 @@ void CArrayObjWithServices::Clear(void)
 //+------------------------------------------------------------------+
 //| Equality comparison of two arrays                                |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::CompareArray(const CArrayObjWithServices *Array) const
+bool CAppObjectArrayObj::CompareArray(const CAppObjectArrayObj *Array) const
   {
 //--- check
    if(!CheckPointer(Array))
@@ -454,7 +454,7 @@ bool CArrayObjWithServices::CompareArray(const CArrayObjWithServices *Array) con
 //+------------------------------------------------------------------+
 //| Method QuickSort                                                 |
 //+------------------------------------------------------------------+
-void CArrayObjWithServices::QuickSort(int beg,int end,const int mode)
+void CAppObjectArrayObj::QuickSort(int beg,int end,const int mode)
   {
    int      i,j;
    CObject *p_node;
@@ -502,7 +502,7 @@ void CArrayObjWithServices::QuickSort(int beg,int end,const int mode)
 //+------------------------------------------------------------------+
 //| Inserting element in a sorted array                              |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::InsertSort(CObject *element)
+bool CAppObjectArrayObj::InsertSort(CObject *element)
   {
    int pos;
 //--- check
@@ -532,7 +532,7 @@ bool CArrayObjWithServices::InsertSort(CObject *element)
 //+------------------------------------------------------------------+
 //| Quick search of position of element in a sorted array            |
 //+------------------------------------------------------------------+
-int CArrayObjWithServices::QuickSearch(const CObject *element) const
+int CAppObjectArrayObj::QuickSearch(const CObject *element) const
   {
    int      i,j,m=-1;
    CObject *t_node;
@@ -559,7 +559,7 @@ int CArrayObjWithServices::QuickSearch(const CObject *element) const
 //+------------------------------------------------------------------+
 //| Search of position of element in a sorted array                  |
 //+------------------------------------------------------------------+
-int CArrayObjWithServices::Search(const CObject *element) const
+int CAppObjectArrayObj::Search(const CObject *element) const
   {
    int pos;
 //--- check
@@ -576,7 +576,7 @@ int CArrayObjWithServices::Search(const CObject *element) const
 //| Search position of the first element which is greater than       |
 //| specified in a sorted array                                      |
 //+------------------------------------------------------------------+
-int CArrayObjWithServices::SearchGreat(const CObject *element) const
+int CAppObjectArrayObj::SearchGreat(const CObject *element) const
   {
    int pos;
 //--- check
@@ -594,7 +594,7 @@ int CArrayObjWithServices::SearchGreat(const CObject *element) const
 //| Search position of the first element which is less than          |
 //| specified in the sorted array                                    |
 //+------------------------------------------------------------------+
-int CArrayObjWithServices::SearchLess(const CObject *element) const
+int CAppObjectArrayObj::SearchLess(const CObject *element) const
   {
    int pos;
 //--- check
@@ -612,7 +612,7 @@ int CArrayObjWithServices::SearchLess(const CObject *element) const
 //| Search position of the first element which is greater than or    |
 //| equal to the specified in a sorted array                         |
 //+------------------------------------------------------------------+
-int CArrayObjWithServices::SearchGreatOrEqual(const CObject *element) const
+int CAppObjectArrayObj::SearchGreatOrEqual(const CObject *element) const
   {
 //--- check
    if(m_data_total==0 || !CheckPointer(element) || m_sort_mode==-1)
@@ -628,7 +628,7 @@ int CArrayObjWithServices::SearchGreatOrEqual(const CObject *element) const
 //| Search position of the first element which is less than or equal |
 //| to the specified in a sorted array                               |
 //+------------------------------------------------------------------+
-int CArrayObjWithServices::SearchLessOrEqual(const CObject *element) const
+int CAppObjectArrayObj::SearchLessOrEqual(const CObject *element) const
   {
 //--- check
    if(m_data_total==0 || !CheckPointer(element) || m_sort_mode==-1)
@@ -643,7 +643,7 @@ int CArrayObjWithServices::SearchLessOrEqual(const CObject *element) const
 //+------------------------------------------------------------------+
 //| Find position of first appearance of element in a sorted array   |
 //+------------------------------------------------------------------+
-int CArrayObjWithServices::SearchFirst(const CObject *element) const
+int CAppObjectArrayObj::SearchFirst(const CObject *element) const
   {
    int pos;
 //--- check
@@ -664,7 +664,7 @@ int CArrayObjWithServices::SearchFirst(const CObject *element) const
 //+------------------------------------------------------------------+
 //| Find position of last appearance of element in a sorted array    |
 //+------------------------------------------------------------------+
-int CArrayObjWithServices::SearchLast(const CObject *element) const
+int CAppObjectArrayObj::SearchLast(const CObject *element) const
   {
    int pos;
 //--- check
@@ -685,11 +685,11 @@ int CArrayObjWithServices::SearchLast(const CObject *element) const
 //+------------------------------------------------------------------+
 //| Writing array to file                                            |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::Save(const int file_handle)
+bool CAppObjectArrayObj::Save(const int file_handle)
   {
    int i=0;
 //--- check
-   if(!CArrayWithServices::Save(file_handle))
+   if(!CAppObjectArray::Save(file_handle))
       return(false);
 //--- write array length
    if(FileWriteInteger(file_handle,m_data_total,INT_VALUE)!=INT_VALUE)
@@ -704,11 +704,11 @@ bool CArrayObjWithServices::Save(const int file_handle)
 //+------------------------------------------------------------------+
 //| Reading array from file                                          |
 //+------------------------------------------------------------------+
-bool CArrayObjWithServices::Load(const int file_handle)
+bool CAppObjectArrayObj::Load(const int file_handle)
   {
    int i=0,num;
 //--- check
-   if(!CArrayWithServices::Load(file_handle))
+   if(!CAppObjectArray::Load(file_handle))
       return(false);
 //--- read array length
    num=FileReadInteger(file_handle,INT_VALUE);

@@ -1,9 +1,16 @@
 //
 #include "Loader.mqh"
 
-class COrderArray : public CArrayObjWithServices
+class COrderArray : public CAppObjectArrayObj
 {
    public:
+      CApplication* app() { return (CApplication*)app; }
+      CSymbolInfoBase* _symbol;
+      void loadsymbol(string symbol)
+      {
+         _symbol = app().symbolloader.LoadSymbol(symbol);
+      }
+
       COrderArray()
       {
          m_free_mode = false;
@@ -66,7 +73,7 @@ class COrderArray : public CArrayObjWithServices
          
          double avg_price = 0;
          
-         if (in_symbol != "") loadsymbol(in_symbol,__FUNCTION__);
+         if (in_symbol != "") loadsymbol(in_symbol);
          
          if (sum_lots_buy > 0) avg_price_buy = sum_price_buy/sum_lots_buy;
          if (sum_lots_sell > 0) avg_price_sell = sum_price_sell/sum_lots_sell;

@@ -13,7 +13,7 @@
 #include "AppObjectBase\SymbolInfoBase.mqh"
 #include "ServiceProviderBase\SymbolLoaderBase.mqh"
 
-#include "AppObjectBase\AppObjectWithBaseServices.mqh"
+//#include "AppObjectBase\AppObjectWithBaseServices.mqh"
 
 #include "AppObjectBase\StopsCalcBase.mqh"
 #include "AppObjectBase\OrderBaseBase.mqh"
@@ -21,9 +21,9 @@
 #include "ServiceProviderBase\OrderFactoryBase.mqh"
 #include "ServiceProviderBase\OrderManagerBase.mqh"
 
-#include "AppObjectBase\AppObjectWithServices.mqh"
-#include "AppObjectBase\ArrayWithServices.mqh"
-#include "AppObjectBase\ArrayObjWithServices.mqh"
+//#include "AppObjectBase\AppObjectWithServices.mqh"
+#include "AppObjectBase\AppObjectArray.mqh"
+#include "AppObjectBase\AppObjectArrayObj.mqh"
 
 #include "ServiceContainer.mqh"
 #include "Application.mqh"

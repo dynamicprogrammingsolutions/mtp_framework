@@ -1,5 +1,5 @@
 //
-class CStopsCalcBase : public CAppObjectWithBaseServices
+class CStopsCalcBase : public CAppObject
 {
 public:
    virtual CStopsCalcBase* SetOrderType(ENUM_ORDER_TYPE _ordertype)

@@ -1,5 +1,5 @@
 //
-class COrderBaseBase : public CAppObjectWithBaseServices
+class COrderBaseBase : public CAppObject
 {
 
 };

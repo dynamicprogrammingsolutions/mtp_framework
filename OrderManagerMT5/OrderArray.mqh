@@ -1,6 +1,6 @@
 //
 
-class COrderArray : public CArrayObjWithServices
+class COrderArray : public CAppObjectArrayObj
 {
 public:
    COrderArray()

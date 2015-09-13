@@ -1,8 +1,7 @@
 //
 #include "moneymanagement_helper.mqh"
-#include "Loader.mqh"
 
-class CMoneyManagement : public CAppObjectWithServices {
+class CMoneyManagement : public CAppObject {
 public:
    string symbol;
    CStopLoss* stoploss;
@@ -25,13 +24,35 @@ public:
    double lotsize;
    CMoneyManagementFixed(double _lotsize) {
       lotsize = _lotsize;
-   }
-   virtual CMoneyManagement* SetStopLoss(CStopLoss* _stoploss)
-   {      
-      return GetPointer(this);
-   }
+   }   
    virtual double GetLotsize() {
       return lotsize;
+   }
+};
+
+class CMoneyManagementExponential : public CMoneyManagement
+{
+public:   
+   double lotsize;
+   CMoneyManagement* mm;
+   double level;
+   double multiplier;
+   double maximum_lotsize;
+   CMoneyManagementExponential(CMoneyManagement* _mm, double _multiplier) {
+      mm = _mm;
+      multiplier = _multiplier;
+   }
+   CMoneyManagementExponential(double _lotsize, double _multiplier) {
+      lotsize = _lotsize;
+      multiplier = _multiplier;
+   }
+   virtual void SetLevel(double _level)
+   {
+      this.level = _level;
+   }
+   virtual double GetLotsize() {
+      if (mm != NULL && (lotsize == 0 || level == 0)) lotsize = mm.SetStopLoss(this.stoploss).SetSymbol(this.symbol).GetLotsize();
+      return maximum_lotsize > 0?MathMin(lotsize*MathPow(multiplier,level),maximum_lotsize):lotsize*MathPow(multiplier,level);
    }
 };
 
@@ -45,7 +66,6 @@ public:
       riskpercent = _riskpercent;
    }
    virtual double GetLotsize() {
-      loadsymbol(this.symbol,__FUNCTION__);
       moneymanagement_init(this.symbol);
       if (use_equity) accountbalance = accountequity;
       return mmgetlot_stoploss((int)stoploss.GetTicks(), riskpercent);

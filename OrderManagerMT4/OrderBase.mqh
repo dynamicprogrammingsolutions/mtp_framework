@@ -10,12 +10,23 @@
 #include "EnumExecuteState.mqh"
 */
 
+#include "Loader.mqh"
 #include "..\libraries\objectfunctions.mqh"
 #include "..\libraries\commonfunctions.mqh"
 #include "..\libraries\file.mqh"
 
 class COrderBase : public COrderBaseBase
 {
+protected:
+   CEventHandlerBase* event;
+   CApplication* app() { return (CApplication*)app; }
+   CSymbolInfoBase* _symbol;
+   void loadsymbol(string __symbol)
+   {
+      _symbol = app().symbolloader.LoadSymbol(__symbol);
+   }
+
+
 public:
    static ushort activity;
 
@@ -103,6 +114,8 @@ protected:
 public:
 
    COrderBase() {
+      event = app().event;
+   
       this.id = maxid+1;
       maxid = this.id;
       
@@ -461,7 +474,7 @@ bool COrderBase::delete_mm_objects = false;
             string virtual_error = "";
             double real_sl = 0, real_tp = 0;                   
             if (ordertype_market(ordertype)) {
-               loadsymbol(symbol,__FUNCTION__);
+               loadsymbol(symbol);
                if (price == 0) {                  
                   if (ordertype == ORDER_TYPE_SELL) { price = _symbol.Bid(); }
                   else if (ordertype == ORDER_TYPE_BUY) { price = _symbol.Ask(); }
@@ -484,7 +497,7 @@ bool COrderBase::delete_mm_objects = false;
                         virtual_error = "Invalid Price: "+this.price+" bid/ask:"+_symbol.Bid()+"/"+_symbol.Ask();
                      }
                   } else {
-                     loadsymbol(symbol,__FUNCTION__);
+                     loadsymbol(symbol);
                      if (!sl_virtual) real_sl = sl;
                      if (!tp_virtual) real_tp = tp;
                      trade.SetExpertMagicNumber(this.magic);
@@ -601,7 +614,7 @@ bool COrderBase::delete_mm_objects = false;
       }      
       
       if (closeprice == 0) {
-         loadsymbol(symbol,__FUNCTION__);
+         loadsymbol(symbol);
          if (this.ordertype == ORDER_TYPE_SELL) { closeprice = _symbol.Ask(); }
          else if (this.ordertype == ORDER_TYPE_BUY) { closeprice = _symbol.Bid(); }
          //if ( event.Verbose ()) event.Verbose ("closeprice: "+(string)closeprice,__FUNCTION__);
@@ -632,7 +645,7 @@ bool COrderBase::delete_mm_objects = false;
       if (Select()) {
          double real_sl = 0, real_tp = 0;
          if ( event.Info ()) event.Info ("Modify Order: ticket="+ticket+" price="+price+" tp="+tp+" sl="+sl+" expiration="+expiration,__FUNCTION__);
-         loadsymbol(this.symbol,__FUNCTION__);
+         loadsymbol(this.symbol);
          if (!sl_virtual) real_sl = _symbol.PriceRound(sl_set?sl:orderinfo.GetStopLoss());
          if (!tp_virtual) real_tp = _symbol.PriceRound(tp_set?tp:orderinfo.GetTakeProfit());
          if (!price_set) price = orderinfo.GetOpenPrice();
@@ -739,7 +752,7 @@ bool COrderBase::delete_mm_objects = false;
             if (this.state == ORDER_STATE_FILLED && (sl_virtual || tp_virtual || realstops_draw_line)) { 
                //Print("update Vstops of ",ticket," type:",ordertype);                 
                UpdateVStopLines();
-               loadsymbol(symbol,__FUNCTION__);
+               loadsymbol(symbol);
                double closeprice;
                ordertype = this.GetType();
                if (ordertype == ORDER_TYPE_SELL) { closeprice = vstops_use_bid?_symbol.Bid():_symbol.Ask(); }

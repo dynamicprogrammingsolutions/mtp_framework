@@ -1,5 +1,5 @@
 //
-class CArrayWithServices : public CAppObjectWithServices
+class CAppObjectArray : public CAppObject
 
   {
 protected:
@@ -9,8 +9,8 @@ protected:
    int               m_sort_mode;        // mode of array sorting
 
 public:
-                     CArrayWithServices(void);
-                    ~CArrayWithServices(void);
+                     CAppObjectArray(void);
+                    ~CAppObjectArray(void);
    //--- methods of access to protected data
    int               Step(void) const { return(m_step_resize); }
    bool              Step(const int step);
@@ -38,7 +38,7 @@ protected:
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
 //+------------------------------------------------------------------+
-CArrayWithServices::CArrayWithServices(void) : m_step_resize(16),
+CAppObjectArray::CAppObjectArray(void) : m_step_resize(16),
                        m_data_total(0),
                        m_data_max(0),
                        m_sort_mode(-1)
@@ -47,13 +47,13 @@ CArrayWithServices::CArrayWithServices(void) : m_step_resize(16),
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
-CArrayWithServices::~CArrayWithServices(void)
+CAppObjectArray::~CAppObjectArray(void)
   {
   }
 //+------------------------------------------------------------------+
 //| Method Set for variable m_step_resize                            |
 //+------------------------------------------------------------------+
-bool CArrayWithServices::Step(const int step)
+bool CAppObjectArray::Step(const int step)
   {
 //--- check
    if(step>0)
@@ -67,7 +67,7 @@ bool CArrayWithServices::Step(const int step)
 //+------------------------------------------------------------------+
 //| Sorting an array in ascending order                              |
 //+------------------------------------------------------------------+
-void CArrayWithServices::Sort(const int mode)
+void CAppObjectArray::Sort(const int mode)
   {
 //--- check
    if(IsSorted(mode))
@@ -81,7 +81,7 @@ void CArrayWithServices::Sort(const int mode)
 //+------------------------------------------------------------------+
 //| Writing header of array to file                                  |
 //+------------------------------------------------------------------+
-bool CArrayWithServices::Save(const int file_handle)
+bool CAppObjectArray::Save(const int file_handle)
   {
 //--- check handle
    if(file_handle!=INVALID_HANDLE)
@@ -100,7 +100,7 @@ bool CArrayWithServices::Save(const int file_handle)
 //+------------------------------------------------------------------+
 //| Reading header of array from file                                |
 //+------------------------------------------------------------------+
-bool CArrayWithServices::Load(const int file_handle)
+bool CAppObjectArray::Load(const int file_handle)
   {
 //--- check handle
    if(file_handle!=INVALID_HANDLE)
@@ -120,7 +120,7 @@ bool CArrayWithServices::Load(const int file_handle)
 //| Find minimum of array                                            |
 //+------------------------------------------------------------------+
 template<typename T>
-int CArrayWithServices::Minimum(const T &data[],const int start,const int count) const
+int CAppObjectArray::Minimum(const T &data[],const int start,const int count) const
   {
    int real_count;
 //--- check
@@ -141,7 +141,7 @@ int CArrayWithServices::Minimum(const T &data[],const int start,const int count)
 //| Find maximum of array                                            |
 //+------------------------------------------------------------------+
 template<typename T>
-int CArrayWithServices::Maximum(const T &data[],const int start,const int count) const
+int CAppObjectArray::Maximum(const T &data[],const int start,const int count) const
   {
    int real_count;
 //--- check

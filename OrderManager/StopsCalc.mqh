@@ -5,6 +5,13 @@
 class CStopsCalc : public CStopsCalcBase
 {
 protected:
+   CApplication* app() { return (CApplication*)app; }
+   CSymbolInfoBase* _symbol;   
+   void loadsymbol(string __symbol)
+   {
+      _symbol = this.app().symbolloader.LoadSymbol(__symbol);
+   }
+
    string symbol;
    int ordertype;
    double currentprice;
@@ -150,7 +157,7 @@ public:
          CStopsCalc::SetPrice(_price);
       } else if (symbol_set && symbol_set) {
          if (ordertype_long(this.ordertype)) {
-            loadsymbol(this.symbol,__FUNCTION__);
+            loadsymbol(this.symbol);
             Print("adding spread to price "+(string)_price+" spread: "+(string)_symbol.SpreadInPrice());
             CStopsCalc::SetPrice(_price+_symbol.SpreadInPrice());
          } else {

@@ -281,7 +281,7 @@ bool COrder::Close(double closevolume = 0, double closeprice = 0)
    //if (event.Verbose ()) event.Verbose ("closeordertype: "+(string)closeordertype,__FUNCTION__);
    
    if (closeprice == 0) {
-      loadsymbol(symbol,__FUNCTION__);
+      loadsymbol(symbol);
       if (closeordertype == ORDER_TYPE_SELL) { closeprice = _symbol.Bid(); }
       else if (closeordertype == ORDER_TYPE_BUY) { closeprice = _symbol.Ask(); }
    }
@@ -396,7 +396,7 @@ void COrder::OnTick()
          if (!has_open_attached) {
             if (NormalizeDouble(volume-closedvolume,8) == 0) this.closed = true;
             else if (volume-closedvolume < 0) {
-               loadsymbol(symbol,__FUNCTION__);
+               loadsymbol(symbol);
                if (_symbol.LotRound(closedvolume-volume) == closedvolume-volume) {
                   event.Warning("Too many attached order triggered, opening balance order",__FUNCTION__);
                   ENUM_ORDER_TYPE balancetype = ordertype_long(this.ordertype)?ORDER_TYPE_BUY:ORDER_TYPE_SELL;

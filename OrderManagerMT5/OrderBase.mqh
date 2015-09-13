@@ -1,6 +1,15 @@
 //
 class COrderBase : public COrderBaseBase
 {
+protected:
+   CEventHandlerBase* event;
+   CApplication* app() { return (CApplication*)app; }
+   CSymbolInfoBase* _symbol;
+   void loadsymbol(string __symbol)
+   {
+      _symbol = app().symbolloader.LoadSymbol(__symbol);
+   }
+
 public:
    static ushort activity; //not implemented
   
@@ -61,6 +70,7 @@ public:
 public:
    
    COrderBase() {
+      event = app().event;
     
       this.id = maxid+1;
       maxid = this.id;     
@@ -188,7 +198,7 @@ double COrderBase::Price()
 double COrderBase::CurrentPrice()
 {
    if (!state_filled(this.state)) return(0);
-   loadsymbol(symbol,__FUNCTION__);
+   loadsymbol(symbol);
    if (ordertype_long(this.ordertype)) return(_symbol.Bid());
    if (ordertype_short(this.ordertype)) return(_symbol.Ask());
    return(0);
@@ -237,7 +247,7 @@ bool COrderBase::Execute()
       bool success;
       if (ordertype_market(ordertype)) {
          if (price == 0) {
-            loadsymbol(symbol,__FUNCTION__);
+            loadsymbol(symbol);
             if (ordertype == ORDER_TYPE_SELL) { price = _symbol.Bid(); }
             else if (ordertype == ORDER_TYPE_BUY) { price = _symbol.Ask(); }
          }
@@ -327,7 +337,7 @@ bool COrderBase::Modify()
 {
    activity = activity | (ushort)ACTIVITY_MODIFY;
    if (Select()) {
-      loadsymbol(this.symbol,__FUNCTION__);
+      loadsymbol(this.symbol);
       if (!price_set) price = this.Price();
       else price = _symbol.PriceRound(price);
       if (!expiration_set) expiration = orderinfo.TimeExpiration();
