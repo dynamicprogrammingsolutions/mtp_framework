@@ -21,9 +21,6 @@
 
 class CMTPSymbolInfo : public CSymbolInfo
 {
-   private:
-      CEventHandlerBase* event;
-      
    public:
       //double m_lotroundup;
       double lot_extradigits;
@@ -73,7 +70,6 @@ bool CMTPSymbolInfo::Name(string name)
 
 void CMTPSymbolInfo::CMTPSymbolInfo()
 {
-   event = this.app.GetService(srvEvent);
    m_name              ="";
    m_point             =0.0;
    m_tick_value        =0.0;

@@ -92,7 +92,7 @@ protected:
    }
    virtual void CalcPrice()
    {
-      price = getentryprice(this.symbol,this.ordertype,this.ticks,this.currentprice);
+      price = getentryprice(this.symbol,this.ordertype,(int)this.ticks,this.currentprice);
    }   
    
 };
@@ -109,7 +109,7 @@ protected:
    virtual void CalcPrice()
    {
       if (!zero_is_nosl && this.ticks == 0) price = this.entryprice;
-      else price = getstoplossprice(this.symbol,this.ordertype,this.ticks,this.entryprice);
+      else price = getstoplossprice(this.symbol,this.ordertype,(int)this.ticks,this.entryprice);
    }   
       
 };
@@ -123,7 +123,7 @@ protected:
    }
    virtual void CalcPrice()
    {
-      price = gettakeprofitprice(this.symbol,this.ordertype,this.ticks,this.entryprice);
+      price = gettakeprofitprice(this.symbol,this.ordertype,(int)this.ticks,this.entryprice);
    }   
       
 };
@@ -151,7 +151,7 @@ public:
       } else if (symbol_set && symbol_set) {
          if (ordertype_long(this.ordertype)) {
             loadsymbol(this.symbol,__FUNCTION__);
-            Print("adding spread to price "+_price+" spread: "+_symbol.SpreadInPrice());
+            Print("adding spread to price "+(string)_price+" spread: "+(string)_symbol.SpreadInPrice());
             CStopsCalc::SetPrice(_price+_symbol.SpreadInPrice());
          } else {
             CStopsCalc::SetPrice(_price);

@@ -1,5 +1,4 @@
 //
-#include "EnumStateselect.mqh"
 
 bool state_placed(ENUM_ORDER_STATE orderstate)
 {

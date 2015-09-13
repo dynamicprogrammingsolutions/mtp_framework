@@ -1,9 +1,4 @@
-#include "..\Loader.mqh"
-
-#include "Trade\Trade.mqh"
-#include "Trade\OrderInfoV.mqh"
-#include "Trade\HistoryOrderInfoV.mqh"
-#include "MoneyManagement.mqh"
+#include "Loader.mqh"
 
 enum ENUM_EXECUTE_STATE
 {
@@ -28,9 +23,6 @@ enum ENUM_ACTIVITY {
 
 class COrderBase : public COrderBaseBase
 {
-protected:
-   CEventHandlerBase* event;
-
 public:
    static ushort activity; //not implemented
   
@@ -91,9 +83,7 @@ public:
 public:
    
    COrderBase() {
-
-      event = this.app.GetService(srvEvent);
-     
+    
       this.id = maxid+1;
       maxid = this.id;     
 

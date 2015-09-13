@@ -10,7 +10,7 @@
 //|                                                                  |
 //+------------------------------------------------------------------+
 
-#include "Order.mqh"
+#include "Loader.mqh"
 
 class COrderManager : public COrderManagerBase
 {
@@ -18,9 +18,6 @@ class COrderManager : public COrderManagerBase
    string stoploss_comment;
    string takeprofit_comment;
    string mtp_comment;
-
-protected:
-   CEventHandlerBase* event;
 
 public:
    COrderArray orders;
@@ -41,8 +38,6 @@ public:
    COrderManager()
    {
      use_ontick = true;
-   
-     event = this.app.GetService(srvEvent);
 
      custom_order_defaults = false;
 
