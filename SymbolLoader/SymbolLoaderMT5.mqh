@@ -17,7 +17,6 @@ public:
    }
 };
 
-/*
 CMTPSymbolInfo *_symbol;
 
 bool loadsymbol(const string in_symbol, const string function = "")
@@ -36,4 +35,3 @@ bool loadsymbol(const string in_symbol, CMTPSymbolInfo*& _symbolinfo, const stri
       return(false);
    }
 }
-*/
