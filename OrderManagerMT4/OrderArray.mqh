@@ -4,20 +4,15 @@
 class COrderArray : public CArrayObjWithServices
 {
    public:
-      COrderManagerBase* OM;
-        
       COrderArray()
       {
          m_free_mode = false;
       }
       COrder* Order(int nIndex){ if (!isset(At(nIndex))) return(NULL); else return((COrder*)At(nIndex)); }     
       
+      COrderFactoryBase* factory() { return ((CApplication*)app).orderfactory; }
       virtual bool  CreateElement(const int index) {
-         if (isset(OM)) {
-            m_data[index] = (CObject*)(OM.NewOrderObject());
-         } else {
-            m_data[index] = (CObject*)(new COrder());
-         }
+         m_data[index] = (CObject*)(factory().NewOrderObject());
          return(true);
       }
       

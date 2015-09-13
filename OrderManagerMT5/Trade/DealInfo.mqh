@@ -1,16 +1,6 @@
-//+------------------------------------------------------------------+
-//|                                                     DealInfo.mqh |
-//|                      Copyright © 2010, MetaQuotes Software Corp. |
-//|                                       http://www.metaquotes.net/ |
-//|                                              Revision 2010.09.14 |
-//+------------------------------------------------------------------+
-#include <Object.mqh>
-#include "..\..\SymbolLoader\SymbolLoaderMT5.mqh"
-//+------------------------------------------------------------------+
-//| Class CDealInfo.                                                 |
-//| Appointment: Class for access to history deal info.              |
-//|              Derives from class CObject.                         |
-//+------------------------------------------------------------------+
+//
+#include "..\Loader.mqh"
+
 class CDealInfo : public CObject
   {
 protected:

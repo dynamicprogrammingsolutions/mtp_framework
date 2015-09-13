@@ -1,16 +1,6 @@
-//+------------------------------------------------------------------+
-//|                                                    OrderInfo.mqh |
-//|                      Copyright © 2010, MetaQuotes Software Corp. |
-//|                                       http://www.metaquotes.net/ |
-//|                                              Revision 2010.08.01 |
-//+------------------------------------------------------------------+
-#include <Object.mqh>
-#include "..\..\SymbolLoader\SymbolLoaderMT5.mqh"
-//+------------------------------------------------------------------+
-//| Class COrderInfo.                                                |
-//| Appointment: Class for access to order info.                     |
-//|              Derives from class CObject.                         |
-//+------------------------------------------------------------------+
+//
+#include "..\Loader.mqh"
+
 class COrderInfoBase : public CObject
   {
 

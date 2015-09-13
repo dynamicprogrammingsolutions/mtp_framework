@@ -44,6 +44,17 @@ public:
       return NULL;
    }
    
+   CServiceProvider* GetService(ENUM_APPLICATION_SERVICE srv)
+   {
+      int count = Total();
+      for (int i = 0; i < count; i++) {
+         CServiceProvider* service = ServiceProvider(i);
+         if (service.srv == srv) return service;
+      }
+      Print("not found: ",EnumToString(srv));
+      return NULL;
+   }
+   
    bool IsRegistered(ENUM_APPLICATION_SERVICE srv)
    {
       if (srv == srvNone) return false;

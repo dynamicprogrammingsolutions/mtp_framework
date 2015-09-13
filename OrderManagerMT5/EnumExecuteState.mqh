@@ -1,0 +1,9 @@
+//
+
+enum ENUM_EXECUTE_STATE
+{
+   ES_NOT_EXECUTED,
+   ES_EXECUTED,
+   ES_CANCELED
+};
+

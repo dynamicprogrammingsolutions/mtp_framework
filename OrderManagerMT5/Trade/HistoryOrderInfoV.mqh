@@ -1,17 +1,5 @@
-//+------------------------------------------------------------------+
-//|                                             HistoryOrderInfo.mqh |
-//|                      Copyright © 2010, MetaQuotes Software Corp. |
-//|                                       http://www.metaquotes.net/ |
-//|                                              Revision 2010.05.14 |
-//+------------------------------------------------------------------+
-#include <Object.mqh>
-#include "OrderInfoBase.mqh"
-#include "..\..\SymbolLoader\SymbolLoaderMT5.mqh"
-//+------------------------------------------------------------------+
-//| Class CHistoryOrderInfoV.                                         |
-//| Appointment: Class for access to history order info.             |
-//|              Derives from class CObject.                         |
-//+------------------------------------------------------------------+
+//
+#include "..\Loader.mqh"
 
 ulong CHistoryOrderInfo_SelectedTicket = -1;
 

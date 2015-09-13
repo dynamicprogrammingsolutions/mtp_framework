@@ -30,4 +30,5 @@ class COrderManagerBase : public CServiceProvider
    
       virtual COrderBaseBase* NewOrderObject() { return NULL ; }
       virtual COrderBaseBase* NewAttachedOrderObject() { return NULL; }
+      
 };

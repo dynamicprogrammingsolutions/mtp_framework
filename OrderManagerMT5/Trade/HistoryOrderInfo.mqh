@@ -1,17 +1,6 @@
-//+------------------------------------------------------------------+
-//|                                             HistoryOrderInfo.mqh |
-//|                      Copyright © 2010, MetaQuotes Software Corp. |
-//|                                       http://www.metaquotes.net/ |
-//|                                              Revision 2010.05.14 |
-//+------------------------------------------------------------------+
-#include <Object.mqh>
-//#include "OrderBase.mqh"
-#include "..\..\SymbolLoader\SymbolLoaderMT5.mqh"
-//+------------------------------------------------------------------+
-//| Class CHistoryOrderInfo.                                         |
-//| Appointment: Class for access to history order info.             |
-//|              Derives from class CObject.                         |
-//+------------------------------------------------------------------+
+//
+#include "..\Loader.mqh"
+
 class CHistoryOrderInfo : public CObject
   {
 protected:

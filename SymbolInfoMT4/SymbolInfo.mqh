@@ -1,7 +1,5 @@
 //
 
-#include "..\ServiceProviderBase\SymbolInfoBase.mqh"
-
 class CSymbolInfo : public CSymbolInfoBase
   {
 public:

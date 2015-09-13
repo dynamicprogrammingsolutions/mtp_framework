@@ -18,6 +18,7 @@ public:
    CEventHandlerBase* event;
    CSymbolLoaderBase* symbolloader;
    COrderManagerBase* ordermanager;
+   COrderFactoryBase* orderfactory;
 
    void RegisterService(CServiceProvider* service)
    {
@@ -33,6 +34,7 @@ public:
       if (service.srv == srvEvent) event = service;
       if (service.srv == srvSymbolLoader) symbolloader = service;
       if (service.srv == srvOrderManager) ordermanager = service;
+      if (service.srv == srvOrderFactory) orderfactory = service;
       
    }
    
@@ -60,8 +62,9 @@ public:
          case srvEvent: return (CObject*)event;
          case srvSymbolLoader: return (CObject*)symbolloader;
          case srvOrderManager: return (CObject*)ordermanager;
+         case srvOrderFactory: return (CObject*)orderfactory;
       }   
-      return NULL;
+      return services.GetService(srv);
    }
 
    void OnInit()
@@ -88,5 +91,3 @@ CApplication* app()
 {
    return global_application_object;
 }
-
-

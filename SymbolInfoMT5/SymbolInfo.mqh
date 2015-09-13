@@ -4,7 +4,6 @@
 //|                                        http://www.metaquotes.net |
 //|                                              Revision 2011.06.08 |
 //+------------------------------------------------------------------+
-#include "..\ServiceProviderBase\SymbolInfoBase.mqh"
 //+------------------------------------------------------------------+
 //| Class CSymbolInfo.                                               |
 //| Appointment: Class for access to symbol info.                    |

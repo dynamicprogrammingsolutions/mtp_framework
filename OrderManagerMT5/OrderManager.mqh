@@ -48,8 +48,9 @@ public:
      retrainhistory = 2592000;
    };
 
-   virtual COrderBaseBase* NewOrderObject() { return(new COrder()); }
-   virtual COrderBaseBase* NewAttachedOrderObject() { return(new CAttachedOrder()); }
+   COrderFactoryBase* factory() { return ((CApplication*)app).orderfactory; }
+   virtual COrderBaseBase* NewOrderObject() { return factory().NewOrderObject(); }
+   virtual COrderBaseBase* NewAttachedOrderObject() { return factory().NewAttachedOrderObject(); }
 
    COrder* NewOrder(string in_symbol,ENUM_ORDER_TYPE _ordertype,double _volume,double _price,double _stoploss,double _takeprofit,string _comment="",datetime _expiration=0);
    COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,double volume,CEntry* _price,

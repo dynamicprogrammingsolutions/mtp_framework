@@ -25,7 +25,7 @@ class COrderManager : public COrderManagerBase
 
 private:
 
-public:   
+public:
 
    bool ontick_has_run;
 
@@ -59,8 +59,6 @@ public:
       tp_virtual = false;
       price_virtual = false;
       ontick_has_run = true;
-      orders.OM = GetPointer(this);
-      historyorders.OM = GetPointer(this);
    };
    
    ~COrderManager() {};
@@ -120,8 +118,9 @@ public:
    double COrderManager::TotalProfit(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1);
    double COrderManager::TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1, bool _commission = true, bool swap = true);
    
-   virtual COrderBaseBase* NewOrderObject() { return(new COrder()); }
-   virtual COrderBaseBase* NewAttachedOrderObject() { return(new CAttachedOrder()); }
+   COrderFactoryBase* factory() { return ((CApplication*)app).orderfactory; }
+   virtual COrderBaseBase* NewOrderObject() { return factory().NewOrderObject(); }
+   virtual COrderBaseBase* NewAttachedOrderObject() { return factory().NewAttachedOrderObject(); }
    
    bool GetOrders(ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY, string in_symbol = "", int in_magic = -1, bool no_loop_and_reset = false)
    {

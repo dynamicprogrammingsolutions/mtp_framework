@@ -1,5 +1,5 @@
 //
-#include "Loader.mqh"
+#include "..\Loader.mqh"
 
 class CAppObjectWithBaseServices : public CAppObject
 {
