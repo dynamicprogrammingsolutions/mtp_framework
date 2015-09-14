@@ -70,9 +70,8 @@ public:
       _symbol = symbolloader.LoadSymbol(symbol);
    }
 
-   COrderFactoryBase* factory() { return app.orderfactory; }
-   virtual COrderBaseBase* NewOrderObject() { return factory().NewOrderObject(); }
-   virtual COrderBaseBase* NewAttachedOrderObject() { return factory().NewAttachedOrderObject(); }
+   virtual COrderBaseBase* NewOrderObject() { return ((CApplication*)app).orderfactory.Create(); }
+   virtual COrderBaseBase* NewAttachedOrderObject() { return ((CApplication*)app).attachedorderfactory.Create(); }
 
    COrder* NewOrder(string in_symbol,ENUM_ORDER_TYPE _ordertype,double _volume,double _price,double _stoploss,double _takeprofit,string _comment="",datetime _expiration=0);
    COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,double volume,CEntry* _price,
