@@ -47,8 +47,30 @@ public:
      mtp_comment = "mtp";
      retrainhistory = 2592000;
    };
+   
+   CApplication* app;
+   void InitalizeService()
+   {
+      app = COrderManagerBase::app;
+      event = app.GetService(srvEvent);
+      symbolloader = app.GetService(srvSymbolLoader);   
+   }
+   
+   CEventHandlerBase* event;
+   CSymbolLoaderBase* symbolloader;
+   CSymbolInfoBase* _symbol;
+   
+   void loadsymbol(string symbol)
+   {
+      _symbol = symbolloader.LoadSymbol(symbol);
+   }
+   
+   void loadsymbol(string symbol, string function)
+   {
+      _symbol = symbolloader.LoadSymbol(symbol);
+   }
 
-   COrderFactoryBase* factory() { return ((CApplication*)app).orderfactory; }
+   COrderFactoryBase* factory() { return app.orderfactory; }
    virtual COrderBaseBase* NewOrderObject() { return factory().NewOrderObject(); }
    virtual COrderBaseBase* NewAttachedOrderObject() { return factory().NewAttachedOrderObject(); }
 

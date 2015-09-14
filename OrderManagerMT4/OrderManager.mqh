@@ -59,9 +59,32 @@ public:
       tp_virtual = false;
       price_virtual = false;
       ontick_has_run = true;
+      use_ontick = true;
    };
    
-   ~COrderManager() {};
+   CApplication* app;
+   
+   void InitalizeService()
+   {
+      app = COrderManagerBase::app;
+      event = app.GetService(srvEvent);
+      symbolloader = app.GetService(srvSymbolLoader);   
+   }
+   
+   CEventHandlerBase* event;
+   CSymbolLoaderBase* symbolloader;
+   CSymbolInfoBase* _symbol;
+   
+   void loadsymbol(string symbol)
+   {
+      _symbol = symbolloader.LoadSymbol(symbol);
+   }
+   
+   void loadsymbol(string symbol, string function)
+   {
+      _symbol = symbolloader.LoadSymbol(symbol);
+   }
+   
       
    //COrder* NullOrder() { return(new COrder()); };
 
@@ -118,9 +141,8 @@ public:
    double COrderManager::TotalProfit(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1);
    double COrderManager::TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1, bool _commission = true, bool swap = true);
    
-   COrderFactoryBase* factory() { return ((CApplication*)app).orderfactory; }
-   virtual COrderBaseBase* NewOrderObject() { return factory().NewOrderObject(); }
-   virtual COrderBaseBase* NewAttachedOrderObject() { return factory().NewAttachedOrderObject(); }
+   virtual COrderBaseBase* NewOrderObject() { return app.orderfactory.Create(); }
+   virtual COrderBaseBase* NewAttachedOrderObject() { return app.attachedorderfactory.Create(); }
    
    bool GetOrders(ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY, string in_symbol = "", int in_magic = -1, bool no_loop_and_reset = false)
    {

@@ -1,7 +1,7 @@
 //
 #include "..\Loader.mqh"
 
-class COrderFactoryBase : public CServiceProvider
+class COrderFactoryBase : public CFactoryBase
 {
 public:
    COrderFactoryBase()
@@ -9,6 +9,4 @@ public:
       srv = srvOrderFactory;
       name = "orderfactory";
    }
-   virtual COrderBaseBase* NewOrderObject() { return NULL ; }
-   virtual COrderBaseBase* NewAttachedOrderObject() { return NULL; }
 };

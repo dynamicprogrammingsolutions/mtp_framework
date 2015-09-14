@@ -1,6 +1,7 @@
 //
 
 #include <Arrays\ArrayObj.mqh>
+#include "EnumClassNames.mqh"
 #include "EnumApplicationService.mqh"
 #include "ApplicationBase.mqh"
 #include "AppObjectBase\AppObject.mqh"
@@ -18,7 +19,9 @@
 #include "AppObjectBase\StopsCalcBase.mqh"
 #include "AppObjectBase\OrderBaseBase.mqh"
 
+#include "ServiceProviderBase\FactoryBase.mqh"
 #include "ServiceProviderBase\OrderFactoryBase.mqh"
+#include "ServiceProviderBase\AttachedOrderFactoryBase.mqh"
 #include "ServiceProviderBase\OrderManagerBase.mqh"
 
 //#include "AppObjectBase\AppObjectWithServices.mqh"

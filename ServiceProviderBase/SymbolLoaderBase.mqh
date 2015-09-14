@@ -3,14 +3,12 @@
 class CSymbolLoaderBase : public CServiceProviderArrayObj
 {
 protected:
-   CEventHandlerBase* event;
 
 public:
    CSymbolLoaderBase()
    {
       name = "symbolloader";
       srv = srvSymbolLoader;
-      event = app.GetService(srvEvent);
    }
    virtual CSymbolInfoBase* LoadByIndex(int nIndex){
       return NULL;

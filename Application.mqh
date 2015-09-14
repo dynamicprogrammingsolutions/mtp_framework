@@ -12,13 +12,14 @@ public:
 
    CApplication()
    {
-      global_application_object = GetPointer(this);
+      //global_application_object = GetPointer(this);
    }
 
    CEventHandlerBase* event;
    CSymbolLoaderBase* symbolloader;
    COrderManagerBase* ordermanager;
    COrderFactoryBase* orderfactory;
+   CAttachedOrderFactoryBase* attachedorderfactory;
 
    void RegisterService(CServiceProvider* service)
    {
@@ -26,7 +27,7 @@ public:
          CServiceProvider* oldservice = DeregisterService(service.srv);
          if (CheckPointer(oldservice) == POINTER_DYNAMIC) delete oldservice;
       }
-      Print("Registering Service ",EnumToString(service.srv)," '",service.name,"'");
+      Print("Registering Service type:",EnumToString(service.srv)," name:'",service.name,"'");
             
       service.app = GetPointer(this);
       services.Add(service);
@@ -35,6 +36,7 @@ public:
       if (service.srv == srvSymbolLoader) symbolloader = service;
       if (service.srv == srvOrderManager) ordermanager = service;
       if (service.srv == srvOrderFactory) orderfactory = service;
+      if (service.srv == srvAttachedOrderFactory) attachedorderfactory = service;
       
    }
    
@@ -63,6 +65,7 @@ public:
          case srvSymbolLoader: return (CObject*)symbolloader;
          case srvOrderManager: return (CObject*)ordermanager;
          case srvOrderFactory: return (CObject*)orderfactory;
+         case srvAttachedOrderFactory: return (CObject*)attachedorderfactory;
       }   
       return services.GetService(srv);
    }
@@ -85,9 +88,15 @@ public:
 };
 
 
-CApplication* global_application_object;
+//CApplication* global_application_object;
 
 CApplication* app()
 {
-   return global_application_object;
+   return (CApplication*)global_application_base_object;
+}
+
+template<typename T>
+string GetTypeName(const T t)
+{
+   return(typename(T));
 }

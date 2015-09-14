@@ -19,7 +19,7 @@ class COrderBase : public COrderBaseBase
 {
 protected:
    CEventHandlerBase* event;
-   CApplication* app() { return (CApplication*)app; }
+   //CApplication* app() { return (CApplication*)app; }
    CSymbolInfoBase* _symbol;
    void loadsymbol(string __symbol)
    {

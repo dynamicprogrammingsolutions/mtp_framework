@@ -5,5 +5,6 @@ enum ENUM_APPLICATION_SERVICE {
    srvEvent,
    srvSymbolLoader,
    srvOrderFactory,
+   srvAttachedOrderFactory,
    srvOrderManager
 };

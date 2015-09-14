@@ -1,9 +1,15 @@
 //
-#include "..\ServiceProviderBase\SymbolLoaderBase.mqh"
+#include "..\Loader.mqh"
 
 class CSymbolLoader : public CSymbolLoaderBase
 {
 public:
+   CEventHandlerBase* event;
+   virtual void InitalizeService()
+   {
+      event = app.GetService(srvEvent);
+   }
+
    virtual CSymbolInfoBase* LoadByIndex(int nIndex){
       CObject *at;
       at = CSymbolLoader::At(nIndex);
