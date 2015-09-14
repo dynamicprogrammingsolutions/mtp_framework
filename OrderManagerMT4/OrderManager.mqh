@@ -64,11 +64,14 @@ public:
    
    CApplication* app;
    
-   void InitalizeService()
+   void Initalize()
    {
-      app = COrderManagerBase::app;
-      event = app.GetService(srvEvent);
-      symbolloader = app.GetService(srvSymbolLoader);   
+      app = AppBase();
+      event = app.event;
+      symbolloader = app.symbolloader;   
+      Prepare(GetPointer(orders)); 
+      Prepare(GetPointer(historyorders));
+      Prepare(GetPointer(attachedorders));
    }
    
    CEventHandlerBase* event;

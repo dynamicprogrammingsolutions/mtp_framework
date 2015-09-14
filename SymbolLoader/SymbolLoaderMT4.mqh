@@ -6,6 +6,8 @@
 class CSymbolLoaderMT4 : public CSymbolLoader
 {
 public:
+   virtual int Type() const { return classSymbolLoaderMT4; }
+public:
    virtual CSymbolInfoBase* NewSymbolInfoObject() {
       return new CMTPSymbolInfo();
    }

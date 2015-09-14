@@ -1,5 +1,9 @@
 //
-class COrderSet : public COrderArray { public:
+class COrderSet : public COrderArray {
+public:
+   virtual int Type() const { return classMT4OrderSet; }
+
+public:
    int id;
    static int highest_id;
    bool closed;

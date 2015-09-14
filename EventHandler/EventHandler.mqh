@@ -18,6 +18,9 @@ enum ENUM_EVENT_TYPE {
 
 class CEventHandler : private CEventHandlerBase
 {
+public:
+   virtual int Type() const { return classEventHandler; }
+private:
    ushort defeventhandling;
    ushort eventhandling[];
    
@@ -40,6 +43,11 @@ class CEventHandler : private CEventHandlerBase
       SetEventHandling(E_ERROR,EH_PRINT|EH_ALERT);
       SetLogLevel(E_NOTICE|E_WARNING|E_ERROR);
    } 
+   
+   virtual void Initalize()
+   {
+   
+   }
 
    void SetLogLevel(ushort _loglevel)
    {

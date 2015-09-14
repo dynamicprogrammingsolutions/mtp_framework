@@ -3,7 +3,10 @@
 
 class COrderArray : public CAppObjectArrayObj
 {
-   public:
+public:
+   virtual int Type() const { return classMT4OrderArray; }
+
+public:
       CApplication* app() { return (CApplication*)app; }
       CSymbolInfoBase* _symbol;
       void loadsymbol(string symbol)

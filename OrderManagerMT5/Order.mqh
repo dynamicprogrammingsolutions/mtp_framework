@@ -2,6 +2,8 @@
 
 class COrder : public COrderBase
 {
+public:
+   virtual int Type() const { return classMT5Order; }
 protected:
    string attachedtoticket;
    string stoploss_name;
@@ -27,7 +29,13 @@ public:
       closetime = 0;
       lastclosetime = 0;
    };
-   ~COrder() {};
+   ~COrder() {};   
+   
+   virtual void Initalize()
+   {
+      COrderBase::Initalize();
+      Prepare(GetPointer(attachedorders));
+   }
    
    bool CheckOrderInfo() { if (CheckPointer(orderinfo) == POINTER_INVALID) return(false); else return(true); }   
    ENUM_ORDER_TYPE GetType() { return(this.ordertype); }

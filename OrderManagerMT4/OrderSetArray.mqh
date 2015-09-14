@@ -1,5 +1,9 @@
 //
-class COrderSetArray : public CArrayObj { public:
+class COrderSetArray : public CArrayObj {
+public:
+   virtual int Type() const { return classMT4OrderSetArray; }
+
+public:
 
    virtual COrderSet* NewSetObject()
    {

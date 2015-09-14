@@ -36,6 +36,9 @@ enum ENUM_TRADE_ACTION
 class CTrade : public CObject
   {
 public:
+   virtual int Type() const { return classMT4Trade; }
+
+  public:
    static int CTrade::SleepIfBusy;
    static int CTrade::SleepIfTooMuch;
    static int CTrade::SleepIfBrokerError;

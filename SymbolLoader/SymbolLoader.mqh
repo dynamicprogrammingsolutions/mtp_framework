@@ -4,8 +4,10 @@
 class CSymbolLoader : public CSymbolLoaderBase
 {
 public:
+   virtual int Type() const { return classSymbolLoader; }
+public:
    CEventHandlerBase* event;
-   virtual void InitalizeService()
+   virtual void Initalize()
    {
       event = app.GetService(srvEvent);
    }

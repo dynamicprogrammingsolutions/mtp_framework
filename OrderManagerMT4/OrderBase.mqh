@@ -17,6 +17,8 @@
 
 class COrderBase : public COrderBaseBase
 {
+public:
+   virtual int Type() const { return classMT4OrderBase; }
 protected:
    CEventHandlerBase* event;
    //CApplication* app() { return (CApplication*)app; }
@@ -114,8 +116,6 @@ protected:
 public:
 
    COrderBase() {
-      event = app().event;
-   
       this.id = maxid+1;
       maxid = this.id;
       
@@ -139,6 +139,14 @@ public:
    ~COrderBase() {
       delete this.orderinfo;
    };
+   
+   CApplication* app;
+   virtual void Initalize()
+   {
+      Print("OrderBase Initalize");
+      app = AppBase();
+      event = app.event;
+   }
    
    void Copy(COrderBase*& target);
    bool ExistingOrder(int existing_ticket);

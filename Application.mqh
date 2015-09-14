@@ -29,7 +29,7 @@ public:
       }
       Print("Registering Service type:",EnumToString(service.srv)," name:'",service.name,"'");
             
-      service.app = GetPointer(this);
+      service.AppBase(GetPointer(this));
       services.Add(service);
 
       if (service.srv == srvEvent) event = service;

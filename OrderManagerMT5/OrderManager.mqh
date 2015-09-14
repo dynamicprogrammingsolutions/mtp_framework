@@ -14,6 +14,10 @@
 
 class COrderManager : public COrderManagerBase
 {
+public:
+   virtual int Type() const { return classMT5OrderManager; }
+   
+private:
    string ticket_prefix;
    string stoploss_comment;
    string takeprofit_comment;
@@ -49,11 +53,13 @@ public:
    };
    
    CApplication* app;
-   void InitalizeService()
+   void Initalize()
    {
-      app = COrderManagerBase::app;
+      app = AppBase();
       event = app.GetService(srvEvent);
-      symbolloader = app.GetService(srvSymbolLoader);   
+      symbolloader = app.GetService(srvSymbolLoader);  
+      Prepare(GetPointer(orders)); 
+      Prepare(GetPointer(historyorders));
    }
    
    CEventHandlerBase* event;

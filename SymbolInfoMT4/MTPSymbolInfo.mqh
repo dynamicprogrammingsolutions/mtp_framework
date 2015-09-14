@@ -11,7 +11,10 @@
 
 class CMTPSymbolInfo : public CSymbolInfo
 {
-   public:
+public:
+   virtual int Type() const { return classMT4MTPSymbolInfo; }
+
+public:
    
       //CEventHandler* event;
       //double m_lotroundup;

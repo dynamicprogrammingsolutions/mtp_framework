@@ -3,6 +3,8 @@
 
 class CMoneyManagement : public CAppObject {
 public:
+   virtual int Type() const { return classMT5MoneyManagement; }
+public:
    string symbol;
    CStopLoss* stoploss;
    virtual CMoneyManagement* SetSymbol(string __symbol)

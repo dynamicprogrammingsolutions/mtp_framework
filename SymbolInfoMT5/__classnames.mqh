@@ -1,0 +1,2 @@
+classMT5MTPSymbolInfo,
+classMT5SymbolInfo,

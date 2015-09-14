@@ -3,7 +3,10 @@
 
 class CAttachedOrderArray : public CAppObjectArrayObj
 {
-   public: CAttachedOrder *AttachedOrder(int nIndex){return((CAttachedOrder*)At(nIndex));}   
+public:
+   virtual int Type() const { return classMT4AttachedOrderArray; }
+public:
+   CAttachedOrder *AttachedOrder(int nIndex){return((CAttachedOrder*)At(nIndex));}   
    virtual bool  CreateElement(const int index) {
       m_data[index] = ((CApplication*)app).attachedorderfactory.Create();      
       return(true);

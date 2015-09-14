@@ -11,29 +11,29 @@ class CSymbolInfoBase : public CAppObject
          event = app.GetService(srvEvent);
       }
    
-      virtual string Name() const { return NULL; }
-      virtual bool Name(string name) { return false; }
+      virtual string Name() { AbstractFunctionWarning(__FUNCTION__); return NULL; }
+      virtual bool Name(string name) { AbstractFunctionWarning(__FUNCTION__); return false; }
       
-      virtual double Bid() const { return(0); }
-      virtual double Ask() const { return(0); }
-      virtual bool RefreshRates() { return false; }
+      virtual double Bid() { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual double Ask() { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual bool RefreshRates() { AbstractFunctionWarning(__FUNCTION__); return false; }
 
-      virtual double TickSize() { return(0); }
-      virtual double TickSizeR() { return(0); }
-      virtual int InTicks(double price) { return(0); }
-      virtual double InTicksD(double price) { return(0); }
-      virtual int TickSizeInPoints() { return(0); }
-      virtual int StopsLevelInTicks() { return(0); }
-      virtual int MinTakeProfit() { return(0); }
-      virtual int MinStopLoss() { return(0); }
-      virtual int SpreadInTicks() { return(0); }
-      virtual double SpreadInPrice() { return(0); }
-      virtual double LotValue() { return(0); }
-      virtual bool IsFractional(double treshold = 0) { return false; };
-      virtual double PriceRound(double price) { return(0); }
+      virtual double TickSize() { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual double TickSizeR() { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual int InTicks(double price) { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual double InTicksD(double price) { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual int TickSizeInPoints() { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual int StopsLevelInTicks() { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual int MinTakeProfit() { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual int MinStopLoss() { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual int SpreadInTicks() { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual double SpreadInPrice() { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual double LotValue() { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual bool IsFractional(double treshold = 0) { AbstractFunctionWarning(__FUNCTION__); return false; };
+      virtual double PriceRound(double price) { AbstractFunctionWarning(__FUNCTION__); return(0); }
       virtual double LotRound(double lotreq, bool close = false) { return 0; }
-      virtual double LotRoundUp() { return(0); }
-      virtual void LotRoundUp(double _lotroundup, bool _roundup_to_minlot) { }
-      virtual void LotRoundUpClose(double _lotroundup, bool _roundup_to_minlot) { }
+      virtual double LotRoundUp() { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual void LotRoundUp(double _lotroundup, bool _roundup_to_minlot) { AbstractFunctionWarning(__FUNCTION__);  }
+      virtual void LotRoundUpClose(double _lotroundup, bool _roundup_to_minlot) { AbstractFunctionWarning(__FUNCTION__);  }
       
 };

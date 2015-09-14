@@ -1,6 +1,8 @@
 //
 class COrderBase : public COrderBaseBase
 {
+public:
+   virtual int Type() const { return classMT5OrderBase; }
 protected:
    CEventHandlerBase* event;
    CApplication* app() { return (CApplication*)app; }
@@ -70,8 +72,6 @@ public:
 public:
    
    COrderBase() {
-      event = app().event;
-    
       this.id = maxid+1;
       maxid = this.id;     
 
@@ -91,7 +91,12 @@ public:
      delete this.orderinfo;
      delete this.orderinfov;
      delete this.historyorderinfov;
-  };
+   };
+   
+   virtual void Initalize()
+   {
+      event = ((CApplication*)AppBase()).event;   
+   }
    
    bool Isset() { return(executestate != ES_NOT_EXECUTED); }
       

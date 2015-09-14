@@ -72,7 +72,7 @@ public:
       for (int i = 0; i < count; i++) {
          CServiceProvider* service = ServiceProvider(i);
          Print("Initalizing Service ",EnumToString(service.srv)," '",service.name,"'");
-         service.InitalizeService();
+         service.Initalize();
       }
    }
    

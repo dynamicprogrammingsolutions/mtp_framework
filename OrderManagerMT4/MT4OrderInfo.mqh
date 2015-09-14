@@ -14,6 +14,8 @@ ulong COrderInfo_SelectedTicket = -1;
 
 class COrderInfo : private CObject
   {
+public:
+   virtual int Type() const { return classMT4OrderInfo; }
 protected:
    // no change
    int m_ticket;

@@ -3,6 +3,8 @@
 class CSymbolInfo : public CSymbolInfoBase
   {
 public:
+   virtual int Type() const { return classMT4SymbolInfo; }
+public:
    string                      m_name;               // symbol name
    MqlTick                     m_tick;               // structure of tick;
    double                      m_point;              // symbol point
@@ -36,7 +38,7 @@ public:
 public:
                      CSymbolInfo();
    //--- methods of access to protected data
-   virtual string            Name()                         const { return(m_name);               }
+   virtual string            Name()                         { return(m_name);               }
    MqlTick           Tick()                         const { return(m_tick);               }
    virtual bool              Name(string name);
    bool              Refresh();
@@ -61,11 +63,11 @@ public:
    int               FreezeLevel()                  const;
    //--- fast access methods to the double symbol propertyes
    //--- bid parameters
-   double            Bid()                          const { return(m_tick.bid);           }
+   double            Bid()                          { return(m_tick.bid);           }
    double            BidHigh()                      const;
    double            BidLow()                       const;
    //--- ask parameters
-   double            Ask()                          const { return(m_tick.ask);           }
+   double            Ask()                          { return(m_tick.ask);           }
    double            AskHigh()                      const;
    double            AskLow()                       const;
    //--- last parameters

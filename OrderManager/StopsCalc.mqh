@@ -4,6 +4,8 @@
 
 class CStopsCalc : public CStopsCalcBase
 {
+public:
+   virtual int Type() const { return classStopsCalc; }
 protected:
    CApplication* app() { return (CApplication*)app; }
    CSymbolInfoBase* _symbol;   
@@ -91,6 +93,8 @@ public:
 };
 
 class CEntry : public CStopsCalc {
+public:
+   virtual int Type() const { return classEntry; }
 
 protected:
    virtual void CalcTicks()
@@ -105,6 +109,8 @@ protected:
 };
 
 class CStopLoss : public CStopsCalc {
+public:
+   virtual int Type() const { return classStopLoss; }
 
 protected:
    bool zero_is_nosl;
@@ -122,6 +128,8 @@ protected:
 };
 
 class CTakeProfit : public CStopsCalc {
+public:
+   virtual int Type() const { return classTakeProfit; }
 
 protected:
    virtual void CalcTicks()

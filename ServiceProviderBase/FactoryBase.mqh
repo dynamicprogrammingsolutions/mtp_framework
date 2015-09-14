@@ -6,16 +6,8 @@ class CFactoryBase : public CServiceProvider
 protected:
    virtual CAppObject* GetNewObject()
    {
-      Print("Calling Abstract Function In: ",EnumToString((ENUM_CLASS_NAMES)this.Type()));
+      AbstractFunctionWarning(__FUNCTION__);   
       return NULL;
-   }
-   virtual void Prepare(CAppObject* obj)
-   {
-      if (CheckPointer(obj) == POINTER_INVALID) {
-         Print("invalid pointer in factory: ",EnumToString((ENUM_CLASS_NAMES)this.Type()));
-         return;
-      }
-      obj.app = this.app;
    }
 
 public:

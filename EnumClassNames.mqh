@@ -1,8 +1,6 @@
 //
 enum ENUM_CLASS_NAMES {
    classNone,
-
-#include "OrderManager\ClassNames.mqh"
-   
+#include "__classnames.mqh"
    classLast
 };

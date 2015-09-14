@@ -3,6 +3,8 @@
 class COrderArray : public CAppObjectArrayObj
 {
 public:
+   virtual int Type() const { return classMT5OrderArray; }
+public:
    COrderArray()
    {
       m_free_mode = false;

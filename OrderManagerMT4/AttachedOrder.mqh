@@ -2,6 +2,8 @@
 
 class CAttachedOrder : public COrderBase
 {
+public:
+   virtual int Type() const { return classMT4AttachedOrder; }
 
 public:
    string name;  

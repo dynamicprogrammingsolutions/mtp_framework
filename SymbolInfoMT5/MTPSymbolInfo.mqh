@@ -21,6 +21,8 @@
 
 class CMTPSymbolInfo : public CSymbolInfo
 {
+public:
+   virtual int Type() const { return classMT5MTPSymbolInfo; }
    public:
       //double m_lotroundup;
       double lot_extradigits;
