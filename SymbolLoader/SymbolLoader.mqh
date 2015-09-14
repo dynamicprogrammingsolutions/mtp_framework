@@ -33,7 +33,7 @@ public:
             }
          }
       }
-      l_symbolinfo = NewSymbolInfoObject();
+      l_symbolinfo = Prepare(NewSymbolInfoObject());
       if (l_symbolinfo.Name(in_symbol)) {
          CSymbolLoader::Add(l_symbolinfo);
          return(l_symbolinfo);

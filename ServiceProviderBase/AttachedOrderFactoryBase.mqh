@@ -4,9 +4,9 @@
 class CAttachedOrderFactoryBase : public CFactoryBase
 {
 public:
-   CAttachedOrderFactoryBase()
+   /*CAttachedOrderFactoryBase()
    {
       srv = srvAttachedOrderFactory;
       name = "attachedorderfactory";
-   }
+   }*/
 };

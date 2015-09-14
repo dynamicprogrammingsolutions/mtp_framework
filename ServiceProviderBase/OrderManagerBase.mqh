@@ -4,9 +4,9 @@
 class COrderManagerBase : public CServiceProvider
 {
    public:
-      COrderManagerBase()
+      /*COrderManagerBase()
       {
          name = "ordermanager";
          srv = srvOrderManager;
-      }      
+      }*/      
 };

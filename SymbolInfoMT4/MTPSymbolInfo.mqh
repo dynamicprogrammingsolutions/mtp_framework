@@ -36,6 +36,12 @@ public:
          roundup_to_minlot = false;
       }
       
+      CEventHandlerBase* event;
+      virtual void Initalize()
+      {
+         event = ((CApplication*)AppBase()).event;
+      }
+      
       virtual bool Name(string name);
 
       double TickSizeR() { return(TickSize()==0?CMTPSymbolInfo::m_point:TickSize()); }

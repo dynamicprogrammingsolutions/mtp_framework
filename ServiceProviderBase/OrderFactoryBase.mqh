@@ -4,9 +4,9 @@
 class COrderFactoryBase : public CFactoryBase
 {
 public:
-   COrderFactoryBase()
+   /*COrderFactoryBase()
    {
       srv = srvOrderFactory;
       name = "orderfactory";
-   }
+   }*/
 };

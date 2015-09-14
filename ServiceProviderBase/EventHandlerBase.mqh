@@ -2,11 +2,11 @@
 class CEventHandlerBase : private CServiceProvider
 {
 public:
-   CEventHandlerBase()
+   /*CEventHandlerBase()
    {
       name = "event";
       srv = srvEvent;
-   }
+   }*/
    
    virtual void SetLogLevel(ushort _loglevel)
    {

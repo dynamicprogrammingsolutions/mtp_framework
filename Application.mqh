@@ -15,28 +15,35 @@ public:
       //global_application_object = GetPointer(this);
    }
 
-   CEventHandlerBase* event;
-   CSymbolLoaderBase* symbolloader;
-   COrderManagerBase* ordermanager;
-   COrderFactoryBase* orderfactory;
-   CAttachedOrderFactoryBase* attachedorderfactory;
+#include "ServiceProviderBase\__service_fastaccess_objects.mqh"
 
-   void RegisterService(CServiceProvider* service)
+#ifdef SERVICE_FASTACCESS_OBJECTS
+  SERVICE_FASTACCESS_OBJECTS
+#endif
+
+   void RegisterService(CServiceProvider* service, ENUM_APPLICATION_SERVICE srv, string servicename)
    {
+      service.srv = srv;
+      service.name = servicename;
+      
       if (service.srv != srvNone && services.IsRegistered(service.srv)) {
          CServiceProvider* oldservice = DeregisterService(service.srv);
          if (CheckPointer(oldservice) == POINTER_DYNAMIC) delete oldservice;
       }
-      Print("Registering Service type:",EnumToString(service.srv)," name:'",service.name,"'");
+      Print("Registering Service type:",EnumToString(service.srv)," name:'",service.name,"' class:",EnumToString((ENUM_CLASS_NAMES)service.Type()));
             
       service.AppBase(GetPointer(this));
       services.Add(service);
 
-      if (service.srv == srvEvent) event = service;
-      if (service.srv == srvSymbolLoader) symbolloader = service;
-      if (service.srv == srvOrderManager) ordermanager = service;
-      if (service.srv == srvOrderFactory) orderfactory = service;
-      if (service.srv == srvAttachedOrderFactory) attachedorderfactory = service;
+      switch(service.srv) {
+
+#include "ServiceProviderBase\__service_fastaccess_switch.mqh"	
+
+#ifdef SERVICE_FASTACCESS_SWITCH
+  SERVICE_FASTACCESS_SWITCH
+#endif
+	
+      }
       
    }
    
@@ -60,13 +67,6 @@ public:
    }
    
    virtual CObject* GetService(ENUM_APPLICATION_SERVICE srv) {
-      switch (srv) {
-         case srvEvent: return (CObject*)event;
-         case srvSymbolLoader: return (CObject*)symbolloader;
-         case srvOrderManager: return (CObject*)ordermanager;
-         case srvOrderFactory: return (CObject*)orderfactory;
-         case srvAttachedOrderFactory: return (CObject*)attachedorderfactory;
-      }   
       return services.GetService(srv);
    }
 
@@ -87,16 +87,7 @@ public:
 
 };
 
-
-//CApplication* global_application_object;
-
 CApplication* app()
 {
    return (CApplication*)global_application_base_object;
-}
-
-template<typename T>
-string GetTypeName(const T t)
-{
-   return(typename(T));
 }

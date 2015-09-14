@@ -7,9 +7,9 @@
 
 void register_services()
 {
-  if (!app().ServiceIsRegistered(srvEvent)) app().RegisterService(new CEventHandler());
-  if (!app().ServiceIsRegistered(srvSymbolLoader)) app().RegisterService(new CSymbolLoaderMT5());
-  if (!app().ServiceIsRegistered(srvOrderManager)) app().RegisterService(new COrderManager());
-  if (!app().ServiceIsRegistered(srvOrderFactory)) app().RegisterService(new COrderFactory());
-  if (!app().ServiceIsRegistered(srvAttachedOrderFactory)) app().RegisterService(new CAttachedOrderFactory());
+  if (!app().ServiceIsRegistered(srvEvent)) app().RegisterService(new CEventHandler(),srvEvent,"eventhandler");
+  if (!app().ServiceIsRegistered(srvSymbolLoader)) app().RegisterService(new CSymbolLoaderMT5(),srvSymbolLoader,"symbolloader");
+  if (!app().ServiceIsRegistered(srvOrderManager)) app().RegisterService(new COrderManager(),srvOrderManager,"ordermanager");
+  if (!app().ServiceIsRegistered(srvOrderFactory)) app().RegisterService(new COrderFactory(),srvOrderFactory,"orderfactory");
+  if (!app().ServiceIsRegistered(srvAttachedOrderFactory)) app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
 }

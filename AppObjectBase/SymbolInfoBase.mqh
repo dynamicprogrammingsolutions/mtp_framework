@@ -2,15 +2,7 @@
 
 class CSymbolInfoBase : public CAppObject
 {
-   protected:
-      CEventHandlerBase* event;
-      
    public:
-      CSymbolInfoBase()
-      {
-         event = app.GetService(srvEvent);
-      }
-   
       virtual string Name() { AbstractFunctionWarning(__FUNCTION__); return NULL; }
       virtual bool Name(string name) { AbstractFunctionWarning(__FUNCTION__); return false; }
       

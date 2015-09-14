@@ -22,6 +22,12 @@
 class CMTPSymbolInfo : public CSymbolInfo
 {
 public:
+   CEventHandlerBase* event;
+   virtual void Initalize()
+   {
+      event = ((CApplication*)AppBase()).event;
+   }
+
    virtual int Type() const { return classMT5MTPSymbolInfo; }
    public:
       //double m_lotroundup;

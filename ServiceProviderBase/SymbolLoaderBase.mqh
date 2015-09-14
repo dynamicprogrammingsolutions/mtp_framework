@@ -5,11 +5,11 @@ class CSymbolLoaderBase : public CServiceProviderArrayObj
 protected:
 
 public:
-   CSymbolLoaderBase()
+   /*CSymbolLoaderBase()
    {
       name = "symbolloader";
       srv = srvSymbolLoader;
-   }
+   }*/
    virtual CSymbolInfoBase* LoadByIndex(int nIndex){
       AbstractFunctionWarning(__FUNCTION__);   
       return NULL;

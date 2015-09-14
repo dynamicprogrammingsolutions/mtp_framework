@@ -22,7 +22,8 @@
 
 class COrderManager : public COrderManagerBase
 {
-
+public:
+   virtual int Type() const { return classMT4OrderManager; }
 private:
 
 public:

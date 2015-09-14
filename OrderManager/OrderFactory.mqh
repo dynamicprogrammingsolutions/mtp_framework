@@ -1,4 +1,6 @@
 //
+#include "..\Loader.mqh"
+
 class COrderFactory : public COrderFactoryBase {
 public:
    virtual int Type() const { return classOrderFactory; }
