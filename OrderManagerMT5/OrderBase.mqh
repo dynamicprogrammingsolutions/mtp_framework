@@ -1,12 +1,12 @@
 //
-class COrderBase : public COrderBaseBase
+class COrderBase : public COrderBaseInterface
 {
 public:
    virtual int Type() const { return classMT5OrderBase; }
 protected:
-   CEventHandlerBase* event;
+   CEventHandlerInterface* event;
    CApplication* app() { return (CApplication*)app; }
-   CSymbolInfoBase* _symbol;
+   CSymbolInfoInterface* _symbol;
    void loadsymbol(string __symbol)
    {
       _symbol = app().symbolloader.LoadSymbol(__symbol);

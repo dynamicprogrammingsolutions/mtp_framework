@@ -12,7 +12,7 @@
 
 #include "Loader.mqh"
 
-class COrderManager : public COrderManagerBase
+class COrderManager : public COrderManagerInterface
 {
 public:
    virtual int Type() const { return classMT5OrderManager; }
@@ -62,9 +62,9 @@ public:
       Prepare(GetPointer(historyorders));
    }
    
-   CEventHandlerBase* event;
-   CSymbolLoaderBase* symbolloader;
-   CSymbolInfoBase* _symbol;
+   CEventHandlerInterface* event;
+   CSymbolLoaderInterface* symbolloader;
+   CSymbolInfoInterface* _symbol;
    
    void loadsymbol(string symbol)
    {
@@ -76,8 +76,8 @@ public:
       _symbol = symbolloader.LoadSymbol(symbol);
    }
 
-   virtual COrderBaseBase* NewOrderObject() { return ((CApplication*)app).orderfactory.Create(); }
-   virtual COrderBaseBase* NewAttachedOrderObject() { return ((CApplication*)app).attachedorderfactory.Create(); }
+   virtual COrderBaseInterface* NewOrderObject() { return ((CApplication*)app).orderfactory.Create(); }
+   virtual COrderBaseInterface* NewAttachedOrderObject() { return ((CApplication*)app).attachedorderfactory.Create(); }
 
    COrder* NewOrder(string in_symbol,ENUM_ORDER_TYPE _ordertype,double _volume,double _price,double _stoploss,double _takeprofit,string _comment="",datetime _expiration=0);
    COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,double volume,CEntry* _price,

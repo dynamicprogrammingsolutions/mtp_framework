@@ -89,11 +89,20 @@ void OnTick()
    
       app.customservice.MessageFromCustomService();
    
-      CSymbolInfoBase* _symbol = app.symbolloader.LoadSymbol(Symbol());
+      CSymbolInfoInterface* _symbol = app.symbolloader.LoadSymbol(Symbol());
       _symbol.RefreshRates();
       
       COrderManager* om = app.GetService(srvOrderManager);
-      om.NewOrder(_symbol.Name(),ORDER_TYPE_BUY,0.1,NULL,new CStopLossTicks(200),new CTakeProfitTicks(200));
+      
+#ifdef __MQL4__
+int stops_size = 200;
+#endif
+
+#ifdef __MQL5__
+int stops_size = 20;
+#endif
+
+      om.NewOrder(_symbol.Name(),ORDER_TYPE_BUY,0.1,NULL,new CStopLossTicks(stops_size),new CTakeProfitTicks(stops_size));
       
    }
    

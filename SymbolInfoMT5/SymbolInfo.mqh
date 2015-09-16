@@ -9,7 +9,7 @@
 //| Appointment: Class for access to symbol info.                    |
 //|              Derives from class CObject.                         |
 //+------------------------------------------------------------------+
-class CSymbolInfo : public CSymbolInfoBase
+class CSymbolInfo : public CSymbolInfoInterface
   {
 public:
    virtual int Type() const { return classMT5SymbolInfo; }

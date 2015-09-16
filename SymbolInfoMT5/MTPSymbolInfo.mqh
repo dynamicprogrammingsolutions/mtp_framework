@@ -22,7 +22,7 @@
 class CMTPSymbolInfo : public CSymbolInfo
 {
 public:
-   CEventHandlerBase* event;
+   CEventHandlerInterface* event;
    virtual void Initalize()
    {
       event = ((CApplication*)AppBase()).event;
