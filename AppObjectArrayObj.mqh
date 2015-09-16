@@ -1,6 +1,4 @@
 //
-#include "..\Loader.mqh"
-
 class CAppObjectArrayObj : public CAppObjectArray
   {
 protected:

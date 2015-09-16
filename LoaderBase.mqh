@@ -1,9 +1,10 @@
 #include <Arrays\ArrayObj.mqh>
 #include "EnumClassNames.mqh"
 #include "EnumApplicationService.mqh"
-#include "AppObjectBase\AppObject.mqh"
-#include "ApplicationBase.mqh"
+#include "AppObject.mqh"
+#include "AppObjectArray.mqh"
+#include "AppObjectArrayObj.mqh"
 
-#include "ServiceProviderBase\ServiceProvider.mqh"
-#include "ServiceProviderBase\ServiceProviderArray.mqh"
-#include "ServiceProviderBase\ServiceProviderArrayObj.mqh"
+#include "ServiceProvider.mqh"
+#include "ServiceProviderArray.mqh"
+#include "ServiceProviderArrayObj.mqh"

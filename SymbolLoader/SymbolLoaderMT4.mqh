@@ -1,5 +1,4 @@
 //
-#include "..\ServiceProviderBase\SymbolLoaderBase.mqh"
 #include "..\SymbolInfoMT4\MTPSymbolInfo.mqh"
 #include "SymbolLoader.mqh"
 

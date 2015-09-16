@@ -1,6 +1,4 @@
 //
-#include "..\ServiceProviderBase\EventHandlerBase.mqh"
-
 enum ENUM_HANDLING_TYPE {
    EH_PRINT = 1,
    EH_ALERT = 2,
