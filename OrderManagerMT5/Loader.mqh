@@ -2,7 +2,7 @@
 
 #include "..\Loader.mqh"
 #include "..\OrderManager\Loader.mqh"
-#include "..\SymbolLoader\SymbolLoaderMT5.mqh"
+#include "..\SymbolLoader\SymbolLoader.mqh"
 
 #include "HelperStateselectMT5.mqh"
 

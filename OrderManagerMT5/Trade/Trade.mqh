@@ -5,7 +5,6 @@
 //|                                              Revision 2010.02.08 |
 //+------------------------------------------------------------------+
 #include <Object.mqh>
-#include "..\..\SymbolLoader\SymbolLoaderMT5.mqh"
 #include "OrderInfo.mqh"
 #include "HistoryOrderInfo.mqh"
 #include "PositionInfo.mqh"

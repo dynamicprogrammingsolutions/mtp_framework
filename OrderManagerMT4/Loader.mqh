@@ -2,7 +2,7 @@
 
 #include "..\Loader.mqh"
 #include "..\OrderManager\Loader.mqh"
-#include "..\SymbolLoader\SymbolLoaderMT4.mqh"
+#include "..\SymbolLoader\SymbolLoader.mqh"
 
 #include "EnumOrderState.mqh"
 #include "HelperStateselect.mqh"

@@ -5,7 +5,6 @@
 //|                                              Revision 2010.05.14 |
 //+------------------------------------------------------------------+
 #include <Object.mqh>
-#include "..\..\SymbolLoader\SymbolLoaderMT5.mqh"
 //+------------------------------------------------------------------+
 //| Class CPositionInfo.                                             |
 //| Appointment: Class for access to position info.                  |

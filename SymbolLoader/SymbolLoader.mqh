@@ -1,6 +1,12 @@
 //
 #include "..\Loader.mqh"
 
+#ifdef __MQL4__
+  #include "..\SymbolInfoMT4\MTPSymbolInfo.mqh"
+#else
+#include "..\SymbolInfoMT5\MTPSymbolInfo.mqh"
+#endif
+
 class CSymbolLoader : public CSymbolLoaderBase
 {
 public:
@@ -19,8 +25,7 @@ public:
       else return((CSymbolInfoBase*)at);
    }
    virtual CSymbolInfoBase* NewSymbolInfoObject() {
-      Print("Calling Abstract Method: ",__FUNCTION__);
-      return NULL;
+      return new CMTPSymbolInfo();
    }
    virtual CSymbolInfoBase* LoadSymbol(const string in_symbol)
    {
@@ -29,6 +34,11 @@ public:
          l_symbolinfo = LoadByIndex(i);
          if (CheckPointer(l_symbolinfo) != POINTER_INVALID) {
             if (l_symbolinfo.Name() == in_symbol) {
+            
+#ifdef __MQL4__
+               if (l_symbolinfo.LotValue() == 0) l_symbolinfo.Name(l_symbolinfo.Name());
+#endif
+
                return(l_symbolinfo);
             }
          }

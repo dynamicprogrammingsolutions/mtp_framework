@@ -6,8 +6,6 @@
 #property copyright "Zoltan Laszlo Ferenci"
 #property link      "http://www.metatraderprogrammer.com"
 
-#include "..\SymbolLoader\SymbolLoaderMT4.mqh"
-
 bool addaccountbalance = true;
 double addfixbalance = 0;
 
