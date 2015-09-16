@@ -12,7 +12,8 @@ public:
 
    CApplication()
    {
-      //global_application_object = GetPointer(this);
+      global_application_object = GetPointer(this);
+      this.AppBase(GetPointer(this));
    }
 
 #include "ServiceProviderBase\__service_fastaccess_objects.mqh"
@@ -89,5 +90,5 @@ public:
 
 CApplication* app()
 {
-   return (CApplication*)global_application_base_object;
+   return (CApplication*)global_application_object;
 }

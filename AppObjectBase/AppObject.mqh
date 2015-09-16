@@ -2,7 +2,7 @@
 class CAppObject : public CObject
 {
 private:
-   CApplicationBase* appbase;
+   CAppObject* appbase;
 protected:
    void AbstractFunctionWarning(string function = "")
    {
@@ -19,15 +19,18 @@ public:
    virtual void Initalize() {
       //AbstractFunctionWarning(__FUNCTION__);
    }
-   CApplicationBase* AppBase() {
+   CAppObject* AppBase() {
       if (CheckPointer(appbase) == POINTER_INVALID) {
          Print("App not set in: ",EnumToString((ENUM_CLASS_NAMES)this.Type()));
-         return global_application_base_object;
+         return global_application_object;
       } else {
          return appbase;
       }
    }
-   void AppBase(CApplicationBase* _appbase) {
+   void AppBase(CAppObject* _appbase) {
       appbase = _appbase;
    }
 };
+
+// this is just for protection
+CAppObject* global_application_object;

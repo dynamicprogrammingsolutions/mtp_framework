@@ -1,14 +1,7 @@
 //
-class CApplicationBase : private CObject
+class CApplicationBase : public CAppObject
 {
 public:
-   CApplicationBase()
-   {
-      global_application_base_object = GetPointer(this);
-   }
-
-   virtual CObject* GetService(string name) { return NULL; }
-   virtual CObject* GetService(ENUM_APPLICATION_SERVICE srv) { return NULL; }
+   virtual CObject* GetService(string name) { AbstractFunctionWarning(__FUNCTION__); return NULL; }
+   virtual CObject* GetService(ENUM_APPLICATION_SERVICE srv) { AbstractFunctionWarning(__FUNCTION__); return NULL; }
 };
-
-CApplicationBase* global_application_base_object;
