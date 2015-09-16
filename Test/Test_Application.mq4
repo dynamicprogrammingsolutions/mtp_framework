@@ -24,9 +24,6 @@
 #define CUSTOM_SERVICES srvCustom,
 #define CUSTOM_CLASSES classCustom,
 
-#define SERVICE_FASTACCESS_OBJECTS CCustomServiceBase* customservice;
-#define SERVICE_FASTACCESS_SWITCH case srvCustom: customservice = service; break;
-
 #include <mtp_framework_1.1\LoaderBase.mqh>
 
 class CCustomServiceBase : public CServiceProvider {
@@ -40,6 +37,9 @@ public:
       Print("Message From ",__FUNCTION__);
    }
 };
+
+#define SERVICE_FASTACCESS_OBJECTS CCustomServiceBase* customservice;
+#define SERVICE_FASTACCESS_SWITCH case srvCustom: customservice = service; break;
 
 #include <mtp_framework_1.1\Loader.mqh>
 #include <mtp_framework_1.1\DefaultServices.mqh>   

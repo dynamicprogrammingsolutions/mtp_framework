@@ -1,4 +1,5 @@
 #include <Arrays\ArrayObj.mqh>
+
 #include "EnumClassNames.mqh"
 #include "EnumApplicationService.mqh"
 
