@@ -42,16 +42,8 @@ public:
 };
 
 #include <mtp_framework_1.1\Loader.mqh>
-
-#ifdef __MQL4__
-   #include <mtp_framework_1.1\DefaultServicesMT4.mqh>
-   #include <mtp_framework_1.1\ChartInfo\IsFirstTickMT4.mqh>
-#endif
-
-#ifdef __MQL5__
-   #include <mtp_framework_1.1\DefaultServicesMT5.mqh>
-   #include <mtp_framework_1.1\ChartInfo\IsFirstTickMT5.mqh>
-#endif
+#include <mtp_framework_1.1\DefaultServices.mqh>   
+#include <mtp_framework_1.1\ChartInfo\IsFirstTick.mqh>
 
 class CCustomService : public CCustomServiceBase {
 public:

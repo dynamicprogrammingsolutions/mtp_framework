@@ -1,7 +1,12 @@
 //
 #include "EventHandler\EventHandler.mqh"
 #include "SymbolLoader\SymbolLoader.mqh"
+#ifdef __MQL4__
 #include "OrderManagerMT4\OrderManager.mqh"
+#endif
+#ifdef __MQL5__
+#include "OrderManagerMT5\OrderManager.mqh"
+#endif
 #include "OrderManager\OrderFactory.mqh"
 #include "OrderManager\AttachedOrderFactory.mqh"
 

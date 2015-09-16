@@ -1,4 +1,7 @@
 //
+#ifdef __MQL5__
+#include "..\mql4to5\timeseries.mqh"
+#endif
 
 class CIsFirstTick
 {
