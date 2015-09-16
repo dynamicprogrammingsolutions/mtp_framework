@@ -1,0 +1,5 @@
+//
+class COrderBaseInterface : public CAppObject
+{
+
+};

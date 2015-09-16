@@ -1,6 +1,6 @@
 //
 
-class CSymbolInfo : public CSymbolInfoBase
+class CSymbolInfo : public CSymbolInfoInterface
   {
 public:
    virtual int Type() const { return classMT4SymbolInfo; }

@@ -20,7 +20,7 @@
 #include "..\libraries\file.mqh"
 //#include "Order.mqh"
 
-class COrderManager : public COrderManagerBase
+class COrderManager : public COrderManagerInterface
 {
 public:
    virtual int Type() const { return classMT4OrderManager; }
@@ -75,9 +75,9 @@ public:
       Prepare(GetPointer(attachedorders));
    }
    
-   CEventHandlerBase* event;
-   CSymbolLoaderBase* symbolloader;
-   CSymbolInfoBase* _symbol;
+   CEventHandlerInterface* event;
+   CSymbolLoaderInterface* symbolloader;
+   CSymbolInfoInterface* _symbol;
    
    void loadsymbol(string symbol)
    {
@@ -145,8 +145,8 @@ public:
    double COrderManager::TotalProfit(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1);
    double COrderManager::TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1, bool _commission = true, bool swap = true);
    
-   virtual COrderBaseBase* NewOrderObject() { return app.orderfactory.Create(); }
-   virtual COrderBaseBase* NewAttachedOrderObject() { return app.attachedorderfactory.Create(); }
+   virtual COrderBaseInterface* NewOrderObject() { return app.orderfactory.Create(); }
+   virtual COrderBaseInterface* NewAttachedOrderObject() { return app.attachedorderfactory.Create(); }
    
    bool GetOrders(ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY, string in_symbol = "", int in_magic = -1, bool no_loop_and_reset = false)
    {

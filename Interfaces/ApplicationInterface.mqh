@@ -1,5 +1,5 @@
 //
-class CApplicationBase : public CAppObject
+class CApplicationInterface : public CAppObject
 {
 public:
    virtual CObject* GetService(string name) { AbstractFunctionWarning(__FUNCTION__); return NULL; }

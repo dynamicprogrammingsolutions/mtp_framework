@@ -1,6 +1,6 @@
 //
 
-class CSymbolInfoBase : public CAppObject
+class CSymbolInfoInterface : public CAppObject
 {
    public:
       virtual string Name() { AbstractFunctionWarning(__FUNCTION__); return NULL; }

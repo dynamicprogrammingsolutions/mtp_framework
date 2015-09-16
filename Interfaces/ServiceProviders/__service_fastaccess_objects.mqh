@@ -1,5 +1,5 @@
-CEventHandlerBase* event;
-CSymbolLoaderBase* symbolloader;
-COrderManagerBase* ordermanager;
-COrderFactoryBase* orderfactory;
-CAttachedOrderFactoryBase* attachedorderfactory;
+CEventHandlerInterface* event;
+CSymbolLoaderInterface* symbolloader;
+COrderManagerInterface* ordermanager;
+CFactoryInterface* orderfactory;
+CFactoryInterface* attachedorderfactory;

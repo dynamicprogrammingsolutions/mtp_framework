@@ -1,6 +1,6 @@
 //
 #include "..\Loader.mqh"
-class CAttachedOrderFactory : public CAttachedOrderFactoryBase {
+class CAttachedOrderFactory : public CFactoryInterface {
 public:
    virtual int Type() const { return classAttachedOrderFactory; }
 protected:

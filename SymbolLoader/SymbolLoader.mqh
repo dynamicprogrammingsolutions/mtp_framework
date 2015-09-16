@@ -7,29 +7,29 @@
 #include "..\SymbolInfoMT5\MTPSymbolInfo.mqh"
 #endif
 
-class CSymbolLoader : public CSymbolLoaderBase
+class CSymbolLoader : public CSymbolLoaderInterface
 {
 public:
    virtual int Type() const { return classSymbolLoader; }
 public:
-   CEventHandlerBase* event;
+   CEventHandlerInterface* event;
    virtual void Initalize()
    {
       event = app.GetService(srvEvent);
    }
 
-   virtual CSymbolInfoBase* LoadByIndex(int nIndex){
+   virtual CSymbolInfoInterface* LoadByIndex(int nIndex){
       CObject *at;
       at = CSymbolLoader::At(nIndex);
       if (CheckPointer(at) == POINTER_INVALID) return(NULL);
-      else return((CSymbolInfoBase*)at);
+      else return((CSymbolInfoInterface*)at);
    }
-   virtual CSymbolInfoBase* NewSymbolInfoObject() {
+   virtual CSymbolInfoInterface* NewSymbolInfoObject() {
       return new CMTPSymbolInfo();
    }
-   virtual CSymbolInfoBase* LoadSymbol(const string in_symbol)
+   virtual CSymbolInfoInterface* LoadSymbol(const string in_symbol)
    {
-      CSymbolInfoBase* l_symbolinfo;
+      CSymbolInfoInterface* l_symbolinfo;
       for (int i = CSymbolLoader::Total()-1; i >= 0; i--) {
          l_symbolinfo = LoadByIndex(i);
          if (CheckPointer(l_symbolinfo) != POINTER_INVALID) {
@@ -51,7 +51,7 @@ public:
          return(NULL);
       }
    }
-   virtual bool LoadSymbol(const string in_symbol, CSymbolInfoBase*& _symbolinfo)
+   virtual bool LoadSymbol(const string in_symbol, CSymbolInfoInterface*& _symbolinfo)
    {
       _symbolinfo = LoadSymbol(in_symbol);
       if (CheckPointer(_symbolinfo) == POINTER_INVALID) return(false);

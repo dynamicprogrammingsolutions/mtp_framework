@@ -1,7 +1,7 @@
 //
 #include "..\Loader.mqh"
 
-class COrderFactory : public COrderFactoryBase {
+class COrderFactory : public CFactoryInterface {
 public:
    virtual int Type() const { return classOrderFactory; }
 protected:

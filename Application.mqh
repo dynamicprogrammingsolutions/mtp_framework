@@ -3,7 +3,7 @@
 
 #include "Loader.mqh"
 
-class CApplication : public CApplicationBase
+class CApplication : public CApplicationInterface
 {
 private:
 

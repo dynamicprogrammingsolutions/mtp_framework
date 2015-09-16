@@ -1,38 +1,38 @@
 //
-class CStopsCalcBase : public CAppObject
+class CStopsCalcInterface : public CAppObject
 {
 public:
-   virtual CStopsCalcBase* SetOrderType(ENUM_ORDER_TYPE _ordertype)
+   virtual CStopsCalcInterface* SetOrderType(ENUM_ORDER_TYPE _ordertype)
    {
       AbstractFunctionWarning(__FUNCTION__); 
       return NULL;
    }
    
-   virtual CStopsCalcBase* SetSymbol(string __symbol)
+   virtual CStopsCalcInterface* SetSymbol(string __symbol)
    {
       AbstractFunctionWarning(__FUNCTION__);
       return NULL;
    }     
    
-   virtual CStopsCalcBase* SetTicks(double _ticks)
+   virtual CStopsCalcInterface* SetTicks(double _ticks)
    {
       AbstractFunctionWarning(__FUNCTION__);
       return NULL;
    }
    
-   virtual CStopsCalcBase* SetPrice(double _price)
+   virtual CStopsCalcInterface* SetPrice(double _price)
    {
       AbstractFunctionWarning(__FUNCTION__);
       return NULL;
    }
    
-   virtual CStopsCalcBase* SetCurrentPrice(double _currentprice)
+   virtual CStopsCalcInterface* SetCurrentPrice(double _currentprice)
    {
       AbstractFunctionWarning(__FUNCTION__);
       return NULL;
    }
    
-   virtual CStopsCalcBase* SetEntryPrice(double _entryprice)
+   virtual CStopsCalcInterface* SetEntryPrice(double _entryprice)
    {
       AbstractFunctionWarning(__FUNCTION__);
       return NULL;

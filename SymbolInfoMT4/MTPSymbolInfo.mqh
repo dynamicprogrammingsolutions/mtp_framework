@@ -36,7 +36,7 @@ public:
          roundup_to_minlot = false;
       }
       
-      CEventHandlerBase* event;
+      CEventHandlerInterface* event;
       virtual void Initalize()
       {
          event = ((CApplication*)AppBase()).event;

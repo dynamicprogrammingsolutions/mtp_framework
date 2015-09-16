@@ -1,7 +1,7 @@
 //
 #include "..\Loader.mqh"
 
-class CFactoryBase : public CServiceProvider
+class CFactoryInterface : public CServiceProvider
 {
 protected:
    virtual CAppObject* GetNewObject()

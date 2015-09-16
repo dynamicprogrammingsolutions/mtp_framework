@@ -2,13 +2,13 @@
 #include "..\Loader.mqh"
 #include "HelperOrderselect.mqh"
 
-class CStopsCalc : public CStopsCalcBase
+class CStopsCalc : public CStopsCalcInterface
 {
 public:
    virtual int Type() const { return classStopsCalc; }
 protected:
    CApplication* app() { return (CApplication*)app; }
-   CSymbolInfoBase* _symbol;   
+   CSymbolInfoInterface* _symbol;   
    void loadsymbol(string __symbol)
    {
       _symbol = this.app().symbolloader.LoadSymbol(__symbol);
@@ -31,44 +31,44 @@ protected:
      
 public:
 
-   virtual CStopsCalcBase* SetOrderType(ENUM_ORDER_TYPE _ordertype)
+   virtual CStopsCalcInterface* SetOrderType(ENUM_ORDER_TYPE _ordertype)
    {
       ordertype_set = true;
       this.ordertype = _ordertype;
-      return (CStopsCalcBase*)GetPointer(this);
+      return (CStopsCalcInterface*)GetPointer(this);
    }
    
-   virtual CStopsCalcBase* SetSymbol(string __symbol)
+   virtual CStopsCalcInterface* SetSymbol(string __symbol)
    {
       symbol_set = true;
       this.symbol = __symbol;
-      return (CStopsCalcBase*)GetPointer(this);
+      return (CStopsCalcInterface*)GetPointer(this);
    }     
    
-   virtual CStopsCalcBase* SetTicks(double _ticks)
+   virtual CStopsCalcInterface* SetTicks(double _ticks)
    {
       ticks_set = true;
       ticks = _ticks;
-      return (CStopsCalcBase*)GetPointer(this);
+      return (CStopsCalcInterface*)GetPointer(this);
    }
    
-   virtual CStopsCalcBase* SetPrice(double _price)
+   virtual CStopsCalcInterface* SetPrice(double _price)
    {
       price_set = true;
       price = _price;
-      return (CStopsCalcBase*)GetPointer(this);
+      return (CStopsCalcInterface*)GetPointer(this);
    }
    
-   virtual CStopsCalcBase* SetCurrentPrice(double _currentprice)
+   virtual CStopsCalcInterface* SetCurrentPrice(double _currentprice)
    {
       currentprice = _currentprice;      
-      return (CStopsCalcBase*)GetPointer(this);
+      return (CStopsCalcInterface*)GetPointer(this);
    }
    
-   virtual CStopsCalcBase* SetEntryPrice(double _entryprice)
+   virtual CStopsCalcInterface* SetEntryPrice(double _entryprice)
    {
       entryprice = _entryprice;      
-      return (CStopsCalcBase*)GetPointer(this);
+      return (CStopsCalcInterface*)GetPointer(this);
    }
    
    virtual double GetTicks()
@@ -159,7 +159,7 @@ public:
       chartprice = _price;
       this.SetPrice(chartprice);
    }
-   virtual CStopsCalcBase* SetPrice(double _price)
+   virtual CStopsCalcInterface* SetPrice(double _price)
    {
       if (!addspread) {
          CStopsCalc::SetPrice(_price);
@@ -172,21 +172,21 @@ public:
             CStopsCalc::SetPrice(_price);
          }
       }
-      return (CStopsCalcBase*)GetPointer(this);
+      return (CStopsCalcInterface*)GetPointer(this);
    }
-   virtual CStopsCalcBase* SetOrderType(ENUM_ORDER_TYPE _ordertype)
+   virtual CStopsCalcInterface* SetOrderType(ENUM_ORDER_TYPE _ordertype)
    {
       CStopsCalc::SetOrderType(_ordertype);
       if (!price_set && symbol_set)
          this.SetPrice(chartprice);
-      return (CStopsCalcBase*)GetPointer(this);
+      return (CStopsCalcInterface*)GetPointer(this);
    }
-   virtual CStopsCalcBase* SetSymbol(string __symbol)
+   virtual CStopsCalcInterface* SetSymbol(string __symbol)
    {
       CStopsCalc::SetSymbol(__symbol);
       if (!price_set && ordertype_set) 
          this.SetPrice(chartprice);
-      return (CStopsCalcBase*)GetPointer(this);
+      return (CStopsCalcInterface*)GetPointer(this);
    }  
 };
 
@@ -256,7 +256,7 @@ double gettakeprofitprice(string in_symbol, int in_ordertype, int in_stoploss, d
 
 double getentryprice(string in_symbol, int in_ordertype, int entrydistance, double price = 0)
 {
-   CSymbolInfoBase* _symbol = app().symbolloader.LoadSymbol(in_symbol);
+   CSymbolInfoInterface* _symbol = app().symbolloader.LoadSymbol(in_symbol);
    //loadsymbol(in_symbol,__FUNCTION__);
 
    if (price == 0) {      
@@ -293,7 +293,7 @@ int getstoplossticks(string in_symbol, int in_ordertype, double in_stoploss, dou
       
    if (price == 0)
    {
-      CSymbolInfoBase* _symbol = app().symbolloader.LoadSymbol(in_symbol);
+      CSymbolInfoInterface* _symbol = app().symbolloader.LoadSymbol(in_symbol);
       //loadsymbol(in_symbol,__FUNCTION__);
       if (ordertype_long(in_ordertype))
          {price = _symbol.Ask();}
@@ -316,7 +316,7 @@ int gettakeprofitticks(string in_symbol, int in_ordertype, double in_takeprofit,
 
    if (price == 0)
    {
-      CSymbolInfoBase* _symbol = app().symbolloader.LoadSymbol(in_symbol);
+      CSymbolInfoInterface* _symbol = app().symbolloader.LoadSymbol(in_symbol);
       //loadsymbol(in_symbol,__FUNCTION__);
       if (ordertype_long(in_ordertype))
          {price = _symbol.Ask();}
@@ -334,7 +334,7 @@ int gettakeprofitticks(string in_symbol, int in_ordertype, double in_takeprofit,
 
 int getprofitticks(string in_symbol, int in_ordertype, double closeprice, double entryprice)
 {
-   CSymbolInfoBase* _symbol = app().symbolloader.LoadSymbol(in_symbol);
+   CSymbolInfoInterface* _symbol = app().symbolloader.LoadSymbol(in_symbol);
    if (ordertype_long(in_ordertype)) {
       return(_symbol.InTicks(closeprice-entryprice));
    } else if (ordertype_short(in_ordertype)) {
@@ -346,7 +346,7 @@ int getprofitticks(string in_symbol, int in_ordertype, double closeprice, double
 int getentrypriceticks(string in_symbol,int in_ordertype, double entryprice, double price=0)
 {
    //loadsymbol(in_symbol,__FUNCTION__);
-   CSymbolInfoBase* _symbol = app().symbolloader.LoadSymbol(in_symbol);   
+   CSymbolInfoInterface* _symbol = app().symbolloader.LoadSymbol(in_symbol);   
    if (price == 0)
    {
       if (ordertype_long(in_ordertype))
@@ -374,7 +374,7 @@ int getentrypriceticks(string in_symbol,int in_ordertype, double entryprice, dou
 
 double getcurrententryprice(string in_symbol, int in_ordertype)
 {
-   CSymbolInfoBase* _symbol = app().symbolloader.LoadSymbol(in_symbol);
+   CSymbolInfoInterface* _symbol = app().symbolloader.LoadSymbol(in_symbol);
    //loadsymbol(in_symbol,__FUNCTION__);
    double currentprice = 0;
    if (ordertype_long(in_ordertype)) currentprice = _symbol.Ask();
@@ -385,7 +385,7 @@ double getcurrententryprice(string in_symbol, int in_ordertype)
 double getcurrentcloseprice(string in_symbol, int in_ordertype)
 {
    //loadsymbol(in_symbol,__FUNCTION__);
-   CSymbolInfoBase* _symbol = app().symbolloader.LoadSymbol(in_symbol);
+   CSymbolInfoInterface* _symbol = app().symbolloader.LoadSymbol(in_symbol);
    double currentprice = 0;
    if (ordertype_long(in_ordertype)) currentprice = _symbol.Bid();
    else if (ordertype_short(in_ordertype)) currentprice = _symbol.Ask();
@@ -395,7 +395,7 @@ double getcurrentcloseprice(string in_symbol, int in_ordertype)
 bool verifysl(string in_symbol, int in_stoploss)
 {
    //loadsymbol(in_symbol,__FUNCTION__);
-   CSymbolInfoBase* _symbol = app().symbolloader.LoadSymbol(in_symbol);
+   CSymbolInfoInterface* _symbol = app().symbolloader.LoadSymbol(in_symbol);
    if ((in_stoploss >= _symbol.MinStopLoss()) || (in_stoploss == 0))
       return(true);
       
@@ -405,7 +405,7 @@ bool verifysl(string in_symbol, int in_stoploss)
 bool verifytp(string in_symbol, int in_takeprofit)
 {
    //loadsymbol(in_symbol,__FUNCTION__);
-   CSymbolInfoBase* _symbol = app().symbolloader.LoadSymbol(in_symbol);
+   CSymbolInfoInterface* _symbol = app().symbolloader.LoadSymbol(in_symbol);
    if ((in_takeprofit >= _symbol.MinTakeProfit()) || (in_takeprofit == 0))
       return(true);
       
@@ -415,7 +415,7 @@ bool verifytp(string in_symbol, int in_takeprofit)
 bool verifyentry(string in_symbol, int in_entry)
 {
    //loadsymbol(in_symbol,__FUNCTION__);
-   CSymbolInfoBase* _symbol = app().symbolloader.LoadSymbol(in_symbol);
+   CSymbolInfoInterface* _symbol = app().symbolloader.LoadSymbol(in_symbol);
    if (in_entry >= _symbol.StopsLevelInTicks())
       return(true);
    return(false);

@@ -1,7 +1,7 @@
 //
 #include "..\Loader.mqh"
 
-class COrderManagerBase : public CServiceProvider
+class COrderManagerInterface : public CServiceProvider
 {
    public:
       /*COrderManagerBase()

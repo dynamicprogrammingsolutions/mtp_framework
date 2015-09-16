@@ -8,7 +8,7 @@ public:
 
 public:
       CApplication* app() { return (CApplication*)app; }
-      CSymbolInfoBase* _symbol;
+      CSymbolInfoInterface* _symbol;
       void loadsymbol(string symbol)
       {
          _symbol = app().symbolloader.LoadSymbol(symbol);

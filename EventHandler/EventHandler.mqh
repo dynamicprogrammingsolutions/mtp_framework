@@ -14,7 +14,7 @@ enum ENUM_EVENT_TYPE {
    E_DEBUG = 32,
 };
 
-class CEventHandler : private CEventHandlerBase
+class CEventHandler : private CEventHandlerInterface
 {
 public:
    virtual int Type() const { return classEventHandler; }
