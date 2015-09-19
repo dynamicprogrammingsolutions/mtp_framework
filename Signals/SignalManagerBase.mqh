@@ -1,3 +1,4 @@
+#include "Signal.mqh"
 
 class CSignalManagerBase : public CServiceProvider
 {

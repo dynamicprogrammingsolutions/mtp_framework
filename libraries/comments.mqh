@@ -7,7 +7,13 @@
 #property link      "http://www.mql5.com"
 
 #include "arrays.mqh"
-#include "objectfunctions.mqh"
+
+#ifdef __MQL4__
+  #include "objectfunctions.mqh"
+#else
+  #include "objectfunctions_MT5.mqh"
+  #include "..\mql4to5\timeseries.mqh"
+#endif
 
 string commentstring[];
 string lastcommentstring[];
