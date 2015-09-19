@@ -9,9 +9,9 @@ public:
 public:
       CApplication* app() { return (CApplication*)app; }
       CSymbolInfoInterface* _symbol;
-      void loadsymbol(string symbol)
+      void loadsymbol(string __symbol)
       {
-         _symbol = app().symbolloader.LoadSymbol(symbol);
+         _symbol = app().symbolloader.LoadSymbol(__symbol);
       }
 
       COrderArray()

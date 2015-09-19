@@ -7,6 +7,8 @@
 #include "AppObjectArray.mqh"
 #include "AppObjectArrayObj.mqh"
 
+#include "Interfaces\ApplicationInterface.mqh"
+
 #include "ServiceProvider.mqh"
 #include "ServiceProviderArray.mqh"
 #include "ServiceProviderArrayObj.mqh"

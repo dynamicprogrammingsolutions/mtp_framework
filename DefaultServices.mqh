@@ -10,6 +10,8 @@
 #include "OrderManager\OrderFactory.mqh"
 #include "OrderManager\AttachedOrderFactory.mqh"
 
+#include "Events\Loader.mqh"
+
 void register_services()
 {
   if (!app().ServiceIsRegistered(srvEvent)) app().RegisterService(new CEventHandler(),srvEvent,"eventhandler");
@@ -17,4 +19,6 @@ void register_services()
   if (!app().ServiceIsRegistered(srvOrderManager)) app().RegisterService(new COrderManager(),srvOrderManager,"ordermanager");
   if (!app().ServiceIsRegistered(srvOrderFactory)) app().RegisterService(new COrderFactory(),srvOrderFactory,"orderfactory");
   if (!app().ServiceIsRegistered(srvAttachedOrderFactory)) app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
+  
+  app().RegisterEventHandler(app().eventhandler,classEventLog);
 }

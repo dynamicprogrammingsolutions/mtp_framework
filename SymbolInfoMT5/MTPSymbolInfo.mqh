@@ -25,7 +25,7 @@ public:
    CEventHandlerInterface* event;
    virtual void Initalize()
    {
-      event = ((CApplication*)AppBase()).event;
+      event = ((CApplication*)AppBase()).eventhandler;
    }
 
    virtual int Type() const { return classMT5MTPSymbolInfo; }
@@ -53,6 +53,7 @@ public:
       int SpreadInTicks() { return(Spread()/TickSizeInPoints()); }
       double LotValue() { return(TickValue()/TickSize()); }
       bool IsFractional(double treshold = FRACTIONAL_TRESHOLD);
+      virtual double ConvertFractional(double pips) { return IsFractional()?pips*10:pips; }
       double PriceRound(double price) { return(InTicks(price)*TickSizeR()); }
       double LotRound(double lotreq, bool close = false);
       double LotRoundUp() { return(lotroundup); }

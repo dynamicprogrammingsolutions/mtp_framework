@@ -66,6 +66,16 @@ public:
       return false;
    }
    
+   bool IsRegistered(string servicename)
+   {
+      int count = Total();
+      for (int i = 0; i < count; i++) {
+         CServiceProvider* service = ServiceProvider(i);
+         if (service.name == servicename) return true;
+      }
+      return false;
+   }
+   
    void InitalizeServices()
    {
       int count = Total();

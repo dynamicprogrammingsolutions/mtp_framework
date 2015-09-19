@@ -1,3 +1,5 @@
+#include "Events\__classnames.mqh"
+#include "Commands\__classnames.mqh"
 #include "EventHandler\__classnames.mqh"
 #include "OrderManager\__classnames.mqh"
 #include "OrderManagerMT4\__classnames.mqh"

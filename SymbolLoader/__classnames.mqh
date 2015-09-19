@@ -1,1 +1,2 @@
 classSymbolLoader,
+classSymbolInfoVars,

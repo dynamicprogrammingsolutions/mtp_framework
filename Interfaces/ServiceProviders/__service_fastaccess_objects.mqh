@@ -1,4 +1,4 @@
-CEventHandlerInterface* event;
+CEventHandlerInterface* eventhandler;
 CSymbolLoaderInterface* symbolloader;
 COrderManagerInterface* ordermanager;
 CFactoryInterface* orderfactory;

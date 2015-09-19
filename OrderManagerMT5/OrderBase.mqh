@@ -95,7 +95,7 @@ public:
    
    virtual void Initalize()
    {
-      event = ((CApplication*)AppBase()).event;   
+      event = ((CApplication*)AppBase()).eventhandler;   
    }
    
    bool Isset() { return(executestate != ES_NOT_EXECUTED); }

@@ -68,7 +68,7 @@ public:
    void Initalize()
    {
       app = AppBase();
-      event = app.event;
+      event = app.eventhandler;
       symbolloader = app.symbolloader;   
       Prepare(GetPointer(orders)); 
       Prepare(GetPointer(historyorders));
@@ -79,14 +79,14 @@ public:
    CSymbolLoaderInterface* symbolloader;
    CSymbolInfoInterface* _symbol;
    
-   void loadsymbol(string symbol)
+   void loadsymbol(string __symbol)
    {
-      _symbol = symbolloader.LoadSymbol(symbol);
+      _symbol = symbolloader.LoadSymbol(__symbol);
    }
    
-   void loadsymbol(string symbol, string function)
+   void loadsymbol(string __symbol, string function)
    {
-      _symbol = symbolloader.LoadSymbol(symbol);
+      _symbol = symbolloader.LoadSymbol(__symbol);
    }
    
       
@@ -299,6 +299,8 @@ public:
    COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagement* _mm,CEntry* _price,
                                     CStopLoss* _stoploss,CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0)
    {
+      app.symbolloader.LoadSymbol(in_symbol).RefreshRates();
+
       COrder* _order = NewOrderObject();
       
       if (custom_order_defaults) {

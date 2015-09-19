@@ -66,14 +66,14 @@ public:
    CSymbolLoaderInterface* symbolloader;
    CSymbolInfoInterface* _symbol;
    
-   void loadsymbol(string symbol)
+   void loadsymbol(string __symbol)
    {
-      _symbol = symbolloader.LoadSymbol(symbol);
+      _symbol = symbolloader.LoadSymbol(__symbol);
    }
    
-   void loadsymbol(string symbol, string function)
+   void loadsymbol(string __symbol, string function)
    {
-      _symbol = symbolloader.LoadSymbol(symbol);
+      _symbol = symbolloader.LoadSymbol(__symbol);
    }
 
    virtual COrderBaseInterface* NewOrderObject() { return ((CApplication*)app).orderfactory.Create(); }

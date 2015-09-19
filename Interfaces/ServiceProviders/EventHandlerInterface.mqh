@@ -1,5 +1,5 @@
 //
-class CEventHandlerInterface : private CServiceProvider
+class CEventHandlerInterface : public CServiceProvider
 {
 public:
    /*CEventHandlerBase()

@@ -8,6 +8,9 @@ class CApplication : public CApplicationInterface
 private:
 
    CServiceContainer services;
+   CHandlerContainer eventhandlers;
+   CHandlerContainer commandhandlers;
+   
 public:
 
    CApplication()
@@ -21,6 +24,8 @@ public:
 #ifdef SERVICE_FASTACCESS_OBJECTS
   SERVICE_FASTACCESS_OBJECTS
 #endif
+
+   
 
    void RegisterService(CServiceProvider* service, ENUM_APPLICATION_SERVICE srv, string servicename)
    {
@@ -48,6 +53,42 @@ public:
       
    }
    
+   void RegisterEventHandler(CServiceProvider* handler, ENUM_CLASS_NAMES handled_class)
+   {
+      this.Prepare(handler);
+      eventhandlers.Add(handled_class, handler);
+   }
+
+   void RegisterCommandHandler(CServiceProvider* handler, ENUM_CLASS_NAMES handled_class)
+   {
+      this.Prepare(handler);
+      commandhandlers.Add(handled_class, handler);
+   }
+
+   bool EventHandlerIsRegistered(ENUM_CLASS_NAMES handled_class)
+   {
+      return eventhandlers.IsRegistered(handled_class);
+   }
+
+   bool CommandHandlerIsRegistered(ENUM_CLASS_NAMES handled_class)
+   {
+      return commandhandlers.IsRegistered(handled_class);
+   }
+   
+   virtual void Command(CObject* command) {
+      CServiceProvider* handler = commandhandlers.GetHandler((ENUM_CLASS_NAMES)command.Type());
+      if (handler != NULL) handler.HandleCommand(command);
+      else Print(__FUNCTION__,": Command Handler Not Found For ",command.Type());
+      delete command;
+   }
+   
+   virtual void Event(CObject* event) {
+      CServiceProvider* handler = eventhandlers.GetHandler((ENUM_CLASS_NAMES)event.Type());
+      if (handler != NULL) handler.HandleEvent(event);
+      else Print(__FUNCTION__,": Event Handler Not Found For ",event.Type());
+      delete event;
+   }   
+   
    void InitalizeServices()
    {
       services.InitalizeServices();
@@ -61,6 +102,11 @@ public:
    bool ServiceIsRegistered(ENUM_APPLICATION_SERVICE srv)
    {
       return services.IsRegistered(srv);
+   }
+
+   bool ServiceIsRegistered(string servicename)
+   {
+      return services.IsRegistered(servicename);
    }
 
    virtual CObject* GetService(string name) {

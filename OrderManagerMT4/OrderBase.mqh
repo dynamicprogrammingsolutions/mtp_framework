@@ -145,7 +145,7 @@ public:
    {
       Print("OrderBase Initalize");
       app = AppBase();
-      event = app.event;
+      event = app.eventhandler;
    }
    
    void Copy(COrderBase*& target);

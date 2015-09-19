@@ -34,6 +34,7 @@ public:
          l_symbolinfo = LoadByIndex(i);
          if (CheckPointer(l_symbolinfo) != POINTER_INVALID) {
             if (l_symbolinfo.Name() == in_symbol) {
+               l_symbolinfo.RefreshRates();
             
 #ifdef __MQL4__
                if (l_symbolinfo.LotValue() == 0) l_symbolinfo.Name(l_symbolinfo.Name());
@@ -45,6 +46,7 @@ public:
       }
       l_symbolinfo = Prepare(NewSymbolInfoObject());
       if (l_symbolinfo.Name(in_symbol)) {
+         l_symbolinfo.RefreshRates();
          CSymbolLoader::Add(l_symbolinfo);
          return(l_symbolinfo);
       } else {
