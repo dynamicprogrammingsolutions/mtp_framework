@@ -55,13 +55,11 @@ public:
    
    void RegisterEventHandler(CServiceProvider* handler, ENUM_CLASS_NAMES handled_class)
    {
-      this.Prepare(handler);
       eventhandlers.Add(handled_class, handler);
    }
 
    void RegisterCommandHandler(CServiceProvider* handler, ENUM_CLASS_NAMES handled_class)
    {
-      this.Prepare(handler);
       commandhandlers.Add(handled_class, handler);
    }
 

@@ -30,6 +30,7 @@ public:
 
    ENUM_SIGNAL signal;
    ENUM_SIGNAL closesignal;
+   ENUM_SIGNAL lastsignal;
 
    bool execute_enabled;
    bool valid;
@@ -133,11 +134,38 @@ public:
    }
    
    virtual void BeforeExecute() {
-
+      if (execute_enabled) {
+         lastsignal = signal;  
+      }
+      valid = true;
+      execute_enabled = true;
+      if (!BeforeFilter()) {
+         valid = false;
+         execute_enabled = false;
+      }
    }
    
    virtual void AfterExecute() {
-      
+      if (!AfterFilter()) {
+         valid = false;
+      }
+   }
+   
+   void Reverse()
+   {
+      if (execute_enabled) {
+         signal = signal_reverse(signal);
+         closesignal = signal_reverse(closesignal);
+      }
+   }
+   
+   virtual bool BeforeFilter()
+   {
+      return true;
+   }
+   virtual bool AfterFilter()
+   {
+      return true;
    }
 
    virtual void CalculateValues() {
@@ -207,6 +235,15 @@ public:
    }
 };
 
+class COpenAndCloseSignal : public CSignal {
+public:
+   COpenAndCloseSignal() {
+      localsignal_enabled = true;
+      opensignal_enabled = true;
+      closesignal_enabled = true;
+   }
+};
+
 class CSignalContainer : public CSignal {
 
 public:
@@ -215,46 +252,6 @@ public:
       subsignal_enabled = true;
       opensignal_enabled = true;
       closesignal_enabled = true;
-   }
-};
-
-class CMainSignalBase : public CSignalContainer
-{
-public:
-   ENUM_SIGNAL lastsignal;
-   virtual void BeforeExecute() {
-      if (execute_enabled) {
-         lastsignal = signal;  
-      }
-      valid = true;
-      execute_enabled = true;
-      if (!BeforeFilter()) {
-         valid = false;
-         execute_enabled = false;
-      }
-   }
-   
-   virtual void AfterExecute() {
-      if (!AfterFilter()) {
-         valid = false;
-      }
-   }
-   
-   void Reverse()
-   {
-      if (execute_enabled) {
-         signal = signal_reverse(signal);
-         closesignal = signal_reverse(closesignal);
-      }
-   }
-   
-   virtual bool BeforeFilter()
-   {
-      return true;
-   }
-   virtual bool AfterFilter()
-   {
-      return true;
    }
 };
 

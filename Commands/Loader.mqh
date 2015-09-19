@@ -2,3 +2,4 @@
 #include "OpenSell.mqh"
 #include "CloseBuy.mqh"
 #include "CloseSell.mqh"
+#include "CloseAll.mqh"

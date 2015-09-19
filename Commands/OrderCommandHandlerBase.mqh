@@ -14,7 +14,13 @@ public:
          case classOpenSell: OpenSell(); break;
          case classCloseBuy: CloseBuy(); break;
          case classCloseSell: CloseSell(); break;
+         case classCloseAll: CloseAll(); break;
       }
+   }
+
+   virtual void CloseAll()
+   {
+
    }
 
    virtual void CloseBuy()
