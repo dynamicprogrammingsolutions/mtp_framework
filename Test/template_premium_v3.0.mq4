@@ -101,7 +101,41 @@ class CClosesignal1 : public CCloseSignal { public:
    }
 };
 
-class CMainSignal : public CMainSignalBase
+/* INLINE SIGNAL
+class CMainSignal : public COpenAndCloseSignal
+{
+   CIsFirstTick* isfirsttick;
+   CMainSignal()
+   {
+      isfirsttick = new CIsFirstTick(symbol,timeframe);
+   }
+   OpenSignal()
+   {
+      
+   }
+   CloseSignal()
+   {
+      
+   }
+   virtual bool BeforeFilter() {
+      if (trade_only_at_barclose && !isfirsttick.isfirsttick()) return false;
+      return true;
+   }
+   
+   virtual bool AfterFilter() {
+      if (reverse_strategy) Reverse();
+      if (trade_only_signal_change && (lastsignal == SIGNAL_NONE || signal == lastsignal)) return false;
+      return true;
+   }
+   
+   virtual void OnTick() {
+      CSignalContainer::OnTick();
+      if (comments_enabled) addcomment("signal: "+signaltext(signal)+" valid:"+(string)valid+"\n");   
+   }   
+}
+*/
+
+class CMainSignal : public CSignalContainer
 {
 public:
    CIsFirstTick* isfirsttick;
@@ -224,15 +258,14 @@ public:
       
       #endif   
 
-      CEventHandlerInterface* eventhandler = App().GetService(srvEvent);
       if (IsTesting() && !IsVisualMode()) {      
-         eventhandler.SetLogLevel(E_ERROR);
+         app().eventhandler.SetLogLevel(E_ERROR);
          comments_enabled = false;
       } else {
-         eventhandler.SetLogLevel(E_NOTICE|E_WARNING|E_ERROR|E_INFO);
+         app().eventhandler.SetLogLevel(E_NOTICE|E_WARNING|E_ERROR|E_INFO);
       }
       
-      CEntryMethodBase* entrymethod = App().GetService(srvEntryMethod);
+      ((COrderManager*)(app().ordermanager)).retrainhistory = 1;   
       
    }
 };
@@ -257,8 +290,6 @@ int OnInit()
    if (!app().ServiceIsRegistered(srvOrderCommandHandler)) app().RegisterService(new COrderCommandHandler(),srvOrderCommandHandler,"ordercommandhandler");
    if (!app().ServiceIsRegistered("main")) app().RegisterService(new CMain(),srvNone,"main");
 
-   app.InitalizeServices();
-   
    if (!app().CommandHandlerIsRegistered(classOpenBuy)) {
       CObject* ordercommandhandler = app().GetService(srvOrderCommandHandler);
       app().RegisterCommandHandler(ordercommandhandler,classOpenBuy);
@@ -266,6 +297,8 @@ int OnInit()
       app().RegisterCommandHandler(ordercommandhandler,classCloseBuy);
       app().RegisterCommandHandler(ordercommandhandler,classCloseSell);
    }
+
+   app.InitalizeServices();   
 
    app.OnInit();
    return(0);
