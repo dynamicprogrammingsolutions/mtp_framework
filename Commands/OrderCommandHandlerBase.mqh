@@ -14,19 +14,19 @@ public:
    {
       COrderCommand* ordercommand = command;
       switch (ordercommand.transaction_type) {
-	case ttOpen:
-	  switch (ordercommand.trade_direction) {
-	    case tdLong: OpenBuy(); break;
-	    case tdShort: OpenSell(); break;
-	  }
-	  break;
-	case ttClose:
-	  switch (ordercommand.trade_direction) {
-	    case tdLong: CloseBuy(); break;
-	    case tdShort: CloseSell(); break;
-	    case tdNone: CloseAll(); break;
-	  }
-	  break;
+      	case ttOpen:
+            switch (ordercommand.trade_direction) {
+               case tdLong: OpenBuy(); break;
+               case tdShort: OpenSell(); break;
+            }
+            break;
+      	case ttClose:
+            switch (ordercommand.trade_direction) {
+               case tdLong: CloseBuy(); break;
+               case tdShort: CloseSell(); break;
+               case tdNone: CloseAll(); break;
+            }
+            break;
       }
    }
 

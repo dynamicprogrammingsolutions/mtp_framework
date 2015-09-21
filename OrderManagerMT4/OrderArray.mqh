@@ -16,7 +16,7 @@ public:
 
       COrderArray()
       {
-         m_free_mode = false;
+         m_free_mode = true;
       }
       COrder* Order(int nIndex){ if (!isset(At(nIndex))) return(NULL); else return((COrder*)At(nIndex)); }     
       

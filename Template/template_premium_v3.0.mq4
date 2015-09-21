@@ -21,8 +21,8 @@
 #property copyright "Dynamic Programming Solutions Corp."
 #property link      "http://www.metatraderprogrammer.com"
 
-#define CUSTOM_SERVICES
-#define CUSTOM_CLASSES
+#define CUSTOM_SERVICES srvMain,
+#define CUSTOM_CLASSES classSignalManager, classEntryMethod, classCommandHandler, classMain,
 
 #include <mtp_framework_1.1\Loader.mqh>
 #include <mtp_framework_1.1\DefaultServices.mqh>   
@@ -59,6 +59,9 @@ input int slippage = 3;
 input bool printcomment = false;
 
 CMoneyManagement* mm;
+
+ulong benchmark_sum;
+ulong benchmark_cnt;
 
 class CSignal1 : public COpenSignal { public:
    double val1;
@@ -154,6 +157,8 @@ public:
 class CSignalManager : public CSignalManagerBase
 {
 public:
+   virtual int Type() const { return classSignalManager; }
+   
    CSignalManager(int __bar)
    {
       bar = __bar;
@@ -164,6 +169,8 @@ public:
 class CEntryMethod : public CEntryMethodBase
 {
 public:
+   virtual int Type() const { return classEntryMethod; }
+
    virtual bool BuySignalFilter(bool valid)
    {
       if (!short_enabled) return false;
@@ -186,21 +193,8 @@ public:
 class COrderCommandHandler : public COrderCommandHandlerBase
 {
 public:
-   virtual void CloseAll()
-   {
-      ordermanager.CloseAll(ORDERSELECT_ANY,STATESELECT_FILLED);   
-   }
+   virtual int Type() const { return classCommandHandler; }
 
-   virtual void CloseBuy()
-   {
-      ordermanager.CloseAll(ORDERSELECT_LONG,STATESELECT_FILLED);   
-   }
-   
-   virtual void CloseSell()
-   {
-      ordermanager.CloseAll(ORDERSELECT_SHORT,STATESELECT_FILLED);     
-   }
-   
    virtual void OpenBuy()
    {
       ordermanager.NewOrder(symbol,ORDER_TYPE_BUY,mm,NULL,new CStopLossTicks(convertfract(stoploss)),new CTakeProfitTicks(convertfract(takeprofit)));      
@@ -215,6 +209,8 @@ public:
 class CMain : public CServiceProvider
 {
 public:
+   virtual int Type() const { return classMain; }
+
    CMain()
    {
       use_ontick = true;
@@ -278,10 +274,10 @@ int OnInit()
    
       register_services();
    
-      app().RegisterService(new CSymbolInfoVars(Symbol()),srvNone,"symbolinfovars");
       app().RegisterService(new CSignalManager(_bar),srvSignalManager,"signalmanager");
       app().RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
-      app().RegisterService(new CMain(),srvNone,"main");
+      app().RegisterService(new CMain(),srvMain,"main");
+      
       app().RegisterCommandHandler(new COrderCommandHandler(),classOrderCommand);
    
       app.Initalize();
@@ -295,6 +291,7 @@ int OnInit()
 
 void OnDeinit(const int reason)
 {
+   //Print("benchmark: "+benchmark_sum/(benchmark_cnt*1.0));
    app.OnDeinit();
    return;
 }

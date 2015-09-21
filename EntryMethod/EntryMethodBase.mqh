@@ -1,4 +1,4 @@
-class CEntryMethodBase : public CEntryMethodInterface
+class    CEntryMethodBase : public CEntryMethodInterface
 {
 public:
    virtual int Type() const { return classEntryMethodBase; }
@@ -11,22 +11,22 @@ public:
    
    virtual void OnCloseSellSignal()
    {
-      App().Command(new CCloseSell());
+      ordermanager.CloseAll(ORDERSELECT_SHORT,STATESELECT_FILLED);
    }
    
    virtual void OnCloseBuySignal()
    {
-      App().Command(new CCloseBuy());
+      ordermanager.CloseAll(ORDERSELECT_LONG,STATESELECT_FILLED);
    }
    
    virtual void OnCloseBuyOpposite(bool valid)
    {
-      App().Command(new CCloseSell());
+      ordermanager.CloseAll(ORDERSELECT_SHORT,STATESELECT_FILLED);
    }
    
    virtual void OnCloseSellOpposite(bool valid)
    {
-      App().Command(new CCloseBuy());
+      ordermanager.CloseAll(ORDERSELECT_LONG,STATESELECT_FILLED);
    }
    
    virtual void OnBuySignal(bool valid)

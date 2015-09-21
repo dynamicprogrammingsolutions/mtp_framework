@@ -143,7 +143,6 @@ public:
    CApplication* app;
    virtual void Initalize()
    {
-      Print("OrderBase Initalize");
       app = AppBase();
       event = app.eventhandler;
    }
@@ -548,9 +547,9 @@ bool COrderBase::delete_mm_objects = false;
          //}
       } else {
          if (executestate == ES_CANCELED) {
-            if ( event.Info ()) event.Info ("Order Already Canceled");
+            if ( event.Info ()) event.Info ("Order Already Canceled",__FUNCTION__);
          } else if (executestate == ES_EXECUTED) {
-            if ( event.Info ()) event.Info ("Order Already Executed");
+            if ( event.Info ()) event.Info ("Order Already Executed",__FUNCTION__);
          }
       }
       return(false);

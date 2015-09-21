@@ -27,6 +27,7 @@ void register_services()
   app().RegisterService(new COrderManager(),srvOrderManager,"ordermanager");
   app().RegisterService(new COrderFactory(),srvOrderFactory,"orderfactory");
   app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
+  app().RegisterService(new CSymbolInfoVars(Symbol()),srvSymbolInfoVars,"symbolinfovars");
   
   app().RegisterEventHandler(app().eventhandler,classEventLog);
 }
