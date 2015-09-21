@@ -3,22 +3,34 @@ class CAppObject : public CObject
 {
 private:
    CAppObject* appbase;
+   
 protected:
+
+  bool initalized;
+  
    void AbstractFunctionWarning(string function = "")
    {
       Print(function,": Calling Abstract Function Of Object ",EnumToString((ENUM_CLASS_NAMES)this.Type()));
    }
+   
    CAppObject* Prepare(CAppObject* obj)
    {
-      obj.AppBase(this.AppBase());
-      obj.Initalize();
+      if (!obj.Initalized()) {
+	 obj.AppBase(this.AppBase());
+	 obj.Initalize();
+	 obj.initalized = true;
+      }
       return obj;
    }
    
 public:
+   void SetInitalized() { initalized = true; }
+   bool Initalized() { return initalized; }
+   
    virtual void Initalize() {
       //AbstractFunctionWarning(__FUNCTION__);
    }
+   
    CAppObject* AppBase() {
       if (CheckPointer(appbase) == POINTER_INVALID) {
          Print("App not set in: ",EnumToString((ENUM_CLASS_NAMES)this.Type()));

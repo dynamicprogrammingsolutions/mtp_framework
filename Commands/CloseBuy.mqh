@@ -1,5 +1,9 @@
-class CCloseBuy : public CObject
+class CCloseBuy : public COrderCommand
 {
 public:
-   virtual int Type() const { return classCloseBuy; }
+   CCloseBuy()
+   {
+      trade_direction = tdLong;
+      transaction_type = ttClose;
+   }
 };

@@ -1,5 +1,9 @@
-class COpenBuy : public CObject
+class COpenBuy : public COrderCommand
 {
 public:
-   virtual int Type() const { return classOpenBuy; }
+   COpenBuy()
+   {
+      trade_direction = tdLong;
+      transaction_type = ttOpen;
+   }
 };

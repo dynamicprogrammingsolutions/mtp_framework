@@ -27,15 +27,6 @@
 #include <mtp_framework_1.1\Loader.mqh>
 #include <mtp_framework_1.1\DefaultServices.mqh>   
 
-#include <mtp_framework_1.1\SymbolLoader\SymbolInfoVars.mqh>
-#include <mtp_framework_1.1\ChartInfo\IsFirstTick.mqh>
-
-#include <mtp_framework_1.1\EntryMethod\EntryMethodBase.mqh>
-#include <mtp_framework_1.1\Signals\SignalManagerBase.mqh>
-#include <mtp_framework_1.1\Commands\OrderCommandHandlerBase.mqh>
-
-#include <mtp_framework_1.1\libraries\comments.mqh>
-
 input double lotsize = 0.1;
 
 input double stoploss = 20;
@@ -267,7 +258,7 @@ public:
          app().eventhandler.SetLogLevel(E_NOTICE|E_WARNING|E_ERROR|E_INFO);
       }
       
-      ((COrderManager*)(app().ordermanager)).retrainhistory = 1;   
+      ((COrderManager*)(app().ordermanager)).retrainhistory = 1;
       
    }
 };
@@ -282,23 +273,20 @@ void OnTick()
 
 int OnInit()
 {
-   register_services();
 
-   if (!app().ServiceIsRegistered("symbolinfovars")) app().RegisterService(new CSymbolInfoVars(Symbol()),srvNone,"symbolinfovars");
-   if (!app().ServiceIsRegistered(srvSignalManager)) app().RegisterService(new CSignalManager(_bar),srvSignalManager,"signalmanager");
-   if (!app().ServiceIsRegistered(srvEntryMethod)) app().RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
-   if (!app().ServiceIsRegistered(srvOrderCommandHandler)) app().RegisterService(new COrderCommandHandler(),srvOrderCommandHandler,"ordercommandhandler");
-   if (!app().ServiceIsRegistered("main")) app().RegisterService(new CMain(),srvNone,"main");
-
-   if (!app().CommandHandlerIsRegistered(classOpenBuy)) {
-      CObject* ordercommandhandler = app().GetService(srvOrderCommandHandler);
-      app().RegisterCommandHandler(ordercommandhandler,classOpenBuy);
-      app().RegisterCommandHandler(ordercommandhandler,classOpenSell);
-      app().RegisterCommandHandler(ordercommandhandler,classCloseBuy);
-      app().RegisterCommandHandler(ordercommandhandler,classCloseSell);
+   if (!app().Initalized()) {
+   
+      register_services();
+   
+      app().RegisterService(new CSymbolInfoVars(Symbol()),srvNone,"symbolinfovars");
+      app().RegisterService(new CSignalManager(_bar),srvSignalManager,"signalmanager");
+      app().RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
+      app().RegisterService(new CMain(),srvNone,"main");
+      app().RegisterCommandHandler(new COrderCommandHandler(),classOrderCommand);
+   
+      app.Initalize();
+   
    }
-
-   app.InitalizeServices();   
 
    app.OnInit();
    

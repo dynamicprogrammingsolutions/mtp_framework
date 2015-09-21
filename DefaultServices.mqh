@@ -9,16 +9,24 @@
 #endif
 #include "OrderManager\OrderFactory.mqh"
 #include "OrderManager\AttachedOrderFactory.mqh"
-
 #include "Events\Loader.mqh"
+#include "SymbolLoader\SymbolInfoVars.mqh"
+
+#include "ChartInfo\IsFirstTick.mqh"
+#include "EntryMethod\EntryMethodBase.mqh"
+#include "Signals\SignalManagerBase.mqh"
+#include "Commands\OrderCommandHandlerBase.mqh"
+
+#include <mtp_framework_1.1\libraries\comments.mqh>
+
 
 void register_services()
 {
-  if (!app().ServiceIsRegistered(srvEvent)) app().RegisterService(new CEventHandler(),srvEvent,"eventhandler");
-  if (!app().ServiceIsRegistered(srvSymbolLoader)) app().RegisterService(new CSymbolLoader(),srvSymbolLoader,"symbolloader");
-  if (!app().ServiceIsRegistered(srvOrderManager)) app().RegisterService(new COrderManager(),srvOrderManager,"ordermanager");
-  if (!app().ServiceIsRegistered(srvOrderFactory)) app().RegisterService(new COrderFactory(),srvOrderFactory,"orderfactory");
-  if (!app().ServiceIsRegistered(srvAttachedOrderFactory)) app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
+  app().RegisterService(new CEventHandler(),srvEvent,"eventhandler");
+  app().RegisterService(new CSymbolLoader(),srvSymbolLoader,"symbolloader");
+  app().RegisterService(new COrderManager(),srvOrderManager,"ordermanager");
+  app().RegisterService(new COrderFactory(),srvOrderFactory,"orderfactory");
+  app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
   
   app().RegisterEventHandler(app().eventhandler,classEventLog);
 }

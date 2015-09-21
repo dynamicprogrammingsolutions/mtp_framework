@@ -25,8 +25,6 @@ public:
   SERVICE_FASTACCESS_OBJECTS
 #endif
 
-   
-
    void RegisterService(CServiceProvider* service, ENUM_APPLICATION_SERVICE srv, string servicename)
    {
       service.srv = srv;
@@ -55,11 +53,15 @@ public:
    
    void RegisterEventHandler(CServiceProvider* handler, ENUM_CLASS_NAMES handled_class)
    {
+      Print("Registering EventHandler: ",EnumToString((ENUM_CLASS_NAMES)handler.Type())," handles: ",EnumToString(handled_class));
+      handler.AppBase(GetPointer(this));
       eventhandlers.Add(handled_class, handler);
    }
 
    void RegisterCommandHandler(CServiceProvider* handler, ENUM_CLASS_NAMES handled_class)
    {
+      Print("Registering CommandHandler: ",EnumToString((ENUM_CLASS_NAMES)handler.Type())," handles: ",EnumToString(handled_class));
+      handler.AppBase(GetPointer(this));
       commandhandlers.Add(handled_class, handler);
    }
 
@@ -87,9 +89,11 @@ public:
       delete event;
    }   
    
-   void InitalizeServices()
+   virtual void Initalize()
    {
       services.InitalizeServices();
+      commandhandlers.InitalizeHandlers();
+      eventhandlers.InitalizeHandlers();
    }
    
    CServiceProvider* DeregisterService(ENUM_APPLICATION_SERVICE srv)

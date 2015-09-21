@@ -7,3 +7,5 @@
 #include "SymbolInfoMT4\__classnames.mqh"
 #include "SymbolInfoMT5\__classnames.mqh"
 #include "SymbolLoader\__classnames.mqh"
+#include "Signals\__classnames.mqh"
+#include "EntryMethod\__classnames.mqh"

@@ -81,8 +81,13 @@ public:
       int count = Total();
       for (int i = 0; i < count; i++) {
          CServiceProvider* service = ServiceProvider(i);
-         Print("Initalizing Service ",EnumToString(service.srv)," '",service.name,"'");
-         service.Initalize();
+         if (!service.Initalized()) {
+            Print("Initalizing Service ",EnumToString(service.srv)," '",service.name,"': ",EnumToString((ENUM_CLASS_NAMES)service.Type()));
+            service.Initalize();
+            service.SetInitalized();
+         } else {
+            Print("Service Alread Initalized: ",EnumToString((ENUM_CLASS_NAMES)service.Type()));
+         }
       }
    }
    

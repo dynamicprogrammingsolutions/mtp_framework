@@ -3,6 +3,8 @@
 class CSignalManagerBase : public CServiceProvider
 {
 public:
+   virtual int Type() const { return classSignalManagerBase; }
+
    CSignal* mainsignal;
    CEntryMethodInterface* entrymethod;
    int bar;

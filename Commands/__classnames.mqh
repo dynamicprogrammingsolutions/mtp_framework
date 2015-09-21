@@ -1,5 +1,2 @@
-classOpenBuy,
-classOpenSell,
-classCloseBuy,
-classCloseSell,
-classCloseAll,
+classOrderCommand,
+classOrderCommandHandlerBase,

@@ -1,3 +1,4 @@
+#include "OrderCommand.mqh"
 #include "OpenBuy.mqh"
 #include "OpenSell.mqh"
 #include "CloseBuy.mqh"

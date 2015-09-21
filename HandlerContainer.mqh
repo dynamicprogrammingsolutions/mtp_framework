@@ -38,6 +38,20 @@ public:
       }
       return NULL;
    }
+   void InitalizeHandlers()
+   {
+      for (int i = 0; i < Total(); i++) {
+      	CHandlerContainerItem* item = At(i);
+      	CAppObject* handler = item.handler;
+      	if (!handler.Initalized()) {
+            Print("Initalizing Handler of '",EnumToString(item.handled_class),"': '",EnumToString((ENUM_CLASS_NAMES)handler.Type()),"'");
+            handler.Initalize();
+            handler.SetInitalized();
+         } else {
+            Print("Handler Already Initalized: ",EnumToString((ENUM_CLASS_NAMES)item.handler.Type()));            
+         }
+      }
+   }
    bool IsRegistered(ENUM_CLASS_NAMES handled_class)
    {
       return (this.GetHandler(handled_class) != NULL);

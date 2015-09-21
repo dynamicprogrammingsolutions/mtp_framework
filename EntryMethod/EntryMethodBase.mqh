@@ -1,6 +1,8 @@
 class CEntryMethodBase : public CEntryMethodInterface
 {
 public:
+   virtual int Type() const { return classEntryMethodBase; }
+
    COrderManager* ordermanager;
    virtual void Initalize()
    {

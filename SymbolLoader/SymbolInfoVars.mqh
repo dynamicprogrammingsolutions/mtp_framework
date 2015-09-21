@@ -33,7 +33,7 @@ string priceiniterror = "variables.mqh has not been initalized at actual tick!";
 class CSymbolInfoVars : public CServiceProvider
 {
    public:
-   virtual int const Type() { return classSymbolInfoVars; }
+   virtual int Type() const { return classSymbolInfoVars; }
    
    CEventHandlerInterface* event;
    CSymbolLoaderInterface* symbolloader;
