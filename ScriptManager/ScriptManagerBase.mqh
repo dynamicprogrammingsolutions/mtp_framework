@@ -6,6 +6,8 @@ class CScriptManagerBase : public CScriptManagerInterface
 {
     CArrayInt scriptids;
 public:
+   virtual int Type() const { return classScriptManagerBase; }
+
    virtual void RegisterScript(int id)
    {
       if (!FindScript(id)) scriptids.Add(id);
@@ -32,8 +34,7 @@ public:
    }
    virtual void RunScript(int id, long lparam, double dparam, string sparam)
    {
-      Print("Running Script: ",id," ",lparam," ",dparam," ",sparam);
-      
+      //Print("Running Script: ",id," ",lparam," ",dparam," ",sparam);
       EventChartCustom(
          ChartID(),
          (ushort)id,
@@ -49,7 +50,7 @@ public:
    }
    virtual void HandleScript(int id, long lparam, double dparam, string sparam)
    {
-      Print("Handling Script: ",id," ",lparam," ",dparam," ",sparam);
+      //Print("Handling Script: ",id," ",lparam," ",dparam," ",sparam);
       this.App().Command(new CScript(id, lparam, dparam, sparam));
    }
    virtual void OnTick()

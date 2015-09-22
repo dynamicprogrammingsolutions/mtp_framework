@@ -3,6 +3,8 @@
 class COrderScriptHandler : public CServiceProvider
 {
 public:
+    virtual int Type() const { return classOrderScriptHandler; }
+  
    int GetId() { return 112; }
    string ActionOpenBuy() { return "openbuy"; }
    string ActionOpenSell() { return "opensell"; }
