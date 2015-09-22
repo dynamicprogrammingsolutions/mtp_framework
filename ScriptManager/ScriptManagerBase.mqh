@@ -6,6 +6,8 @@ class CScriptManagerBase : public CScriptManagerInterface
 {
     CArrayInt scriptids;
 public:
+   TraitAppAccess
+
    virtual int Type() const { return classScriptManagerBase; }
 
    virtual void RegisterScript(int id)

@@ -5,6 +5,8 @@ class    CEntryMethodBase : public CEntryMethodInterface
 public:
    virtual int Type() const { return classEntryMethodBase; }
 
+   TraitAppAccess
+
    COrderCommand* command_open_buy;
    COrderCommand* command_open_sell;
    COrderCommand* command_close_buy;

@@ -11,11 +11,13 @@ class CSymbolLoader : public CSymbolLoaderInterface
 {
 public:
    virtual int Type() const { return classSymbolLoader; }
-public:
+
+   TraitAppAccess
+   
    CEventHandlerInterface* event;
    virtual void Initalize()
    {
-      event = app.GetService(srvEvent);
+      event = this.App().GetService(srvEvent);
    }
 
    virtual CSymbolInfoInterface* LoadByIndex(int nIndex){

@@ -5,6 +5,8 @@ class CSignalManagerBase : public CServiceProvider
 public:
    virtual int Type() const { return classSignalManagerBase; }
 
+   TraitAppAccess
+
    CSignal* mainsignal;
    CEntryMethodInterface* entrymethod;
    int bar;

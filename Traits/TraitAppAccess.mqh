@@ -1,0 +1,1 @@
+#define TraitAppAccess CApplication* App() { return (CApplication*)AppBase(); }

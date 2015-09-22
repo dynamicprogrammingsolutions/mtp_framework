@@ -2,6 +2,7 @@
 
 #include "EnumClassNames.mqh"
 #include "EnumApplicationService.mqh"
+#include "Traits\Loader.mqh"
 
 #include "AppObject.mqh"
 #include "AppObjectArray.mqh"

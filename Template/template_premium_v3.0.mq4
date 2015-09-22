@@ -155,13 +155,17 @@ public:
 class CSignalManager : public CSignalManagerBase
 {
 public:
-   virtual int Type() const { return classSignalManager; }
-   
-   CSignalManager(int __bar)
+   virtual int Type() const { return classSignalManager; }   
+   virtual void OnInit()
    {
-      bar = __bar;
-      mainsignal = new CMainSignal();   
+      bar = _bar;
+      mainsignal = new CMainSignal();      
    }
+   virtual void OnDeinit()
+   {
+      delete mainsignal;
+   }
+   
 };
 
 class CEntryMethod : public CEntryMethodBase
@@ -194,11 +198,6 @@ public:
    CStopLoss* sl;
    CTakeProfit* tp;
    CMoneyManagement* mm;
-   
-   COrderCommandHandler()
-   {
-      use_oninit = true;
-   }
    
    virtual void OnInit()
    {
@@ -269,13 +268,13 @@ public:
       #endif   
 
       if (IsTesting() && !IsVisualMode()) {      
-         app.eventhandler.SetLogLevel(E_ERROR);
+         application.eventhandler.SetLogLevel(E_ERROR);
          comments_enabled = false;
       } else {
-         app.eventhandler.SetLogLevel(E_NOTICE|E_WARNING|E_ERROR|E_INFO);
+         application.eventhandler.SetLogLevel(E_NOTICE|E_WARNING|E_ERROR|E_INFO);
       }
       
-      ((COrderManager*)(app.ordermanager)).retrainhistory = 1;
+      ((COrderManager*)(application.ordermanager)).retrainhistory = 1;
       
    }
    
@@ -285,45 +284,45 @@ public:
    }
 };
 
-CApplication app;
+CApplication application;
 
 void OnTick()
 {
-   app.OnTick();  
+   application.OnTick();  
 }
 
 
 int OnInit()
 {
 
-   if (!app.Initalized()) {
+   if (!application.Initalized()) {
    
       register_services();
    
-      app.RegisterService(new CSignalManager(_bar),srvSignalManager,"signalmanager");
-      app.RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
-      app.RegisterService(new CMain(),srvMain,"main");
-      app.RegisterService(new COrderCommandHandler(),srvNone,"ordercommandhandler");
-      app.RegisterService(new CScriptManagerBase(),srvScriptManager,"scriptmanager");
+      application.RegisterService(new CSignalManager(),srvSignalManager,"signalmanager");
+      application.RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
+      application.RegisterService(new CMain(),srvMain,"main");
+      application.RegisterService(new COrderCommandHandler(),srvNone,"ordercommandhandler");
+      application.RegisterService(new CScriptManagerBase(),srvScriptManager,"scriptmanager");
       
-      app.RegisterCommandHandler(app.GetService("ordercommandhandler"),classOrderCommand);
-      app.RegisterCommandHandler(new COrderScriptHandler(),classScript);
+      application.RegisterCommandHandler(application.GetService("ordercommandhandler"),classOrderCommand);
+      application.RegisterCommandHandler(new COrderScriptHandler(),classScript);
    
-      app.Initalize();
+      application.Initalize();
          
    }
 
-   app.OnInit();
+   application.OnInit();
    
    return(0);
 }
 
 void OnDeinit(const int reason)
 {
-   app.OnDeinit();
+   application.OnDeinit();
 }
 
 void OnChartEvent(const int id, const long& lparam, const double& dparam, const string& sparam)
 {
-   app.OnChartEvent(id, lparam, dparam, sparam);
+   application.OnChartEvent(id, lparam, dparam, sparam);
 }

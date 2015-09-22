@@ -25,12 +25,12 @@
 
 void register_services()
 {
-  app().RegisterService(new CEventHandler(),srvEvent,"eventhandler");
-  app().RegisterService(new CSymbolLoader(),srvSymbolLoader,"symbolloader");
-  app().RegisterService(new COrderManager(),srvOrderManager,"ordermanager");
-  app().RegisterService(new COrderFactory(),srvOrderFactory,"orderfactory");
-  app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
-  app().RegisterService(new CSymbolInfoVars(Symbol()),srvSymbolInfoVars,"symbolinfovars");
+  global_app().RegisterService(new CEventHandler(),srvEvent,"eventhandler");
+  global_app().RegisterService(new CSymbolLoader(),srvSymbolLoader,"symbolloader");
+  global_app().RegisterService(new COrderManager(),srvOrderManager,"ordermanager");
+  global_app().RegisterService(new COrderFactory(),srvOrderFactory,"orderfactory");
+  global_app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
+  global_app().RegisterService(new CSymbolInfoVars(Symbol()),srvSymbolInfoVars,"symbolinfovars");
   
-  app().RegisterEventHandler(app().eventhandler,classEventLog);
+  global_app().RegisterEventHandler(global_app().eventhandler,classEventLog);
 }

@@ -7,11 +7,11 @@ public:
    virtual int Type() const { return classMT4OrderArray; }
 
 public:
-      CApplication* app() { return (CApplication*)app; }
+      CApplication* App() { return (CApplication*)AppBase(); }
       CSymbolInfoInterface* _symbol;
       void loadsymbol(string __symbol)
       {
-         _symbol = app().symbolloader.LoadSymbol(__symbol);
+         _symbol = App().symbolloader.LoadSymbol(__symbol);
       }
 
       COrderArray()
@@ -21,7 +21,7 @@ public:
       COrder* Order(int nIndex){ if (!isset(At(nIndex))) return(NULL); else return((COrder*)At(nIndex)); }     
       
       virtual bool  CreateElement(const int index) {
-         m_data[index] = (CObject*)(((CApplication*)app).orderfactory.Create());
+         m_data[index] = (CObject*)(App().orderfactory.Create());
          return(true);
       }
       

@@ -99,7 +99,7 @@ bool COrder::CreateAttached(ENUM_ORDER_TYPE _ordertype, double _volume, double _
 {
    CAttachedOrder *attachedorder;
    if (_price > 0 || ordertype_market(_ordertype)) {
-      attachedorder = ((CApplication*)app).attachedorderfactory.Create();
+      attachedorder = ((CApplication*)AppBase()).attachedorderfactory.Create();
       //attachedorder.ordermanager = this.ordermanager;
       attachedorder.symbol = this.symbol;
       attachedorder.ordertype = _ordertype;

@@ -1,0 +1,1 @@
+#define TraitLoadSymbolFunction CSymbolInfoInterface* _symbol; void loadsymbol(string __symbol) { _symbol = App().symbolloader.LoadSymbol(__symbol); }

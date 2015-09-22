@@ -5,11 +5,11 @@ public:
    virtual int Type() const { return classMT5OrderBase; }
 protected:
    CEventHandlerInterface* event;
-   CApplication* app() { return (CApplication*)app; }
+   CApplication* App() { return (CApplication*)AppBase(); }
    CSymbolInfoInterface* _symbol;
    void loadsymbol(string __symbol)
    {
-      _symbol = app().symbolloader.LoadSymbol(__symbol);
+      _symbol = App().symbolloader.LoadSymbol(__symbol);
    }
 
 public:

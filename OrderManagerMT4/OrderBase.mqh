@@ -21,13 +21,10 @@ public:
    virtual int Type() const { return classMT4OrderBase; }
 protected:
    CEventHandlerInterface* event;
-   //CApplication* app() { return (CApplication*)app; }
-   CSymbolInfoInterface* _symbol;
-   void loadsymbol(string __symbol)
-   {
-      _symbol = app().symbolloader.LoadSymbol(__symbol);
-   }
-
+   
+   // Used Traits:
+   TraitAppAccess
+   TraitLoadSymbolFunction
 
 public:
    static ushort activity;
@@ -140,11 +137,9 @@ public:
       delete this.orderinfo;
    };
    
-   CApplication* app;
    virtual void Initalize()
    {
-      app = AppBase();
-      event = app.eventhandler;
+      event = App().eventhandler;
    }
    
    void Copy(COrderBase*& target);

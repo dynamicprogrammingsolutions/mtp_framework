@@ -4,6 +4,8 @@ class COrderCommandHandlerBase : public CServiceProvider
 public:
    virtual int Type() const { return classOrderCommandHandlerBase; }
 
+   TraitAppAccess
+
    COrderManager* ordermanager;
    
    virtual void Initalize()

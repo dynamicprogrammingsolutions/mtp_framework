@@ -31,7 +31,7 @@ CSymbolInfoInterface* mm_symbol;
 
 void moneymanagement_init(string __symbol)
 {
-   mm_symbol = app().symbolloader.LoadSymbol(__symbol);
+   mm_symbol = global_app().symbolloader.LoadSymbol(__symbol);
    CSymbolInfoInterface* _symbol = mm_symbol;
 
    mm_init_ticktime = (datetime)SymbolInfoInteger(_symbol.Name(),SYMBOL_TIME);

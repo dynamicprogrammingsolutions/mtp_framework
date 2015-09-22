@@ -141,7 +141,7 @@ public:
 
 };
 
-CApplication* app()
+CApplication* global_app()
 {
    return (CApplication*)global_application_object;
 }

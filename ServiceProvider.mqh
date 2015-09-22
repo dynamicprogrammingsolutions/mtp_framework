@@ -18,11 +18,6 @@ public:
       use_onchartevent = true;
    }
    
-   CApplicationInterface* App()
-   {
-      return (CApplicationInterface*)this.AppBase();
-   }
-   
    virtual void OnInit() {
       use_oninit = false;
       Print("Disable OnInit on class ",EnumToString((ENUM_CLASS_NAMES)Type()));

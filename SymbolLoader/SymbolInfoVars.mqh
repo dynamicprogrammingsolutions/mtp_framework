@@ -1,6 +1,7 @@
 #property copyright "Zoltan Laszlo Ferenci"
 #property link      "http://www.metatraderprogrammer.com"
 
+#include "..\Loader.mqh"
 #include "..\libraries\commonfunctions.mqh"
 
 //CAccountInfo accountinfo;
@@ -34,6 +35,8 @@ class CSymbolInfoVars : public CServiceProvider
 {
    public:
    virtual int Type() const { return classSymbolInfoVars; }
+   
+   TraitAppAccess
    
    CEventHandlerInterface* event;
    CSymbolLoaderInterface* symbolloader;

@@ -4,6 +4,8 @@ class COrderScriptHandler : public CServiceProvider
 {
 public:
     virtual int Type() const { return classOrderScriptHandler; }
+   
+   TraitAppAccess
   
    int GetId() { return 112; }
    string ActionOpenBuy() { return "openbuy"; }
