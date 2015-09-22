@@ -4,3 +4,4 @@
 #include "CloseBuy.mqh"
 #include "CloseSell.mqh"
 #include "CloseAll.mqh"
+#include "Script.mqh"

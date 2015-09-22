@@ -119,4 +119,13 @@ public:
          if (service.use_ondeinit) service.OnDeinit();
       }
    }
+   
+   void OnChartEvent(int id, long lparam, double dparam, string sparam)
+   {
+      int count = Total();
+      for (int i = 0; i < count; i++) {
+         CServiceProvider* service = ServiceProvider(i);
+         if (service.use_onchartevent) service.OnChartEvent(id, lparam, dparam, sparam);
+      }
+   }
 };

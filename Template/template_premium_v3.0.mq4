@@ -278,6 +278,11 @@ public:
       ((COrderManager*)(app.ordermanager)).retrainhistory = 1;
       
    }
+   
+   virtual void OnDeinit()
+   {
+      if (benchmark_cnt > 0) Print("benchmark ("+benchmark_cnt+"): "+benchmark_sum/(benchmark_cnt*1.0));
+   }
 };
 
 CApplication app;
@@ -299,11 +304,13 @@ int OnInit()
       app.RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
       app.RegisterService(new CMain(),srvMain,"main");
       app.RegisterService(new COrderCommandHandler(),srvNone,"ordercommandhandler");
+      app.RegisterService(new CScriptManagerBase(),srvScriptManager,"scriptmanager");
       
-      app.RegisterCommandHandler(app.GetService("ordercommandhandler"),classOrderCommand);
+      app.RegisterCommandHandler(app.GetService(srvScriptManager),classOrderCommand);
+      app.RegisterCommandHandler(new COrderScriptHandler(),classScript);
    
       app.Initalize();
-   
+         
    }
 
    app.OnInit();
@@ -313,7 +320,10 @@ int OnInit()
 
 void OnDeinit(const int reason)
 {
-   if (benchmark_cnt > 0) Print("benchmark ("+benchmark_cnt+"): "+benchmark_sum/(benchmark_cnt*1.0));
    app.OnDeinit();
-   return;
+}
+
+void OnChartEvent(const int id, const long& lparam, const double& dparam, const string& sparam)
+{
+   app.OnChartEvent(id, lparam, dparam, sparam);
 }

@@ -17,6 +17,9 @@
 #include "Signals\SignalManagerBase.mqh"
 #include "Commands\OrderCommandHandlerBase.mqh"
 
+#include "ScriptManager\ScriptManagerBase.mqh"
+#include "ScriptManager\OrderScriptHandler.mqh"
+
 #include <mtp_framework_1.1\libraries\comments.mqh>
 
 

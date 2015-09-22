@@ -1,2 +1,3 @@
 classOrderCommand,
 classOrderCommandHandlerBase,
+classScript,

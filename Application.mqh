@@ -134,6 +134,11 @@ public:
    {
       services.OnDeinit();
    }
+   
+   void OnChartEvent(int id, long lparam, double dparam, string sparam)
+   {
+      services.OnChartEvent(id, lparam, dparam, sparam);
+   }
 
 };
 
