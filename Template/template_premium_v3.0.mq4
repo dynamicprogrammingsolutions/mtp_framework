@@ -58,6 +58,16 @@ input int slippage = 3;
 
 input bool printcomment = false;
 
+bool savetofile_at_remove = true;
+bool savetofile_at_chart_change = false;
+bool savetofile_at_chart_close = false;
+bool savetofile_at_parameter_change = false;
+bool savetofile_at_template_change = false;
+bool savetofile_at_terminal_close = true;
+
+bool loadfromfile = true;
+string datafile = "save_dps";
+
 ulong benchmark_sum;
 ulong benchmark_cnt;
 
@@ -238,6 +248,8 @@ class CMain : public CServiceProvider
 {
 public:
    virtual int Type() const { return classMain; }
+   
+   TraitAppAccess
 
    virtual void OnTick()
    {
@@ -276,11 +288,63 @@ public:
       
       ((COrderManager*)(application.ordermanager)).retrainhistory = 1;
       
+      #ifdef __MQL4__
+         // STORE OPEN ORDERS
+         for (int i = OrdersTotal()-1; i >= 0; i--) {
+            if (OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) {
+               COrder* exord;
+               exord = App().ordermanager.ExistingOrder(OrderTicket());
+               if (exord != NULL) {  
+                  if (exord.symbol != _symbol.Name() || exord.magic != COrderBase::magic_default) {         
+                     int idx = om.GetIdxByTicket(exord.GetTicket());
+                     if (idx >= 0)
+                        App().ordermanager.orders.Delete(idx);
+                  }                     
+               } else {
+                  //Print("Order Adding Failed");
+               }
+            }
+         }
+         om.AssignAttachedOrders();
+      #endif
+      
+      if (loadfromfile) {
+         string filename = datafile+Symbol()+".dat";
+         if (FileIsExist(filename))
+         {
+            Print("loading from file");
+            int handle = FileOpen(filename,FILE_READ|FILE_BIN);
+      
+            if (!App().ordermanager.Load(handle)) {
+               Print("file load failed");
+            }
+            FileClose(handle);
+            FileDelete(filename);
+         }      
+      }
+      
    }
    
    virtual void OnDeinit()
    {
       if (benchmark_cnt > 0) Print("benchmark ("+(string)benchmark_cnt+"): "+(string)(benchmark_sum/(benchmark_cnt*1.0)));
+      
+      string filename = datafile+Symbol()+".dat";
+      if ((savetofile_at_remove && UninitializeReason() == REASON_REMOVE) ||
+      (savetofile_at_chart_change && UninitializeReason() == REASON_CHARTCHANGE) ||
+      (savetofile_at_chart_close && UninitializeReason() == REASON_CHARTCLOSE) ||
+      (savetofile_at_parameter_change && UninitializeReason() == REASON_PARAMETERS) ||
+      (savetofile_at_template_change && UninitializeReason() == REASON_TEMPLATE) ||
+      (savetofile_at_terminal_close && UninitializeReason() == REASON_CLOSE)) {
+         Print("saving to file");
+         int handle = FileOpen(filename,FILE_WRITE|FILE_BIN);
+         if (!App().ordermanager.Save(handle)) {
+            Print("file save failed");
+         }
+         FileClose(handle);
+      } else {
+         FileDelete(filename);
+      }
    }
 };
 
