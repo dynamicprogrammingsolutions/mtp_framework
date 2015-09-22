@@ -19,15 +19,11 @@ class CTrailingStop : CAppObject
    double stoptrailing;
    int lockinprofit;
    bool trailingstop_round;
+   
+   TraitAppAccess
+   TraitLoadSymbolFunction
 
    COrderManager* om;
-   CSymbolLoaderInterface* symbolloader;
-
-   CSymbolInfoInterface* _symbol;
-   void loadsymbol(string __symbol)
-   {
-      _symbol = symbolloader.LoadSymbol(__symbol);
-   }
    
    CTrailingStop()
    {
@@ -43,7 +39,6 @@ class CTrailingStop : CAppObject
    virtual void Initalize()
    {
       om = this.App().GetService(srvOrderManager); 
-      symbolloader = this.App().GetService(srvSymbolLoader);
    }
    
    void Fract()
@@ -98,7 +93,7 @@ class CTrailingStop : CAppObject
       //in_order.Update();
       if (in_order.State() != ORDER_STATE_FILLED) return(false);
       bool ret = false;
-      loadsymbol(in_order.symbol,__FUNCTION__);
+      loadsymbol(in_order.symbol);
       int _sl = in_order.GetStopLossTicks();
       //Print("TS sl:",_sl);
       int newsl = _sl;
@@ -216,7 +211,7 @@ class CTrailingStop : CAppObject
          COrder* _order = om.GetOrderByIdx(i);
          _order.Select();
          if (_order.State() == ORDER_STATE_FILLED) {
-            loadsymbol(_order.symbol,__FUNCTION__);
+            loadsymbol(_order.symbol);
             bool change = false;
             double newsl = 0;
             if (_order.GetType() == OP_BUY) {
@@ -241,7 +236,7 @@ class CTrailingStop : CAppObject
    {
       bool ret = false;
       if (_order.State() == ORDER_STATE_FILLED) {
-         loadsymbol(_order.symbol,__FUNCTION__);
+         loadsymbol(_order.symbol);
          bool change = false;
          double newsl = 0;
          if (_order.GetType() == OP_BUY) {

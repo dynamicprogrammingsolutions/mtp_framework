@@ -24,6 +24,13 @@ public:
       delete_after_use = true;
    }
    
+   COrderCommand(ENUM_TRADE_DIRECTION _trade_direction, ENUM_TRANSACTION_TYPE _transaction_type)
+   {
+      delete_after_use = true;
+      trade_direction = _trade_direction;
+      transaction_type = _transaction_type;
+   }
+   
    virtual bool DeleteAfterUse() { return delete_after_use; }
    
 };
