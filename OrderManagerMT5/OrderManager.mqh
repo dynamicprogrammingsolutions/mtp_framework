@@ -41,8 +41,6 @@ public:
    
    COrderManager()
    {
-     use_ontick = true;
-
      custom_order_defaults = false;
 
      ticket_prefix = "ticket=";

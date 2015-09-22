@@ -9,11 +9,6 @@ public:
    CEntryMethodInterface* entrymethod;
    int bar;
    
-   CSignalManagerBase()
-   {
-      use_ontick = true;
-   }
-   
    virtual void Initalize()
    {
       entrymethod = App().GetService(srvEntryMethod);

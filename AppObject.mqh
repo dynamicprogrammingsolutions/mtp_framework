@@ -24,6 +24,8 @@ protected:
    }
    
 public:
+   virtual bool DeleteAfterUse() { return false; }
+
    void SetInitalized() { initalized = true; }
    bool Initalized() { return initalized; }
    

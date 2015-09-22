@@ -249,19 +249,19 @@ public:
    bool SetTakeProfit(CTakeProfit* _tp, bool check = false);
    
    static void DeleteIf(CStopLoss* obj) {
-      if (delete_stoploss_objects) delete obj;
+      if (obj.DeleteAfterUse()) delete obj;
    }
 
    static void DeleteIf(CTakeProfit* obj) {
-      if (delete_takeprofit_objects) delete obj;
+      if (obj.DeleteAfterUse()) delete obj;
    }
    
    static void DeleteIf(CEntry* obj) {
-      if (delete_entry_objects) delete obj;
+      if (obj.DeleteAfterUse()) delete obj;
    }
    
    static void DeleteIf(CMoneyManagement* obj) {
-      if (delete_mm_objects) delete obj;
+      if (obj.DeleteAfterUse()) delete obj;
    }
 
    virtual bool Save(const int handle)

@@ -7,3 +7,5 @@
 #include "ServiceProviders\FactoryInterface.mqh"
 #include "ServiceProviders\OrderManagerInterface.mqh"
 #include "ServiceProviders\EntryMethodInterface.mqh"
+
+#include "CommandInterface.mqh"

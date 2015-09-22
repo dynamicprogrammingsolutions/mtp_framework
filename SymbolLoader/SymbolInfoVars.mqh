@@ -41,8 +41,6 @@ class CSymbolInfoVars : public CServiceProvider
    
    CSymbolInfoVars(string _symbol)
    {
-      use_oninit = true;
-      use_ontick = true;
       symbol = _symbol;
    }
    virtual void Initalize()

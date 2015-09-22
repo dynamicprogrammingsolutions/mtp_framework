@@ -60,7 +60,6 @@ public:
       tp_virtual = false;
       price_virtual = false;
       ontick_has_run = true;
-      use_ontick = true;
    };
    
    CApplication* app;

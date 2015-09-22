@@ -22,7 +22,7 @@
 #property link      "http://www.metatraderprogrammer.com"
 
 #define CUSTOM_SERVICES srvMain,
-#define CUSTOM_CLASSES classSignalManager, classEntryMethod, classCommandHandler, classMain,
+#define CUSTOM_CLASSES classSignalManager, classEntryMethod, classOrderCommandHandler, classMain,
 
 #include <mtp_framework_1.1\Loader.mqh>
 #include <mtp_framework_1.1\DefaultServices.mqh>   
@@ -57,8 +57,6 @@ input int _magic = 1234;
 input int slippage = 3;
 
 input bool printcomment = false;
-
-CMoneyManagement* mm;
 
 ulong benchmark_sum;
 ulong benchmark_cnt;
@@ -193,16 +191,47 @@ public:
 class COrderCommandHandler : public COrderCommandHandlerBase
 {
 public:
-   virtual int Type() const { return classCommandHandler; }
+   CStopLoss* sl;
+   CTakeProfit* tp;
+   CMoneyManagement* mm;
+   
+   COrderCommandHandler()
+   {
+      use_oninit = true;
+   }
+   
+   virtual void OnInit()
+   {
+      mm = new CMoneyManagementFixed(lotsize);
+      sl = new CStopLossTicks(convertfract(stoploss));
+      tp = new CTakeProfitTicks(convertfract(takeprofit));
+   }
 
+   virtual int Type() const { return classOrderCommandHandler; }
+   
+   virtual void CloseAll()
+   {
+      ordermanager.CloseAll(ORDERSELECT_ANY,STATESELECT_FILLED);
+   }
+
+   virtual void CloseBuy()
+   {
+      ordermanager.CloseAll(ORDERSELECT_LONG,STATESELECT_FILLED);
+   }
+   
+   virtual void CloseSell()
+   {
+      ordermanager.CloseAll(ORDERSELECT_SHORT,STATESELECT_FILLED);
+   }
+   
    virtual void OpenBuy()
    {
-      ordermanager.NewOrder(symbol,ORDER_TYPE_BUY,mm,NULL,new CStopLossTicks(convertfract(stoploss)),new CTakeProfitTicks(convertfract(takeprofit)));      
+      ordermanager.NewOrder(symbol,ORDER_TYPE_BUY,mm,NULL,sl,tp);      
    }
    
    virtual void OpenSell()
    {
-      ordermanager.NewOrder(symbol,ORDER_TYPE_SELL,mm,NULL,new CStopLossTicks(convertfract(stoploss)),new CTakeProfitTicks(convertfract(takeprofit)));      
+      ordermanager.NewOrder(symbol,ORDER_TYPE_SELL,mm,NULL,sl,tp);      
    }
 };
 
@@ -211,12 +240,6 @@ class CMain : public CServiceProvider
 public:
    virtual int Type() const { return classMain; }
 
-   CMain()
-   {
-      use_ontick = true;
-      use_oninit = true;
-   }
-   
    virtual void OnTick()
    {
       writecomment();
@@ -225,8 +248,6 @@ public:
    
    virtual void OnInit()
    {
-      mm = new CMoneyManagementFixed(lotsize);
-   
       // TRADE
       if (COrderBase::trade_default == NULL) COrderBase::trade_default = new CTrade();
       if (IsTesting() && !IsVisualMode()) COrderBase::trade_default.LogLevel(LOG_LEVEL_ERRORS);
@@ -248,13 +269,13 @@ public:
       #endif   
 
       if (IsTesting() && !IsVisualMode()) {      
-         app().eventhandler.SetLogLevel(E_ERROR);
+         app.eventhandler.SetLogLevel(E_ERROR);
          comments_enabled = false;
       } else {
-         app().eventhandler.SetLogLevel(E_NOTICE|E_WARNING|E_ERROR|E_INFO);
+         app.eventhandler.SetLogLevel(E_NOTICE|E_WARNING|E_ERROR|E_INFO);
       }
       
-      ((COrderManager*)(app().ordermanager)).retrainhistory = 1;
+      ((COrderManager*)(app.ordermanager)).retrainhistory = 1;
       
    }
 };
@@ -270,15 +291,16 @@ void OnTick()
 int OnInit()
 {
 
-   if (!app().Initalized()) {
+   if (!app.Initalized()) {
    
       register_services();
    
-      app().RegisterService(new CSignalManager(_bar),srvSignalManager,"signalmanager");
-      app().RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
-      app().RegisterService(new CMain(),srvMain,"main");
+      app.RegisterService(new CSignalManager(_bar),srvSignalManager,"signalmanager");
+      app.RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
+      app.RegisterService(new CMain(),srvMain,"main");
+      app.RegisterService(new COrderCommandHandler(),srvNone,"ordercommandhandler");
       
-      app().RegisterCommandHandler(new COrderCommandHandler(),classOrderCommand);
+      app.RegisterCommandHandler(app.GetService("ordercommandhandler"),classOrderCommand);
    
       app.Initalize();
    
@@ -291,7 +313,7 @@ int OnInit()
 
 void OnDeinit(const int reason)
 {
-   //Print("benchmark: "+benchmark_sum/(benchmark_cnt*1.0));
+   if (benchmark_cnt > 0) Print("benchmark ("+benchmark_cnt+"): "+benchmark_sum/(benchmark_cnt*1.0));
    app.OnDeinit();
    return;
 }

@@ -9,23 +9,31 @@ public:
    bool use_ontick;
    bool use_ondeinit;
    
+   CServiceProvider()
+   {
+      use_oninit = true;
+      use_ontick = true;
+      use_ondeinit = true;
+   }
+   
    CApplicationInterface* App()
    {
       return (CApplicationInterface*)this.AppBase();
    }
    
    virtual void OnInit() {
-      AbstractFunctionWarning(__FUNCTION__);
-     
+      use_oninit = false;
+      Print("Disable OnInit on class ",EnumToString((ENUM_CLASS_NAMES)Type()));
    }
    
    virtual void OnTick() {
-      AbstractFunctionWarning(__FUNCTION__);
-     
+      use_ontick = false;
+      Print("Disable OnTick on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
    }
    
    virtual void OnDeinit() {
-      AbstractFunctionWarning(__FUNCTION__);
+      use_ondeinit = false;
+      Print("Disable OnDeinit on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
    }
    
    virtual void HandleEvent(CObject* event)

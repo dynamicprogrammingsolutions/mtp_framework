@@ -140,10 +140,10 @@ public:
    void SetPrice(const double value) { price_set = true; if (executestate != ES_CANCELED) price = value; else Print("Cannot change canceled order data (price)"); }
    void SetTypeTime(const ENUM_ORDER_TYPE_TIME value) { typetime_set = true; if (executestate != ES_CANCELED) type_time = value; else Print("Cannot change canceled order data (typetime)"); }
    
-   static void DeleteIf(CStopLoss* obj) { if (delete_stoploss_objects) delete obj; }
-   static void DeleteIf(CTakeProfit* obj) { if (delete_takeprofit_objects) delete obj; }
-   static void DeleteIf(CEntry* obj) { if (delete_entry_objects) delete obj; }
-   static void DeleteIf(CMoneyManagement* obj) { if (delete_mm_objects) delete obj; }
+   static void DeleteIf(CStopLoss* obj) { if (obj.DeleteAfterUse()) delete obj; }
+   static void DeleteIf(CTakeProfit* obj) { if (obj.DeleteAfterUse()) delete obj; }
+   static void DeleteIf(CEntry* obj) { if (obj.DeleteAfterUse()) delete obj; }
+   static void DeleteIf(CMoneyManagement* obj) { if (obj.DeleteAfterUse()) delete obj; }
 
 };
 

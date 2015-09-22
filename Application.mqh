@@ -75,18 +75,19 @@ public:
       return commandhandlers.IsRegistered(handled_class);
    }
    
-   virtual void Command(CObject* command) {
+   virtual void Command(CObject* command, bool disable_delete = false) {
+      
       CServiceProvider* handler = commandhandlers.GetHandler((ENUM_CLASS_NAMES)command.Type());
       if (handler != NULL) handler.HandleCommand(command);
       else Print(__FUNCTION__,": Command Handler Not Found For ",command.Type());
-      delete command;
+      if (!disable_delete && ((CCommandInterface*)command).DeleteAfterUse()) delete command;
    }
    
-   virtual void Event(CObject* event) {
+   virtual void Event(CObject* event, bool disable_delete = false) {
       CServiceProvider* handler = eventhandlers.GetHandler((ENUM_CLASS_NAMES)event.Type());
       if (handler != NULL) handler.HandleEvent(event);
       else Print(__FUNCTION__,": Event Handler Not Found For ",event.Type());
-      delete event;
+      if (!disable_delete) delete event;
    }   
    
    virtual void Initalize()
