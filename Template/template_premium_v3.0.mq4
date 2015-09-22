@@ -281,7 +281,7 @@ public:
    
    virtual void OnDeinit()
    {
-      if (benchmark_cnt > 0) Print("benchmark ("+benchmark_cnt+"): "+benchmark_sum/(benchmark_cnt*1.0));
+      if (benchmark_cnt > 0) Print("benchmark ("+(string)benchmark_cnt+"): "+(string)(benchmark_sum/(benchmark_cnt*1.0)));
    }
 };
 
@@ -306,7 +306,7 @@ int OnInit()
       app.RegisterService(new COrderCommandHandler(),srvNone,"ordercommandhandler");
       app.RegisterService(new CScriptManagerBase(),srvScriptManager,"scriptmanager");
       
-      app.RegisterCommandHandler(app.GetService(srvScriptManager),classOrderCommand);
+      app.RegisterCommandHandler(app.GetService("ordercommandhandler"),classOrderCommand);
       app.RegisterCommandHandler(new COrderScriptHandler(),classScript);
    
       app.Initalize();

@@ -76,7 +76,7 @@ public:
    }
    
    virtual void Command(CObject* command, bool disable_delete = false) {
-      
+      Print("command: "+EnumToString((ENUM_CLASS_NAMES)command.Type()));
       CServiceProvider* handler = commandhandlers.GetHandler((ENUM_CLASS_NAMES)command.Type());
       if (handler != NULL) handler.HandleCommand(command);
       else Print(__FUNCTION__,": Command Handler Not Found For ",command.Type());

@@ -20,7 +20,7 @@ public:
    void CheckObjects()
    {
       for (int i = 0; i < scriptids.Total(); i++) {
-         string objname = "eascript_"+scriptids.At(i);
+         string objname = "eascript_"+(string)scriptids.At(i);
          if (ObjectFind(ChartID(),objname) >= 0) {
             long lparam = ObjectGetInteger(ChartID(),objname,OBJPROP_TIME);
             double dparam = ObjectGetDouble(ChartID(),objname,OBJPROP_PRICE);
@@ -34,15 +34,14 @@ public:
    {
       Print("Running Script: ",id," ",lparam," ",dparam," ",sparam);
       
-      int hwnd=WindowHandle(Symbol(), Period());
       EventChartCustom(
          ChartID(),
-         id,
+         (ushort)id,
          lparam,
          dparam,
          sparam
       );
-      string objname = "eascript_"+id;
+      string objname = "eascript_"+(string)id;
       ObjectCreate(ChartID(),objname,OBJ_ARROW,0,0,0);
       ObjectSetInteger(ChartID(),objname,OBJPROP_TIME,lparam);
       ObjectSetDouble(ChartID(),objname,OBJPROP_PRICE,dparam);
