@@ -20,22 +20,22 @@ public:
    
    virtual void OnInit() {
       use_oninit = false;
-      Print("Disable OnInit on class ",EnumToString((ENUM_CLASS_NAMES)Type()));
+      //Print("Disable OnInit on class ",EnumToString((ENUM_CLASS_NAMES)Type()));
    }
    
    virtual void OnTick() {
       use_ontick = false;
-      Print("Disable OnTick on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
+      //Print("Disable OnTick on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
    }
    
    virtual void OnDeinit() {
       use_ondeinit = false;
-      Print("Disable OnDeinit on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
+      //Print("Disable OnDeinit on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
    }
    
    virtual void OnChartEvent(int id, long lparam, double dparam, string sparam) {
       use_onchartevent = false;
-      Print("Disable OnChartEvent on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
+      //Print("Disable OnChartEvent on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
    }
    
    virtual void HandleEvent(CObject* event)

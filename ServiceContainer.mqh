@@ -93,8 +93,8 @@ public:
    
    void OnInit()
    {
-      int count = Total();
-      for (int i = 0; i < count; i++) {
+      //int count = Total();
+      for (int i = 0; i < Total(); i++) {
          CServiceProvider* service = ServiceProvider(i);
          if (service.use_oninit) service.OnInit();
       }
@@ -102,8 +102,8 @@ public:
    
    void OnTick()
    {
-      int count = Total();
-      for (int i = 0; i < count; i++) {
+      //int count = Total();
+      for (int i = 0; i < Total(); i++) {
          CServiceProvider* service = ServiceProvider(i);
          if (service.use_ontick) {
             service.OnTick();
@@ -113,8 +113,8 @@ public:
    
    void OnDeinit()
    {
-      int count = Total();
-      for (int i = 0; i < count; i++) {
+      //int count = Total();
+      for (int i = 0; i < Total(); i++) {
          CServiceProvider* service = ServiceProvider(i);
          if (service.use_ondeinit) service.OnDeinit();
       }
@@ -122,8 +122,8 @@ public:
    
    void OnChartEvent(int id, long lparam, double dparam, string sparam)
    {
-      int count = Total();
-      for (int i = 0; i < count; i++) {
+      //int count = Total();
+      for (int i = 0; i < Total(); i++) {
          CServiceProvider* service = ServiceProvider(i);
          if (service.use_onchartevent) service.OnChartEvent(id, lparam, dparam, sparam);
       }

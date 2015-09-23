@@ -16,9 +16,9 @@ protected:
    CAppObject* Prepare(CAppObject* obj)
    {
       if (!obj.Initalized()) {
-	 obj.AppBase(this.AppBase());
-	 obj.Initalize();
-	 obj.initalized = true;
+         obj.AppBase(this.AppBase());
+         obj.Initalize();
+         obj.initalized = true;
       }
       return obj;
    }

@@ -33,7 +33,7 @@ public:
       {
          lotroundup = LOTROUNDUP_DEF;
          lot_extradigits = 0;
-         roundup_to_minlot = false;
+         roundup_to_minlot = true;
       }
       
       CEventHandlerInterface* event;

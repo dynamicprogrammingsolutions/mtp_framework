@@ -94,6 +94,7 @@ public:
       services.InitalizeServices();
       commandhandlers.InitalizeHandlers();
       eventhandlers.InitalizeHandlers();
+      this.SetInitalized();
    }
    
    CServiceProvider* DeregisterService(ENUM_APPLICATION_SERVICE srv)
