@@ -10,13 +10,14 @@ private:
    CServiceContainer services;
    CHandlerContainer eventhandlers;
    CHandlerContainer commandhandlers;
-   
+
+   bool initalized;
+     
 public:
 
    CApplication()
    {
       global_application_object = GetPointer(this);
-      this.AppBase(GetPointer(this));
    }
 
 #include "Interfaces\ServiceProviders\__service_fastaccess_objects.mqh"
@@ -96,6 +97,9 @@ public:
       eventhandlers.InitalizeHandlers();
       this.SetInitalized();
    }
+   
+   void SetInitalized() { initalized = true; }
+   bool Initalized() { return initalized; }   
    
    CServiceProvider* DeregisterService(ENUM_APPLICATION_SERVICE srv)
    {

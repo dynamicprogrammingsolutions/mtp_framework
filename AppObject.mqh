@@ -1,8 +1,10 @@
 //
+#include "Loader.mqh"
+
 class CAppObject : public CObject
 {
 private:
-   CAppObject* appbase;
+   CApplicationInterface* appbase;
    
 protected:
 
@@ -24,8 +26,6 @@ protected:
    }
    
 public:
-   virtual bool DeleteAfterUse() { return false; }
-
    void SetInitalized() { initalized = true; }
    bool Initalized() { return initalized; }
    
@@ -33,7 +33,7 @@ public:
       //AbstractFunctionWarning(__FUNCTION__);
    }
    
-   CAppObject* AppBase() {
+   CApplicationInterface* AppBase() {
       if (CheckPointer(appbase) == POINTER_INVALID) {
          Print("App not set in: ",EnumToString((ENUM_CLASS_NAMES)this.Type()));
          return global_application_object;
@@ -41,10 +41,10 @@ public:
          return appbase;
       }
    }
-   void AppBase(CAppObject* _appbase) {
+   void AppBase(CApplicationInterface* _appbase) {
       appbase = _appbase;
    }
 };
 
 // this is just for protection
-CAppObject* global_application_object;
+CApplicationInterface* global_application_object;

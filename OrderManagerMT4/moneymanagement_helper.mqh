@@ -93,6 +93,7 @@ double mmgetlot_stoploss_req(double balance, int in_stoploss, double percent, do
          if (_symbol.LotValue() == 0 || _symbol.TickSize() == 0) return 0;
       }
    }*/
+   
    return((risk) / ((in_stoploss*_symbol.TickSize() + commission_indist(price)) * _symbol.LotValue()));
 }
 

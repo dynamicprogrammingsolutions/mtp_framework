@@ -2,6 +2,8 @@
 class CStopsCalcInterface : public CAppObject
 {
 public:
+   virtual bool DeleteAfterUse() { return false; }
+
    virtual CStopsCalcInterface* SetOrderType(ENUM_ORDER_TYPE _ordertype)
    {
       AbstractFunctionWarning(__FUNCTION__); 

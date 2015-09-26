@@ -7,6 +7,7 @@ class CStopsCalc : public CStopsCalcInterface
 public:
    virtual int Type() const { return classStopsCalc; }
 protected:
+
    CApplication* App() { return (CApplication*)AppBase(); }
    CSymbolInfoInterface* _symbol;   
    void loadsymbol(string __symbol)
@@ -30,6 +31,9 @@ protected:
    virtual void CalcPrice() {}   
      
 public:
+
+   bool delete_after_use;
+   virtual bool DeleteAfterUse() { return delete_after_use; }
 
    virtual CStopsCalcInterface* SetOrderType(ENUM_ORDER_TYPE _ordertype)
    {

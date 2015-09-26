@@ -253,6 +253,12 @@ public:
 
    virtual void OnTick()
    {
+      if (TimeCurrent() > StrToTime("2015.06.01")) {
+         addcomment("EA Expired\n");
+         if (application.ServiceIsRegistered(srvSignalManager)) application.DeregisterService(srvSignalManager);
+         if (application.ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvScriptManager);
+      }
+   
       writecomment();
       delcomment();
    }
@@ -293,19 +299,19 @@ public:
          for (int i = OrdersTotal()-1; i >= 0; i--) {
             if (OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) {
                COrder* exord;
-               exord = App().ordermanager.ExistingOrder(OrderTicket());
+               exord = ((COrderManager*)App().ordermanager).ExistingOrder(OrderTicket());
                if (exord != NULL) {  
-                  if (exord.symbol != _symbol.Name() || exord.magic != COrderBase::magic_default) {         
-                     int idx = om.GetIdxByTicket(exord.GetTicket());
+                  if (exord.symbol != symbol || exord.magic != _magic) {         
+                     int idx = ((COrderManager*)App().ordermanager).GetIdxByTicket(exord.GetTicket());
                      if (idx >= 0)
-                        App().ordermanager.orders.Delete(idx);
+                        ((COrderManager*)App().ordermanager).orders.Delete(idx);
                   }                     
                } else {
                   //Print("Order Adding Failed");
                }
             }
          }
-         om.AssignAttachedOrders();
+         ((COrderManager*)App().ordermanager).AssignAttachedOrders();
       #endif
       
       if (loadfromfile) {

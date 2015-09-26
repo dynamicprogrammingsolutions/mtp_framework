@@ -105,7 +105,7 @@ public:
    double            TickValue()                    const { return(m_tick_value);         }
    double            TickValueProfit()              const { return(m_tick_value_profit);  }
    double            TickValueLoss()                const { return(m_tick_value_loss);    }
-   double            TickSize()                     const { return(m_tick_size);          }
+   double            TickSize()                     { return(m_tick_size);          }
    //--- lots parameters
    double            ContractSize()                 const { return(m_contract_size);      }
    double            LotsMin()                      const { return(m_lots_min);           }
