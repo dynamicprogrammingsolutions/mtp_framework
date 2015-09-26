@@ -24,6 +24,8 @@
 #include "ScriptManager\ScriptManagerBase.mqh"
 #include "ScriptManager\OrderScriptHandler.mqh"
 
+#include "TrailingStop\TrailingStop.mqh"
+
 #include "EventManager\EventManager.mqh"
 #include "CommandManager\CommandManager.mqh"
 

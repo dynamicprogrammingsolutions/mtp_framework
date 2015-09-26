@@ -31,6 +31,16 @@ input double lotsize = 0.1;
 
 input double stoploss = 20;
 input double takeprofit = 40;
+
+/*
+#define TRAILINGSTOP
+input double breakevenat = 0;
+input double breakeven_profit = 0;
+input double trailingstop_activate = 0;
+input double trailingstop = 0;
+input double trailingstop_step = 1;
+*/
+
 input int _bar = 1;
 input ENUM_TIMEFRAMES timeframe = 0;
 
@@ -239,6 +249,33 @@ public:
    }
 };
 
+#ifdef TRAILINGSTOP
+class CTrailingStopManager : public CServiceProvider
+{
+public:
+   CTrailingStop TrailingStop;
+
+   virtual void Initalize()
+   {
+      this.Prepare(GetPointer(TrailingStop));
+   }
+
+   virtual void OnTick()
+   {
+      TrailingStop.OnAll();
+   }
+   
+   virtual void OnInit()
+   {
+      TrailingStop.lockin = convertfract(breakevenat);
+      TrailingStop.lockinprofit = convertfract(breakeven_profit);
+      TrailingStop.activate = convertfract(trailingstop_activate);
+      TrailingStop.trailingstop = convertfract(trailingstop);
+      TrailingStop.step = convertfract(trailingstop_step);
+   }
+};
+#endif
+
 class CMain : public CServiceProvider
 {
 public:
@@ -250,8 +287,8 @@ public:
    {
       if (TimeCurrent() > StrToTime("2015.12.26")) {
          addcomment("EA Expired\n");
-         if (application.ServiceIsRegistered(srvSignalManager)) application.DeregisterService(srvSignalManager);
-         if (application.ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvScriptManager);
+         if (this.App().ServiceIsRegistered(srvSignalManager)) application.DeregisterService(srvSignalManager);
+         if (this.App().ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvScriptManager);
       }
    
       writecomment();
@@ -318,6 +355,9 @@ int OnInit()
    
       application.RegisterService(new CSignalManager(),srvSignalManager,"signalmanager");
       application.RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
+      #ifdef TRAILINGSTOP
+         application.RegisterService(new CTrailingStopManager(),srvNone,"trailingstopmanager");
+      #endif
       application.RegisterService(new CMain(),srvMain,"main");
       application.RegisterService(new COrderDataSaver(), srvNone, "orderdatasaver");
       application.RegisterService(new CScriptManagerBase(),srvScriptManager,"scriptmanager");
