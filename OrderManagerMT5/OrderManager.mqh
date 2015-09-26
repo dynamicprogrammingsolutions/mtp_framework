@@ -161,25 +161,21 @@ COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _or
       if (isset(trade)) _order.trade = trade;
    }
 
-   if (_price == NULL) _price = new CEntryPrice(0);
-   if (_stoploss == NULL) _stoploss = new CStopLossPrice(0);
-   if (_takeprofit == NULL) _takeprofit = new CTakeProfitPrice(0);
-   
-   _price.SetOrderType(_ordertype).SetSymbol(in_symbol);
-   _stoploss.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price.GetPrice());
-   _takeprofit.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price.GetPrice());
+   if (_price != NULL) _price.SetOrderType(_ordertype).SetSymbol(in_symbol);
+   if (_stoploss != NULL) _stoploss.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price != NULL ? _price.GetPrice() : 0);
+   if (_takeprofit != NULL) _takeprofit.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price != NULL ? _price.GetPrice() : 0);
 
    _order.NewOrder(
       in_symbol,_ordertype,_volume,
-      _price.GetPrice(),
-      _stoploss.GetPrice(),
-      _takeprofit.GetPrice(),
+      _price == NULL ? 0 : _price.GetPrice(),
+      _stoploss == NULL ? 0 : _stoploss.GetPrice(),
+      _takeprofit == NULL ? 0 : _takeprofit.GetPrice(),
       _comment,_expiration
    );
    
-   COrderBase::DeleteIf(_price);
-   COrderBase::DeleteIf(_stoploss);
-   COrderBase::DeleteIf(_takeprofit);
+   if (_price != NULL) COrderBase::DeleteIf(_price);
+   if (_stoploss != NULL) COrderBase::DeleteIf(_stoploss);
+   if (_takeprofit != NULL) COrderBase::DeleteIf(_takeprofit);
       
    orders.Add(_order); 
 
@@ -197,26 +193,22 @@ COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _or
       if (isset(trade)) _order.trade = trade;
    }
 
-   if (_price == NULL) _price = new CEntryPrice(0);
-   if (_stoploss == NULL) _stoploss = new CStopLossPrice(0);
-   if (_takeprofit == NULL) _takeprofit = new CTakeProfitPrice(0);
-   
-   _price.SetOrderType(_ordertype).SetSymbol(in_symbol);
-   _stoploss.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price.GetPrice());
-   _takeprofit.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price.GetPrice());
+   if (_price != NULL) _price.SetOrderType(_ordertype).SetSymbol(in_symbol);
+   if (_stoploss != NULL) _stoploss.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price != NULL ? _price.GetPrice() : 0);
+   if (_takeprofit != NULL) _takeprofit.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price != NULL ? _price.GetPrice() : 0);
    _mm.SetSymbol(in_symbol).SetStopLoss(_stoploss);
 
    _order.NewOrder(
       in_symbol,_ordertype,_mm.GetLotsize(),
-      _price.GetPrice(),
-      _stoploss.GetPrice(),
-      _takeprofit.GetPrice(),
+      _price == NULL ? 0 : _price.GetPrice(),
+      _stoploss == NULL ? 0 : _stoploss.GetPrice(),
+      _takeprofit == NULL ? 0 : _takeprofit.GetPrice(),
       _comment,_expiration
    );
    
-   COrderBase::DeleteIf(_price);
-   COrderBase::DeleteIf(_stoploss);
-   COrderBase::DeleteIf(_takeprofit);
+   if (_price != NULL) COrderBase::DeleteIf(_price);
+   if (_stoploss != NULL) COrderBase::DeleteIf(_stoploss);
+   if (_takeprofit != NULL) COrderBase::DeleteIf(_takeprofit);
    COrderBase::DeleteIf(_mm);
       
    orders.Add(_order); 

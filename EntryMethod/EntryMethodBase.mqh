@@ -45,14 +45,14 @@ public:
    virtual void OnBuySignal(bool valid)
    {
       if (CloseOpposite()) OnCloseBuyOpposite(valid);
-      if (valid && BuySignalFilter()) {
+      if (valid && BuySignalFilter(valid)) {
          App().Command(command_open_buy);
       }
    }
    virtual void OnSellSignal(bool valid)
    {   
       if (CloseOpposite()) OnCloseSellOpposite(valid);
-      if (valid && SellSignalFilter()) {
+      if (valid && SellSignalFilter(valid)) {
          App().Command(command_open_sell);
       }
    }
@@ -62,14 +62,14 @@ public:
       return false;
    }
    
-   virtual bool BuySignalFilter()
+   virtual bool BuySignalFilter(bool valid)
    {
-      return true;
+      return valid;
    }
    
-   virtual bool SellSignalFilter()
+   virtual bool SellSignalFilter(bool valid)
    {
-      return true;
+      return valid;
    }
 
 };
