@@ -128,4 +128,13 @@ public:
          if (service.use_onchartevent) service.OnChartEvent(id, lparam, dparam, sparam);
       }
    }
+   
+   void OnTimer()
+   {
+      //int count = Total();
+      for (int i = 0; i < Total(); i++) {
+         CServiceProvider* service = ServiceProvider(i);
+         if (service.use_ontimer) service.OnTimer();
+      }
+   }
 };

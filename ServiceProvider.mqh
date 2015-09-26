@@ -9,6 +9,7 @@ public:
    bool use_ontick;
    bool use_ondeinit;
    bool use_onchartevent;
+   bool use_ontimer;
    
    CServiceProvider()
    {
@@ -36,6 +37,11 @@ public:
    virtual void OnChartEvent(int id, long lparam, double dparam, string sparam) {
       use_onchartevent = false;
       //Print("Disable OnChartEvent on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
+   }
+   
+   virtual void OnTimer() {
+      use_ontimer = false;
+      //Print("Disable OnDeinit on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
    }
    
 };

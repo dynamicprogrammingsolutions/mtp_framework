@@ -101,6 +101,11 @@ public:
    {
       services.OnChartEvent(id, lparam, dparam, sparam);
    }
+   
+   void OnTimer()
+   {
+      services.OnTimer();
+   }
 
 };
 

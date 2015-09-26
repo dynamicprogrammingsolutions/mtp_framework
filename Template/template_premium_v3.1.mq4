@@ -281,6 +281,13 @@ class CExpiration : public CServiceProvider
 public:
    TraitAppAccess
    
+   int expiration_days;
+   
+   CExpiration()
+   {
+      expiration_days = 90;
+   }
+   
    virtual void OnTick()
    {
       if (IsExpired()) {
@@ -288,12 +295,19 @@ public:
          if (this.App().ServiceIsRegistered(srvSignalManager)) application.DeregisterService(srvSignalManager);
          if (this.App().ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvScriptManager);
          ((COrderManager*)this.App().ordermanager).CloseAll(ORDERSELECT_ANY);
+      } else {
+         addcomment("This is a test version. EA will work until "+TimeToStr(GetExpirationTime()-1,TIME_DATE)+"\n");
       }
+   }
+   
+   datetime GetExpirationTime()
+   {
+      return __DATE__+86400*expiration_days;
    }
    
    bool IsExpired()
    {
-      return (TimeCurrent() > StrToTime("2015.05.27"));
+      return (TimeCurrent() > GetExpirationTime());
    }
 };
 
@@ -366,6 +380,12 @@ public:
    {
       if (benchmark_cnt > 0) Print("benchmark ("+(string)benchmark_cnt+"): "+(string)(benchmark_sum/(benchmark_cnt*1.0)));
    }
+   
+   /*virtual void OnTimer()
+   {
+      application.OnTick();
+   }*/
+   
 };
 
 CApplication application;
@@ -414,4 +434,9 @@ void OnDeinit(const int reason)
 void OnChartEvent(const int id, const long& lparam, const double& dparam, const string& sparam)
 {
    application.OnChartEvent(id, lparam, dparam, sparam);
+}
+
+void OnTimer()
+{
+   application.OnTimer();
 }
