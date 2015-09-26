@@ -290,23 +290,7 @@ public:
       ((COrderManager*)(application.ordermanager)).retrainhistory = 1;
 
       #ifdef __MQL4__
-         // STORE OPEN ORDERS
-         for (int i = OrdersTotal()-1; i >= 0; i--) {
-            if (OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) {
-               COrder* exord;
-               exord = ((COrderManager*)App().ordermanager).ExistingOrder(OrderTicket());
-               if (exord != NULL) {  
-                  if (exord.symbol != symbol || exord.magic != _magic) {         
-                     int idx = ((COrderManager*)App().ordermanager).GetIdxByTicket(exord.GetTicket());
-                     if (idx >= 0)
-                        ((COrderManager*)App().ordermanager).orders.Delete(idx);
-                  }                     
-               } else {
-                  //Print("Order Adding Failed");
-               }
-            }
-         }
-         ((COrderManager*)App().ordermanager).AssignAttachedOrders();
+         ((COrderManager*)(application.ordermanager)).LoadOpenOrders(Symbol(),_magic);
       #endif
             
    }

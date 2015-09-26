@@ -173,6 +173,26 @@ public:
       get_orders_i = -1;
       return gotorder;
    }
+   
+   void LoadOpenOrders(string __symbol, int __magic)
+   {
+      for (int i = OrdersTotal()-1; i >= 0; i--) {
+         if (OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) {
+            COrder* exord;
+            exord = ExistingOrder(OrderTicket());
+            if (exord != NULL) {  
+               if (exord.symbol != __symbol || exord.magic != __magic) {         
+                  int idx = GetIdxByTicket(exord.GetTicket());
+                  if (idx >= 0)
+                     orders.Delete(idx);
+               }                     
+            } else {
+               //Print("Order Adding Failed");
+            }
+         }
+      }
+      AssignAttachedOrders();
+   }
 
 };
 
