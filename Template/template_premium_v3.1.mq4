@@ -276,6 +276,49 @@ public:
 };
 #endif
 
+class CExpiration : public CServiceProvider
+{
+public:
+   TraitAppAccess
+   
+   virtual void OnTick()
+   {
+      if (IsExpired()) {
+         addcomment("EA Expired\n");
+         if (this.App().ServiceIsRegistered(srvSignalManager)) application.DeregisterService(srvSignalManager);
+         if (this.App().ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvScriptManager);
+         ((COrderManager*)this.App().ordermanager).CloseAll(ORDERSELECT_ANY);
+      }
+   }
+   
+   bool IsExpired()
+   {
+      return (TimeCurrent() > StrToTime("2015.05.27"));
+   }
+};
+
+class CChartComment : public CServiceProvider
+{
+public:
+   TraitAppAccess
+   
+   virtual void OnTick()
+   {
+      if (comments_enabled) {
+         writecomment_noformat();
+         if (printcomment) printcomment();
+         delcomment();
+      }
+   }
+   
+   virtual void OnInit()
+   {
+      if (IsTesting() && !IsVisualMode() && !printcomment) {    
+         comments_enabled = false;
+      }    
+   }
+};
+
 class CMain : public CServiceProvider
 {
 public:
@@ -283,18 +326,6 @@ public:
    
    TraitAppAccess
 
-   virtual void OnTick()
-   {
-      if (TimeCurrent() > StrToTime("2015.12.26")) {
-         addcomment("EA Expired\n");
-         if (this.App().ServiceIsRegistered(srvSignalManager)) application.DeregisterService(srvSignalManager);
-         if (this.App().ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvScriptManager);
-      }
-   
-      writecomment();
-      delcomment();
-   }
-   
    virtual void OnInit()
    {
       // TRADE
@@ -319,7 +350,6 @@ public:
 
       if (IsTesting() && !IsVisualMode()) {      
          application.eventhandler.SetLogLevel(E_ERROR);
-         comments_enabled = false;
       } else {
          application.eventhandler.SetLogLevel(E_NOTICE|E_WARNING|E_ERROR|E_INFO);
       }
@@ -353,6 +383,7 @@ int OnInit()
    
       register_services();
    
+      application.RegisterService(new CExpiration(),srvNone,"expiration");
       application.RegisterService(new CSignalManager(),srvSignalManager,"signalmanager");
       application.RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
       #ifdef TRAILINGSTOP
@@ -363,6 +394,8 @@ int OnInit()
       application.RegisterService(new CScriptManagerBase(),srvScriptManager,"scriptmanager");
       application.RegisterService(new COrderCommandHandler(),srvOrderCommandHandler,"ordercommandhandler");
       application.RegisterService(new COrderScriptHandler(),srvNone,"orderscripthandler");
+      
+      application.RegisterService(new CChartComment(),srvNone,"chartcomment");
 
       application.Initalize();
 
