@@ -52,8 +52,7 @@ public:
    }
    virtual void HandleScript(int id, long lparam, double dparam, string sparam)
    {
-      //Print("Handling Script: ",id," ",lparam," ",dparam," ",sparam);
-      this.App().Command(new CScript(id, lparam, dparam, sparam));
+      this.App().commandmanager.Send(CScript::Command,new CScript(id,lparam,dparam,sparam),true);
    }
    virtual void OnTick()
    {

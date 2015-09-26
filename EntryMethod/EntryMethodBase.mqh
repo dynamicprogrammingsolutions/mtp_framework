@@ -11,7 +11,7 @@ public:
    COrderCommand* command_open_sell;
    COrderCommand* command_close_buy;
    COrderCommand* command_close_sell;
-
+   
    COrderManager* ordermanager;
    virtual void Initalize()
    {
@@ -24,36 +24,36 @@ public:
    
    virtual void OnCloseSellSignal()
    {
-      App().Command(command_close_sell);
+      App().commandmanager.Send(COrderCommand::Command, command_close_sell);
    }
    
    virtual void OnCloseBuySignal()
    {
-      App().Command(command_close_buy);
+      App().commandmanager.Send(COrderCommand::Command, command_close_buy);
    }
    
    virtual void OnCloseBuyOpposite(bool valid)
    {
-      App().Command(command_close_sell);
+      App().commandmanager.Send(COrderCommand::Command, command_close_sell);
    }
    
    virtual void OnCloseSellOpposite(bool valid)
    {
-      App().Command(command_close_buy);
+      App().commandmanager.Send(COrderCommand::Command, command_close_buy);
    }
    
    virtual void OnBuySignal(bool valid)
    {
       if (CloseOpposite()) OnCloseBuyOpposite(valid);
       if (valid && BuySignalFilter()) {
-         App().Command(command_open_buy);
+         App().commandmanager.Send(COrderCommand::Command, command_open_buy);
       }
    }
    virtual void OnSellSignal(bool valid)
    {   
       if (CloseOpposite()) OnCloseSellOpposite(valid);
       if (valid && SellSignalFilter()) {
-         App().Command(command_open_sell);
+         App().commandmanager.Send(COrderCommand::Command, command_open_sell);
       }
    }
    

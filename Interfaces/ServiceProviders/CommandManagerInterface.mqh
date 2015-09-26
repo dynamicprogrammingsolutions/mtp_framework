@@ -1,5 +1,5 @@
 //
-class CEventManagerInterface : public CServiceProvider
+class CCommandManagerInterface : public CServiceProvider
 {
 public:
   

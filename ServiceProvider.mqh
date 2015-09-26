@@ -38,15 +38,4 @@ public:
       //Print("Disable OnChartEvent on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
    }
    
-   virtual void HandleEvent(CObject* event)
-   {
-      AbstractFunctionWarning(__FUNCTION__);
-   }
-   
-   virtual void HandleCommand(CObject* command)
-   {
-      AbstractFunctionWarning(__FUNCTION__);
-   }
-   
-   
 };

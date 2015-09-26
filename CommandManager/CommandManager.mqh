@@ -1,10 +1,10 @@
 //
 #include "..\Loader.mqh"
 
-class CEventManager : public CEventManagerInterface
+class CCommandManager : public CCommandManagerInterface
 {
 public:
-   TraitGetType { return classEventManager; }
+   TraitGetType { return classCommandManager; }
    
 public:
    CArrayObj container;
@@ -44,6 +44,6 @@ public:
       }
       if (deleteobject) delete object;
       return ret;
-   } 
+   }
    
 };

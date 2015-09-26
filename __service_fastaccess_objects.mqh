@@ -4,3 +4,4 @@ COrderManagerInterface* ordermanager;
 CFactoryInterface* orderfactory;
 CFactoryInterface* attachedorderfactory;
 CEventManagerInterface* eventmanager;
+CCommandManagerInterface* commandmanager;

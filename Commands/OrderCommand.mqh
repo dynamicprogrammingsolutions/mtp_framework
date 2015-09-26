@@ -14,7 +14,9 @@ class COrderCommand : public CCommandInterface
 {
 public:
    virtual int Type() const { return classOrderCommand; }
-
+   
+   static int Command;
+   
    bool delete_after_use;
    ENUM_TRADE_DIRECTION trade_direction;
    ENUM_TRANSACTION_TYPE transaction_type;
@@ -34,3 +36,5 @@ public:
    virtual bool DeleteAfterUse() { return delete_after_use; }
    
 };
+
+int COrderCommand::Command = 0;

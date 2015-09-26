@@ -1,4 +1,14 @@
 //
+
+enum ENUM_EVENT_TYPE {
+   E_VERBOSE = 1,
+   E_INFO = 2,
+   E_NOTICE = 4,
+   E_WARNING = 8, 
+   E_ERROR = 16,
+   E_DEBUG = 32,
+};
+
 enum ENUM_HANDLING_TYPE {
    EH_PRINT = 1,
    EH_ALERT = 2,
@@ -92,32 +102,6 @@ private:
       else return(true);
    }
 
-   virtual void HandleEvent(CObject* event)
-   {
-      CEventLog* logevent = event;
-       
-      int event_idx = (int)MathRound(MathLog(logevent.type)/MathLog(2));
-      ushort _eventhandling;
-      if ((logevent.type & loglevel) == 0) return;
-
-      if (ArraySize(eventhandling) < event_idx+1) {
-         _eventhandling = defeventhandling;
-      } else {
-         _eventhandling = eventhandling[event_idx];
-      }
-      logevent.message = logevent.function+":"+logevent.message;
-      if ((_eventhandling & EH_PRINT) > 0) Print(logevent.message);
-      if ((_eventhandling & EH_ALERT) > 0) Alert(logevent.message);
-      if ((_eventhandling & EH_SOUND) > 0) {
-         string _soundfile;
-         if (ArraySize(soundfiles) < event_idx+1) _soundfile = defsoundfile;
-         else _soundfile = soundfiles[event_idx];
-         if (_soundfile == "") _soundfile = defsoundfile;
-         PlaySound(_soundfile);
-      }
-       
-   }
-   
    void Debug(const string message, const string function = "")
    {
       Event(E_DEBUG, message, function);

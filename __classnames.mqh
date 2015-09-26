@@ -1,4 +1,3 @@
-#include "Events\__classnames.mqh"
 #include "Commands\__classnames.mqh"
 #include "EventHandler\__classnames.mqh"
 #include "OrderManager\__classnames.mqh"
@@ -11,3 +10,4 @@
 #include "EntryMethod\__classnames.mqh"
 #include "ScriptManager\__classnames.mqh"
 #include "EventManager\__classnames.mqh"
+#include "CommandManager\__classnames.mqh"

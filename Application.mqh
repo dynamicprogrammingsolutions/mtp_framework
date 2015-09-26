@@ -8,8 +8,6 @@ class CApplication : public CApplicationInterface
 private:
 
    CServiceContainer services;
-   CHandlerContainer eventhandlers;
-   CHandlerContainer commandhandlers;
 
    bool initalized;
      
@@ -52,49 +50,9 @@ public:
       
    }
    
-   void RegisterEventHandler(CServiceProvider* handler, ENUM_CLASS_NAMES handled_class)
-   {
-      Print("Registering EventHandler: ",EnumToString((ENUM_CLASS_NAMES)handler.Type())," handles: ",EnumToString(handled_class));
-      handler.AppBase(GetPointer(this));
-      eventhandlers.Add(handled_class, handler);
-   }
-
-   void RegisterCommandHandler(CServiceProvider* handler, ENUM_CLASS_NAMES handled_class)
-   {
-      Print("Registering CommandHandler: ",EnumToString((ENUM_CLASS_NAMES)handler.Type())," handles: ",EnumToString(handled_class));
-      handler.AppBase(GetPointer(this));
-      commandhandlers.Add(handled_class, handler);
-   }
-
-   bool EventHandlerIsRegistered(ENUM_CLASS_NAMES handled_class)
-   {
-      return eventhandlers.IsRegistered(handled_class);
-   }
-
-   bool CommandHandlerIsRegistered(ENUM_CLASS_NAMES handled_class)
-   {
-      return commandhandlers.IsRegistered(handled_class);
-   }
-   
-   virtual void Command(CObject* command, bool disable_delete = false) {
-      CServiceProvider* handler = commandhandlers.GetHandler((ENUM_CLASS_NAMES)command.Type());
-      if (handler != NULL) handler.HandleCommand(command);
-      else Print(__FUNCTION__,": Command Handler Not Found For ",command.Type());
-      if (!disable_delete && ((CCommandInterface*)command).DeleteAfterUse()) delete command;
-   }
-   
-   virtual void Event(CObject* event, bool disable_delete = false) {
-      CServiceProvider* handler = eventhandlers.GetHandler((ENUM_CLASS_NAMES)event.Type());
-      if (handler != NULL) handler.HandleEvent(event);
-      else Print(__FUNCTION__,": Event Handler Not Found For ",event.Type());
-      if (!disable_delete) delete event;
-   }   
-   
    virtual void Initalize()
    {
       services.InitalizeServices();
-      commandhandlers.InitalizeHandlers();
-      eventhandlers.InitalizeHandlers();
       this.SetInitalized();
    }
    

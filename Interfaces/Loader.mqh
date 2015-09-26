@@ -1,7 +1,9 @@
 #include "SymbolInfoInterface.mqh"
 #include "StopsCalcInterface.mqh"
 #include "OrderBaseInterface.mqh"
+#include "CallBackInterface.mqh"
 #include "EventCallBackInterface.mqh"
+#include "CommandCallBackInterface.mqh"
 
 #include "ServiceProviders\EventHandlerInterface.mqh"
 #include "ServiceProviders\SymbolLoaderInterface.mqh"
@@ -10,5 +12,6 @@
 #include "ServiceProviders\EntryMethodInterface.mqh"
 #include "ServiceProviders\ScriptManagerInterface.mqh"
 #include "ServiceProviders\EventManagerInterface.mqh"
+#include "ServiceProviders\CommandManagerInterface.mqh"
 
 #include "CommandInterface.mqh"

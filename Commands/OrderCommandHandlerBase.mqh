@@ -1,5 +1,5 @@
 
-class COrderCommandHandlerBase : public CServiceProvider
+class COrderCommandHandlerBase : public CCommandCallBackInterface
 {
 public:
    virtual int Type() const { return classOrderCommandHandlerBase; }
@@ -11,7 +11,14 @@ public:
    virtual void Initalize()
    {
       this.ordermanager = this.App().GetService(srvOrderManager);
+      this.App().commandmanager.Register(COrderCommand::Command,GetPointer(this));
    }
+   
+   virtual void Function(int id, CObject* obj)
+   {
+      HandleCommand(obj);
+   }
+   
    virtual void HandleCommand(CObject* command)
    {
       if (command.Type() == classOrderCommand) {

@@ -6,6 +6,8 @@ public:
    long lparam;
    double dparam;
    string sparam;
+   
+   static int Command;
   
    virtual int Type() const { return classScript; }
    virtual bool DeleteAfterUse() { return true; }
@@ -18,3 +20,5 @@ public:
       sparam = _sparam;
    }
 };
+
+int CScript::Command = 0;

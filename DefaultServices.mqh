@@ -1,4 +1,5 @@
 //
+
 #include "EventHandler\EventHandler.mqh"
 #include "SymbolLoader\SymbolLoader.mqh"
 #ifdef __MQL4__
@@ -9,10 +10,13 @@
 #endif
 #include "OrderManager\OrderFactory.mqh"
 #include "OrderManager\AttachedOrderFactory.mqh"
-#include "Events\Loader.mqh"
+
 #include "SymbolLoader\SymbolInfoVars.mqh"
 
 #include "ChartInfo\IsFirstTick.mqh"
+
+#include "Commands\Loader.mqh"
+
 #include "EntryMethod\EntryMethodBase.mqh"
 #include "Signals\SignalManagerBase.mqh"
 #include "Commands\OrderCommandHandlerBase.mqh"
@@ -25,6 +29,7 @@
 #include "libraries\comments.mqh"
 
 
+
 void register_services()
 {
   global_app().RegisterService(new CEventHandler(),srvEvent,"eventhandler");
@@ -34,6 +39,4 @@ void register_services()
   global_app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
   global_app().RegisterService(new CSymbolInfoVars(Symbol()),srvSymbolInfoVars,"symbolinfovars");
   global_app().RegisterService(new CEventManager(),srvEventManager,"eventmanager");
-  
-  global_app().RegisterEventHandler(global_app().eventhandler,classEventLog);
 }
