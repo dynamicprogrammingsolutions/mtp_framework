@@ -10,3 +10,4 @@
 #include "Signals\__classnames.mqh"
 #include "EntryMethod\__classnames.mqh"
 #include "ScriptManager\__classnames.mqh"
+#include "EventManager\__classnames.mqh"

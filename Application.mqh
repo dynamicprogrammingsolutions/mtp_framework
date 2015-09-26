@@ -20,7 +20,7 @@ public:
       global_application_object = GetPointer(this);
    }
 
-#include "Interfaces\ServiceProviders\__service_fastaccess_objects.mqh"
+#include "__service_fastaccess_objects.mqh"
 
 #ifdef SERVICE_FASTACCESS_OBJECTS
   SERVICE_FASTACCESS_OBJECTS
@@ -42,7 +42,7 @@ public:
 
       switch(service.srv) {
 
-#include "Interfaces\ServiceProviders\__service_fastaccess_switch.mqh"	
+#include "__service_fastaccess_switch.mqh"	
 
 #ifdef SERVICE_FASTACCESS_SWITCH
   SERVICE_FASTACCESS_SWITCH

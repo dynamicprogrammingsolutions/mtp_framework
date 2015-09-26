@@ -1,6 +1,6 @@
 #include "..\Loader.mqh"
 
-class    CEntryMethodBase : public CEntryMethodInterface
+class CEntryMethodBase : public CEntryMethodInterface
 {
 public:
    virtual int Type() const { return classEntryMethodBase; }

@@ -20,7 +20,9 @@
 #include "ScriptManager\ScriptManagerBase.mqh"
 #include "ScriptManager\OrderScriptHandler.mqh"
 
-#include <mtp_framework_1.1\libraries\comments.mqh>
+#include "EventManager\EventManager.mqh"
+
+#include "libraries\comments.mqh"
 
 
 void register_services()
@@ -31,6 +33,7 @@ void register_services()
   global_app().RegisterService(new COrderFactory(),srvOrderFactory,"orderfactory");
   global_app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
   global_app().RegisterService(new CSymbolInfoVars(Symbol()),srvSymbolInfoVars,"symbolinfovars");
+  global_app().RegisterService(new CEventManager(),srvEventManager,"eventmanager");
   
   global_app().RegisterEventHandler(global_app().eventhandler,classEventLog);
 }
