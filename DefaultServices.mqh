@@ -25,6 +25,7 @@
 #include "ScriptManager\OrderScriptHandler.mqh"
 
 #include "EventManager\EventManager.mqh"
+#include "CommandManager\CommandManager.mqh"
 
 #include "libraries\comments.mqh"
 
@@ -39,4 +40,6 @@ void register_services()
   global_app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
   global_app().RegisterService(new CSymbolInfoVars(Symbol()),srvSymbolInfoVars,"symbolinfovars");
   global_app().RegisterService(new CEventManager(),srvEventManager,"eventmanager");
+  global_app().RegisterService(new CCommandManager(),srvCommandManager,"commandmanager");
+  
 }

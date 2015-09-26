@@ -24,8 +24,8 @@
 #define CUSTOM_SERVICES srvMain,
 #define CUSTOM_CLASSES classSignalManager, classEntryMethod, classOrderCommandHandler, classMain,
 
-#include <mtp_framework_1.1\Loader.mqh>
-#include <mtp_framework_1.1\DefaultServices.mqh>   
+#include <mtp_framework_1.2\Loader.mqh>
+#include <mtp_framework_1.2\DefaultServices.mqh>   
 
 input double lotsize = 0.1;
 
@@ -187,14 +187,14 @@ public:
    {
       if (!short_enabled) return false;
       if (ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED) >= maxorders) return false;
-      return true;
+      return valid;
    }
    
    virtual bool SellSignalFilter(bool valid)
    {
       if (!long_enabled) return false;
       if (ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED) >= maxorders) return false;
-      return true;
+      return valid;
    }
    virtual bool CloseOpposite()
    {
@@ -208,6 +208,11 @@ public:
    CStopLoss* sl;
    CTakeProfit* tp;
    CMoneyManagement* mm;
+
+   virtual void Initalize()
+   {
+      COrderCommandHandlerBase::Initalize();
+   }
    
    virtual void OnInit()
    {
@@ -235,7 +240,7 @@ public:
    
    virtual void OpenBuy()
    {
-      ordermanager.NewOrder(symbol,ORDER_TYPE_BUY,mm,NULL,sl,tp);      
+      ordermanager.NewOrder(symbol,ORDER_TYPE_BUY,mm,NULL,sl,tp);
    }
    
    virtual void OpenSell()
@@ -253,7 +258,7 @@ public:
 
    virtual void OnTick()
    {
-      if (TimeCurrent() > StrToTime("2015.06.01")) {
+      if (TimeCurrent() > StrToTime("2015.12.26")) {
          addcomment("EA Expired\n");
          if (application.ServiceIsRegistered(srvSignalManager)) application.DeregisterService(srvSignalManager);
          if (application.ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvScriptManager);
@@ -372,14 +377,12 @@ int OnInit()
       application.RegisterService(new CSignalManager(),srvSignalManager,"signalmanager");
       application.RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
       application.RegisterService(new CMain(),srvMain,"main");
-      application.RegisterService(new COrderCommandHandler(),srvNone,"ordercommandhandler");
       application.RegisterService(new CScriptManagerBase(),srvScriptManager,"scriptmanager");
-      
-      application.RegisterCommandHandler(application.GetService("ordercommandhandler"),classOrderCommand);
-      application.RegisterCommandHandler(new COrderScriptHandler(),classScript);
-   
+      application.RegisterService(new COrderCommandHandler(),srvOrderCommandHandler,"ordercommandhandler");
+      application.RegisterService(new COrderScriptHandler(),srvNone,"orderscripthandler");
+
       application.Initalize();
-         
+
    }
 
    application.OnInit();
