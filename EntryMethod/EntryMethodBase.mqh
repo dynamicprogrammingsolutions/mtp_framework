@@ -11,25 +11,32 @@ public:
    COrderCommand* command_open_sell;
    COrderCommand* command_close_buy;
    COrderCommand* command_close_sell;
+   COrderCommand* command_close_all;
    
    COrderManager* ordermanager;
    virtual void Initalize()
    {
       this.ordermanager = this.App().GetService(srvOrderManager);
-      command_open_buy = new COpenBuy(false);
-      command_open_sell = new COpenSell(false);
-      command_close_buy = new CCloseBuy(false);
-      command_close_sell = new CCloseSell(false);
+      command_open_buy = new COrderCommand(commandOpenBuy);
+      command_open_sell = new COrderCommand(commandOpenSell);
+      command_close_buy = new COrderCommand(commandCloseBuy);
+      command_close_sell = new COrderCommand(commandCloseSell);
+      command_close_all = new COrderCommand(commandCloseAll);
    }
    
-   virtual void OnCloseSellSignal()
+   virtual void OnCloseSellSignal(bool valid)
    {
       App().commandmanager.Send(COrderCommand::Command, command_close_sell);
    }
    
-   virtual void OnCloseBuySignal()
+   virtual void OnCloseBuySignal(bool valid)
    {
       App().commandmanager.Send(COrderCommand::Command, command_close_buy);
+   }
+   
+   virtual void OnCloseAllSignal(bool valid)
+   {
+      App().commandmanager.Send(COrderCommand::Command, command_close_all);
    }
    
    virtual void OnCloseBuyOpposite(bool valid)

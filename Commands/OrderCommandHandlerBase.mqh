@@ -21,24 +21,15 @@ public:
    
    virtual void HandleCommand(CObject* command)
    {
-      if (command.Type() == classOrderCommand) {
-         COrderCommand* ordercommand = command;
-         switch (ordercommand.transaction_type) {
-         	case ttOpen:
-               switch (ordercommand.trade_direction) {
-                  case tdLong: OpenBuy(); break;
-                  case tdShort: OpenSell(); break;
-               }
-               break;
-         	case ttClose:
-               switch (ordercommand.trade_direction) {
-                  case tdLong: CloseBuy(); break;
-                  case tdShort: CloseSell(); break;
-                  case tdNone: CloseAll(); break;
-               }
-               break;
-         }
+      COrderCommand* ordercommand = command;
+      switch (ordercommand.commandtype) {
+      	case commandOpenBuy: OpenBuy(); break;
+      	case commandOpenSell: OpenSell(); break;
+      	case commandCloseBuy: CloseBuy(); break;
+      	case commandCloseSell: CloseSell(); break;
+      	case commandCloseAll: CloseAll(); break;
       }
+      
    }
 
    virtual void CloseAll()

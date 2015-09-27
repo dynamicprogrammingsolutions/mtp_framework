@@ -1,40 +1,22 @@
-enum ENUM_TRADE_DIRECTION {
-   tdNone,
-   tdLong,
-   tdShort
+enum ENUM_ORDER_COMMAND_TYPE {
+   commandOpenBuy,
+   commandOpenSell,
+   commandCloseBuy,
+   commandCloseSell,
+   commandCloseAll
 };
 
-enum ENUM_TRANSACTION_TYPE {
-   ttOpen,
-   ttClose,
-   ttCancel
-};
-
-class COrderCommand : public CCommandInterface
+class COrderCommand : public CObject
 {
 public:
    virtual int Type() const { return classOrderCommand; }
+   ENUM_ORDER_COMMAND_TYPE commandtype;
    
+   COrderCommand(ENUM_ORDER_COMMAND_TYPE _commandtype)
+   {
+      commandtype = _commandtype;
+   }
    static int Command;
-   
-   bool delete_after_use;
-   ENUM_TRADE_DIRECTION trade_direction;
-   ENUM_TRANSACTION_TYPE transaction_type;
-   
-   COrderCommand()
-   {
-      delete_after_use = true;
-   }
-   
-   COrderCommand(ENUM_TRADE_DIRECTION _trade_direction, ENUM_TRANSACTION_TYPE _transaction_type)
-   {
-      delete_after_use = true;
-      trade_direction = _trade_direction;
-      transaction_type = _transaction_type;
-   }
-   
-   virtual bool DeleteAfterUse() { return delete_after_use; }
-   
 };
 
 int COrderCommand::Command = 0;

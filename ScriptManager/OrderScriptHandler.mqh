@@ -24,11 +24,11 @@ public:
       CScript* script = command;
       Print("Script: ",script.id," ",script.sparam);
       if (script.id == GetId()) {
-         if (script.sparam == ActionOpenBuy()) this.App().commandmanager.Send(COrderCommand::Command,new COpenBuy(),true);
-         if (script.sparam == ActionOpenSell())  this.App().commandmanager.Send(COrderCommand::Command,new COpenSell(),true);
-         if (script.sparam == ActionCloseBuy())  this.App().commandmanager.Send(COrderCommand::Command,new CCloseBuy(),true);
-         if (script.sparam == ActionCloseSell())  this.App().commandmanager.Send(COrderCommand::Command,new CCloseSell(),true);
-         if (script.sparam == ActionCloseAll())  this.App().commandmanager.Send(COrderCommand::Command,new CCloseAll(),true);
+         if (script.sparam == ActionOpenBuy()) this.App().commandmanager.Send(COrderCommand::Command,new COrderCommand(commandOpenBuy),true);
+         if (script.sparam == ActionOpenSell())  this.App().commandmanager.Send(COrderCommand::Command,new COrderCommand(commandOpenSell),true);
+         if (script.sparam == ActionCloseBuy())  this.App().commandmanager.Send(COrderCommand::Command,new COrderCommand(commandCloseBuy),true);
+         if (script.sparam == ActionCloseSell())  this.App().commandmanager.Send(COrderCommand::Command,new COrderCommand(commandCloseSell),true);
+         if (script.sparam == ActionCloseAll())  this.App().commandmanager.Send(COrderCommand::Command,new COrderCommand(commandCloseAll),true);
       }
    }
    

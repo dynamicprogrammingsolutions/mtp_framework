@@ -1,5 +1,5 @@
 //
-class CScript : public CCommandInterface
+class CScript : public CObject
 {
 public:
    int id;
@@ -10,7 +10,6 @@ public:
    static int Command;
   
    virtual int Type() const { return classScript; }
-   virtual bool DeleteAfterUse() { return true; }
    
    CScript(int _id, long _lparam, double _dparam, string _sparam)
    {
