@@ -52,10 +52,10 @@ public:
    
    virtual bool SendB(int id)
    {
+      bool ret = true;
       if (id > 0) {
          CArrayObj* callbacks = GetCallBacks(id);
          int total = callbacks.Total();
-         bool ret = true;
          for (int i = 0; i < callbacks.Total(); i++) {
             CAppObject* callback = callbacks.At(i);
             ret &= callback.callback_b(id);

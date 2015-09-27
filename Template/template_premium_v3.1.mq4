@@ -245,46 +245,12 @@ public:
    
    virtual void OpenBuy()
    {
-      if (App().eventmanager.SendB(EventOpeningBuy)) {
-         COrder* order = ordermanager.NewOrder(symbol,ORDER_TYPE_BUY,mm,NULL,sl,tp);
-         App().eventmanager.Send(EventOpenedBuy,order);
-      }
+      COrder* order = ordermanager.NewOrder(symbol,ORDER_TYPE_BUY,mm,NULL,sl,tp);
    }
    
    virtual void OpenSell()
    {
-      if (App().eventmanager.SendB(EventOpeningSell)) {
-         COrder* order = ordermanager.NewOrder(symbol,ORDER_TYPE_SELL,mm,NULL,sl,tp);   
-         App().eventmanager.Send(EventOpenedSell,order);
-      }
-   }
-};
-
-class COrderEventListener : public CAppObject
-{
-   virtual bool callback_b(int i)
-   {
-      Print("event (1): "+i);
-      return true;
-   }
-   virtual void callback(int i, CObject* o)
-   {
-      COrder* order = o;
-      Print("order opened: "+order.id);
-   }
-};
-
-class COrderEventListener1 : public CAppObject
-{
-   virtual bool callback_b(int i)
-   {
-      Print("event (2): "+i);
-      return true;
-   }
-   virtual void callback(int i, CObject* o)
-   {
-      COrder* order = o;
-      Print("order opened: "+order.id);
+      COrder* order = ordermanager.NewOrder(symbol,ORDER_TYPE_SELL,mm,NULL,sl,tp);   
    }
 };
 
@@ -372,6 +338,15 @@ public:
    }
 };
 
+class CSignalEventListener : public CAppObject
+{
+   virtual void callback(int i, CObject* o)
+   {
+      CSignal* signal = o;
+      Print("Signal changed: ",signaltext(signal.signal),", ",signaltext_close(signal.closesignal));
+   }
+};
+
 class CMain : public CServiceProvider
 {
 public:
@@ -381,17 +356,8 @@ public:
    
    virtual void Initalize()
    {
-      CAppObject* eventlistener = new COrderEventListener();
-      App().eventmanager.Register(COrderCommandHandlerBase::EventOpeningBuy,eventlistener);
-      App().eventmanager.Register(COrderCommandHandlerBase::EventOpeningSell,eventlistener);
-      App().eventmanager.Register(COrderCommandHandlerBase::EventOpenedBuy,eventlistener);
-      App().eventmanager.Register(COrderCommandHandlerBase::EventOpenedSell,eventlistener);
-
-      eventlistener = new COrderEventListener1();
-      App().eventmanager.Register(COrderCommandHandlerBase::EventOpeningBuy,eventlistener);
-      App().eventmanager.Register(COrderCommandHandlerBase::EventOpeningSell,eventlistener);
-      App().eventmanager.Register(COrderCommandHandlerBase::EventOpenedBuy,eventlistener);
-      App().eventmanager.Register(COrderCommandHandlerBase::EventOpenedSell,eventlistener);
+      CAppObject* eventlistener = new CSignalEventListener();
+      App().eventmanager.Register(CSignalManagerBase::Signal,eventlistener);
    }
 
    virtual void OnInit()

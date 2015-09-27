@@ -11,6 +11,8 @@ public:
    CEntryMethodInterface* entrymethod;
    int bar;
    
+   static int Signal;
+   
    virtual void Initalize()
    {
       entrymethod = App().GetService(srvEntryMethod);
@@ -19,6 +21,11 @@ public:
    virtual void OnTick()
    {
       mainsignal.Run(bar);
+      
+      if (mainsignal.signal != mainsignal.lastsignal || mainsignal.closesignal != mainsignal.lastclosesignal) {
+         App().eventmanager.Send(Signal,mainsignal);
+      }
+      
       switch (mainsignal.closesignal) {
          case SIGNAL_BUY: entrymethod.OnCloseSellSignal(mainsignal.closesignal_valid); break;
          case SIGNAL_SELL: entrymethod.OnCloseBuySignal(mainsignal.closesignal_valid); break;
@@ -33,3 +40,5 @@ public:
    }
    
 };
+
+int CSignalManagerBase::Signal = 0;
