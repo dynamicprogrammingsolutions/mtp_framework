@@ -3,26 +3,39 @@ class CCommandManagerInterface : public CServiceProvider
 {
 public:
   
-   virtual void Register(int& id, CCallBackInterface* callback)
+   virtual void Register(int& id, CAppObject* callback)
    {
       AbstractFunctionWarning(__FUNCTION__);
+   }
+
+   virtual CAppObject* Send(int id)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return NULL;
+   }
+
+   virtual CAppObject* Send(int id, int i)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return NULL;
+   }
+
+   virtual CAppObject* Send(int id, double d)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return NULL;
+   }
+
+   virtual CAppObject* Send(int id, bool b)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return NULL;
    }
    
-   virtual void Send(int id, CObject* object = NULL, bool deleteobject = false)
+   virtual CAppObject* Send(int id, CObject* o, bool deleteobject = false)
    {
       AbstractFunctionWarning(__FUNCTION__);
-   }
-
-   virtual CObject* SendRetObj(int id, CObject* object = NULL, bool deleteobject = false)
-   {
-      AbstractFunctionWarning(__FUNCTION__);
-      return object;
-   }
-
-   virtual bool SendRetBool(int id, CObject* object = NULL, bool defaultreturn = true, bool deleteobject = false)
-   {
-      AbstractFunctionWarning(__FUNCTION__);
-      return defaultreturn;
+      return NULL;
    }
 
 };

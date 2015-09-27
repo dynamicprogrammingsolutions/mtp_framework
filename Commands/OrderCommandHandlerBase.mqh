@@ -14,9 +14,9 @@ public:
       this.App().commandmanager.Register(COrderCommand::Command,GetPointer(this));
    }
    
-   virtual void Function(int id, CObject* obj)
+   virtual void callback(CObject* o)
    {
-      HandleCommand(obj);
+      HandleCommand(o);
    }
    
    virtual void HandleCommand(CObject* command)

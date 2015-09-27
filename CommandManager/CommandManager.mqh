@@ -9,41 +9,72 @@ public:
 public:
    CArrayObj container;
   
-   virtual void Register(int& id, CCallBackInterface* callback)
+   virtual void Register(int& id, CAppObject* callback)
    {
       container.Add(callback);
       id = container.Total();
    }
    
-   virtual void Send(int id, CObject* object = NULL, bool deleteobject = false)
+   CObject* GetCallBack(int id)
    {
       if (id > 0) {
          CCallBackInterface* callback = container.At(id-1);
-         callback.Function(id,object);
+         return callback;
       }
-      if (deleteobject) delete object;
-   } 
-
-   virtual CObject* SendRetObj(int id, CObject* object = NULL, bool deleteobject = false)
-   {
-      CObject* ret = NULL;
-      if (id > 0) {
-         CCallBackInterface* callback = container.At(id-1);
-         ret = callback.FunctionRetObj(id,object);
-      }
-      if (deleteobject) delete object;
-      return ret;
-   } 
-
-   virtual bool SendRetBool(int id, CObject* object = NULL, bool defaultreturn = true, bool deleteobject = false)
-   {
-      bool ret = defaultreturn;
-      if (id > 0) {
-         CCallBackInterface* callback = container.At(id-1);
-         ret = callback.FunctionRetBool(id,object);
-      }
-      if (deleteobject) delete object;
-      return ret;
+      return NULL;
    }
+   
+   virtual CAppObject* Send(int id)
+   {
+      if (id > 0) {
+         CAppObject* callback = GetCallBack(id);
+         callback.callback(id);
+         return callback;
+      }
+      return NULL;
+   }    
+   
+   virtual CAppObject* Send(int id, int i)
+   {
+      if (id > 0) {
+         CAppObject* callback = GetCallBack(id);
+         callback.callback(i);
+         return callback;
+      }
+      return NULL;
+   } 
+
+   virtual CAppObject* Send(int id, bool b)
+   {
+      if (id > 0) {
+         CAppObject* callback = GetCallBack(id);
+         callback.callback(b);
+         return callback;
+      }
+      return NULL;
+   } 
+
+   virtual CAppObject* Send(int id, double d)
+   {
+      if (id > 0) {
+         CAppObject* callback = GetCallBack(id);
+         callback.callback(d);
+         return callback;
+      }
+      return NULL;
+   } 
+   
+   virtual CAppObject* Send(int id, CObject* o = NULL, bool deleteobject = false)
+   {
+      if (id > 0) {
+         CAppObject* callback = GetCallBack(id);
+         callback.callback(o);
+         if (deleteobject) delete o;
+         return callback;
+      }
+      if (deleteobject) delete o;
+      return NULL;
+   } 
+
    
 };

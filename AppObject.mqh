@@ -44,6 +44,13 @@ public:
    void AppBase(CApplicationInterface* _appbase) {
       appbase = _appbase;
    }
+   
+   virtual void callback() { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void callback(int i) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void callback(double i) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void callback(bool b) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void callback(CObject* o) { AbstractFunctionWarning(__FUNCTION__); }
+   
 };
 
 // this is just for protection
