@@ -18,62 +18,99 @@ public:
    virtual CAppObject* GetCallBack(int id)
    {
       if (id > 0) {
-         CAppObject* callback = container.At(id-1);
-         return callback;
+         return container.At(id-1);
       }
       return NULL;
    }
    
-   virtual CAppObject* Send(int id)
+   virtual void Send(int id)
    {
       if (id > 0) {
          CAppObject* callback = GetCallBack(id);
          callback.callback(id);
-         return callback;
       }
-      return NULL;
    }    
    
-   virtual CAppObject* Send(int id, int i)
+   virtual void Send(int id, int i)
    {
       if (id > 0) {
          CAppObject* callback = GetCallBack(id);
-         callback.callback(i);
-         return callback;
+         callback.callback(id,i);
       }
-      return NULL;
    } 
 
-   virtual CAppObject* Send(int id, bool b)
+   virtual void Send(int id, bool b)
    {
       if (id > 0) {
          CAppObject* callback = GetCallBack(id);
-         callback.callback(b);
-         return callback;
+         callback.callback(id,b);
       }
-      return NULL;
    } 
 
-   virtual CAppObject* Send(int id, double d)
+   virtual void Send(int id, double d)
    {
       if (id > 0) {
          CAppObject* callback = GetCallBack(id);
-         callback.callback(d);
-         return callback;
+         callback.callback(id,d);
       }
-      return NULL;
    } 
    
-   virtual CAppObject* Send(int id, CObject* o = NULL, bool deleteobject = false)
+   virtual void Send(int id, CObject* o = NULL, bool deleteobject = false)
    {
       if (id > 0) {
          CAppObject* callback = GetCallBack(id);
-         callback.callback(o);
+         callback.callback(id,o);
          if (deleteobject) delete o;
-         return callback;
       }
       if (deleteobject) delete o;
-      return NULL;
+   } 
+   
+   virtual bool SendB(int id, bool def = true)
+   {
+      if (id > 0) {
+         CAppObject* callback = GetCallBack(id);
+         return callback.callback_b(id);
+      }
+      return def;
+   }    
+   
+   virtual bool SendB(int id, int i, bool def = true)
+   {
+      if (id > 0) {
+         CAppObject* callback = GetCallBack(id);
+         return callback.callback_b(id,i);
+      }
+      return def;
+   } 
+
+   virtual bool SendB(int id, bool b, bool def = true)
+   {
+      if (id > 0) {
+         CAppObject* callback = GetCallBack(id);
+         return callback.callback_b(id,b);
+      }
+      return def;
+   } 
+
+   virtual bool SendB(int id, double d, bool def = true)
+   {
+      if (id > 0) {
+         CAppObject* callback = GetCallBack(id);
+         return callback.callback_b(id,d);
+      }
+      return def;
+   } 
+   
+   virtual bool SendB(int id, CObject* o = NULL, bool def = true, bool deleteobject = false)
+   {
+      if (id > 0) {
+         CAppObject* callback = GetCallBack(id);
+         bool ret = callback.callback_b(id,o);
+         if (deleteobject) delete o;
+         return ret;
+      }
+      if (deleteobject) delete o;
+      return def;
    } 
 
    

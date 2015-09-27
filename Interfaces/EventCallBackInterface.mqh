@@ -1,5 +1,0 @@
-//
-class CEventCallBackInterface : public CCallBackInterface
-{
-
-};

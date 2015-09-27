@@ -46,10 +46,27 @@ public:
    }
    
    virtual void callback() { AbstractFunctionWarning(__FUNCTION__); }
+   
    virtual void callback(int i) { AbstractFunctionWarning(__FUNCTION__); }
    virtual void callback(double i) { AbstractFunctionWarning(__FUNCTION__); }
-   virtual void callback(bool b) { AbstractFunctionWarning(__FUNCTION__); }
    virtual void callback(CObject* o) { AbstractFunctionWarning(__FUNCTION__); }
+
+   virtual void callback(int i1, int i2) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void callback(int i, bool b) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void callback(int i, double d) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void callback(int i, CObject* o) { AbstractFunctionWarning(__FUNCTION__); }
+
+   virtual bool callback_b() { AbstractFunctionWarning(__FUNCTION__); return false; }
+   
+   virtual bool callback_b(int i) { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool callback_b(double i) { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool callback_b(bool b) { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool callback_b(CObject* o) { AbstractFunctionWarning(__FUNCTION__); return false; }
+
+   virtual bool callback_b(int i1, int i2) { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool callback_b(int i, bool b) { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool callback_b(int i, double d) { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool callback_b(int i, CObject* o) { AbstractFunctionWarning(__FUNCTION__); return false; }
    
 };
 

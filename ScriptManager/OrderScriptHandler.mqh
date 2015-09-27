@@ -14,7 +14,7 @@ public:
    string ActionCloseSell() { return "closesell"; }
    string ActionCloseAll() { return "closeall"; }
    
-   void callback(CObject* o)
+   void callback(int i, CObject* o)
    {
       HandleCommand(o);
    }

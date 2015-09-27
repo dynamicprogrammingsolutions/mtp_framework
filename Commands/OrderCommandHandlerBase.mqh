@@ -1,3 +1,4 @@
+#include "..\Loader.mqh"
 
 class COrderCommandHandlerBase : public CServiceProvider
 {
@@ -8,17 +9,20 @@ public:
 
    COrderManager* ordermanager;
    
+   static int EventOpeningBuy;
+   static int EventOpeningSell;
+   
    virtual void Initalize()
    {
       this.ordermanager = this.App().GetService(srvOrderManager);
       this.App().commandmanager.Register(COrderCommand::Command,GetPointer(this));
    }
    
-   virtual void callback(int i)
+   virtual void callback(int i1, int i2)
    {
-      switch (i) {
-      	case commandOpenBuy: OpenBuy(); break;
-      	case commandOpenSell: OpenSell(); break;
+      switch (i2) {
+      	case commandOpenBuy: /*App().eventmanager.Send(EventOpeningBuy);*/ OpenBuy(); break;
+      	case commandOpenSell: /*App().eventmanager.Send(EventOpeningSell);*/ OpenSell(); break;
       	case commandCloseBuy: CloseBuy(); break;
       	case commandCloseSell: CloseSell(); break;
       	case commandCloseAll: CloseAll(); break;
@@ -51,3 +55,6 @@ public:
 
    }
 };
+
+int COrderCommandHandlerBase::EventOpeningBuy = 0;
+int COrderCommandHandlerBase::EventOpeningSell = 0;
