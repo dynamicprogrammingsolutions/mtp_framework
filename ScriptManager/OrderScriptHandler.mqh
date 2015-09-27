@@ -24,11 +24,11 @@ public:
       CScript* script = command;
       Print("Script: ",script.id," ",script.sparam);
       if (script.id == GetId()) {
-         if (script.sparam == ActionOpenBuy()) this.App().commandmanager.Send(COrderCommand::Command,(int)commandOpenBuy);
-         if (script.sparam == ActionOpenSell())  this.App().commandmanager.Send(COrderCommand::Command,(int)commandOpenSell);
-         if (script.sparam == ActionCloseBuy())  this.App().commandmanager.Send(COrderCommand::Command,(int)commandCloseBuy);
-         if (script.sparam == ActionCloseSell())  this.App().commandmanager.Send(COrderCommand::Command,(int)commandCloseSell);
-         if (script.sparam == ActionCloseAll())  this.App().commandmanager.Send(COrderCommand::Command,(int)commandCloseAll);
+         if (script.sparam == ActionOpenBuy()) this.App().commandmanager.Send(COrderCommand::CommandOpenBuy);
+         if (script.sparam == ActionOpenSell())  this.App().commandmanager.Send(COrderCommand::CommandOpenSell);
+         if (script.sparam == ActionCloseBuy())  this.App().commandmanager.Send(COrderCommand::CommandCloseBuy);
+         if (script.sparam == ActionCloseSell())  this.App().commandmanager.Send(COrderCommand::CommandCloseSell);
+         if (script.sparam == ActionCloseAll())  this.App().commandmanager.Send(COrderCommand::CommandCloseAll);
       }
    }
    

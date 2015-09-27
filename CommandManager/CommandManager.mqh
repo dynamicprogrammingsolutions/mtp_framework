@@ -45,7 +45,7 @@ public:
          CAppObject* callback = GetCallBack(id);
          callback.callback(id,b);
       }
-   } 
+   }
 
    virtual void Send(int id, double d)
    {
@@ -53,7 +53,7 @@ public:
          CAppObject* callback = GetCallBack(id);
          callback.callback(id,d);
       }
-   } 
+   }
    
    virtual void Send(int id, CObject* o = NULL, bool deleteobject = false)
    {

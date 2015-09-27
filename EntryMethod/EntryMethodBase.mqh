@@ -15,41 +15,41 @@ public:
    
    virtual void OnCloseSellSignal(bool valid)
    {
-      if (valid) App().commandmanager.Send(COrderCommand::Command, (int)commandCloseSell);
+      if (valid) App().commandmanager.Send(COrderCommand::CommandCloseSell);
    }
    
    virtual void OnCloseBuySignal(bool valid)
    {
-      if (valid) App().commandmanager.Send(COrderCommand::Command, (int)commandCloseBuy);
+      if (valid) App().commandmanager.Send(COrderCommand::CommandCloseBuy);
    }
    
    virtual void OnCloseAllSignal(bool valid)
    {
-      if (valid) App().commandmanager.Send(COrderCommand::Command, (int)commandCloseAll);
+      if (valid) App().commandmanager.Send(COrderCommand::CommandCloseAll);
    }
    
    virtual void OnCloseBuyOpposite(bool valid)
    {
-      if (valid) App().commandmanager.Send(COrderCommand::Command, (int)commandCloseSell);
+      if (valid) App().commandmanager.Send(COrderCommand::CommandCloseSell);
    }
    
    virtual void OnCloseSellOpposite(bool valid)
    {
-      if (valid) App().commandmanager.Send(COrderCommand::Command, (int)commandCloseBuy);
+      if (valid) App().commandmanager.Send(COrderCommand::CommandCloseBuy);
    }
    
    virtual void OnBuySignal(bool valid)
    {
       if (CloseOpposite()) OnCloseBuyOpposite(valid);
       if (BuySignalFilter(valid)) {
-         App().commandmanager.Send(COrderCommand::Command, (int)commandOpenBuy);
+         App().commandmanager.Send(COrderCommand::CommandOpenBuy);
       }
    }
    virtual void OnSellSignal(bool valid)
    {   
       if (CloseOpposite()) OnCloseSellOpposite(valid);
       if (SellSignalFilter(valid)) {
-         App().commandmanager.Send(COrderCommand::Command, (int)commandOpenSell);
+         App().commandmanager.Send(COrderCommand::CommandOpenSell);
       }
    }
    

@@ -15,19 +15,20 @@ public:
    virtual void Initalize()
    {
       this.ordermanager = this.App().GetService(srvOrderManager);
-      this.App().commandmanager.Register(COrderCommand::Command,GetPointer(this));
+      this.App().commandmanager.Register(COrderCommand::CommandOpenBuy,GetPointer(this));
+      this.App().commandmanager.Register(COrderCommand::CommandOpenSell,GetPointer(this));
+      this.App().commandmanager.Register(COrderCommand::CommandCloseBuy,GetPointer(this));
+      this.App().commandmanager.Register(COrderCommand::CommandCloseSell,GetPointer(this));
+      this.App().commandmanager.Register(COrderCommand::CommandCloseAll,GetPointer(this));
    }
    
-   virtual void callback(int i1, int i2)
+   virtual void callback(int i)
    {
-      switch ((ENUM_ORDER_COMMAND_TYPE)i2) {
-      	case commandOpenBuy: /*App().eventmanager.Send(EventOpeningBuy);*/ OpenBuy(); break;
-      	case commandOpenSell: /*App().eventmanager.Send(EventOpeningSell);*/ OpenSell(); break;
-      	case commandCloseBuy: CloseBuy(); break;
-      	case commandCloseSell: CloseSell(); break;
-      	case commandCloseAll: CloseAll(); break;
-      }
-      
+      if (i == COrderCommand::CommandOpenBuy) OpenBuy();
+      if (i == COrderCommand::CommandOpenSell) OpenSell();
+      if (i == COrderCommand::CommandCloseBuy) CloseBuy();
+      if (i == COrderCommand::CommandCloseSell) CloseSell();
+      if (i == COrderCommand::CommandCloseAll) CloseAll();
    }
 
    virtual void CloseAll()

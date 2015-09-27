@@ -1,22 +1,17 @@
-enum ENUM_ORDER_COMMAND_TYPE {
-   commandOpenBuy,
-   commandOpenSell,
-   commandCloseBuy,
-   commandCloseSell,
-   commandCloseAll
-};
-
 class COrderCommand : public CObject
 {
 public:
-   virtual int Type() const { return classOrderCommand; }
-   ENUM_ORDER_COMMAND_TYPE commandtype;
+
+   static int CommandOpenBuy;
+   static int CommandOpenSell;
+   static int CommandCloseBuy;
+   static int CommandCloseSell;
+   static int CommandCloseAll;
    
-   COrderCommand(ENUM_ORDER_COMMAND_TYPE _commandtype)
-   {
-      commandtype = _commandtype;
-   }
-   static int Command;
 };
 
-int COrderCommand::Command = 0;
+int COrderCommand::CommandOpenBuy = 0;
+int COrderCommand::CommandOpenSell = 0;
+int COrderCommand::CommandCloseBuy = 0;
+int COrderCommand::CommandCloseSell = 0;
+int COrderCommand::CommandCloseAll = 0;
