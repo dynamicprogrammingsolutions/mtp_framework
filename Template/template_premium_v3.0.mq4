@@ -253,7 +253,7 @@ public:
 
    virtual void OnTick()
    {
-      if (TimeCurrent() > StrToTime("2015.06.01")) {
+      if (TimeCurrent() > StrToTime("2015.12.27")) {
          addcomment("EA Expired\n");
          if (application.ServiceIsRegistered(srvSignalManager)) application.DeregisterService(srvSignalManager);
          if (application.ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvScriptManager);
