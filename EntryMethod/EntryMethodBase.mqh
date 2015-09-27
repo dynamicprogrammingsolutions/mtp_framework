@@ -22,12 +22,12 @@ public:
       command_close_sell = new CCloseSell(false);
    }
    
-   virtual void OnCloseSellSignal()
+   virtual void OnCloseSellSignal(bool valid)
    {
       App().Command(command_close_sell);
    }
    
-   virtual void OnCloseBuySignal()
+   virtual void OnCloseBuySignal(bool valid)
    {
       App().Command(command_close_buy);
    }
