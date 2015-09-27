@@ -15,10 +15,10 @@ public:
       id = container.Total();
    }
    
-   CObject* GetCallBack(int id)
+   virtual CAppObject* GetCallBack(int id)
    {
       if (id > 0) {
-         CCallBackInterface* callback = container.At(id-1);
+         CAppObject* callback = container.At(id-1);
          return callback;
       }
       return NULL;

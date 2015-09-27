@@ -1,5 +1,5 @@
 
-class COrderCommandHandlerBase : public CCommandCallBackInterface
+class COrderCommandHandlerBase : public CServiceProvider
 {
 public:
    virtual int Type() const { return classOrderCommandHandlerBase; }
@@ -14,15 +14,9 @@ public:
       this.App().commandmanager.Register(COrderCommand::Command,GetPointer(this));
    }
    
-   virtual void callback(CObject* o)
+   virtual void callback(int i)
    {
-      HandleCommand(o);
-   }
-   
-   virtual void HandleCommand(CObject* command)
-   {
-      COrderCommand* ordercommand = command;
-      switch (ordercommand.commandtype) {
+      switch (i) {
       	case commandOpenBuy: OpenBuy(); break;
       	case commandOpenSell: OpenSell(); break;
       	case commandCloseBuy: CloseBuy(); break;

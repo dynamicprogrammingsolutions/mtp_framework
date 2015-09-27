@@ -1,5 +1,0 @@
-//
-class CCommandCallBackInterface : public CCallBackInterface
-{
-   
-};

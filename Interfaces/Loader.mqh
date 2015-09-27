@@ -3,7 +3,6 @@
 #include "OrderBaseInterface.mqh"
 #include "CallBackInterface.mqh"
 #include "EventCallBackInterface.mqh"
-#include "CommandCallBackInterface.mqh"
 
 #include "ServiceProviders\EventHandlerInterface.mqh"
 #include "ServiceProviders\SymbolLoaderInterface.mqh"

@@ -8,6 +8,12 @@ public:
       AbstractFunctionWarning(__FUNCTION__);
    }
 
+   virtual CAppObject* GetCallBack(int id)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return NULL;
+   }
+
    virtual CAppObject* Send(int id)
    {
       AbstractFunctionWarning(__FUNCTION__);

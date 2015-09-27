@@ -1,6 +1,6 @@
 #include "..\Loader.mqh"
 
-class COrderScriptHandler : public CCallBackInterface
+class COrderScriptHandler : public CServiceProvider
 {
 public:
     virtual int Type() const { return classOrderScriptHandler; }
@@ -24,11 +24,11 @@ public:
       CScript* script = command;
       Print("Script: ",script.id," ",script.sparam);
       if (script.id == GetId()) {
-         if (script.sparam == ActionOpenBuy()) this.App().commandmanager.Send(COrderCommand::Command,new COrderCommand(commandOpenBuy),true);
-         if (script.sparam == ActionOpenSell())  this.App().commandmanager.Send(COrderCommand::Command,new COrderCommand(commandOpenSell),true);
-         if (script.sparam == ActionCloseBuy())  this.App().commandmanager.Send(COrderCommand::Command,new COrderCommand(commandCloseBuy),true);
-         if (script.sparam == ActionCloseSell())  this.App().commandmanager.Send(COrderCommand::Command,new COrderCommand(commandCloseSell),true);
-         if (script.sparam == ActionCloseAll())  this.App().commandmanager.Send(COrderCommand::Command,new COrderCommand(commandCloseAll),true);
+         if (script.sparam == ActionOpenBuy()) this.App().commandmanager.Send(COrderCommand::Command,(int)commandOpenBuy);
+         if (script.sparam == ActionOpenSell())  this.App().commandmanager.Send(COrderCommand::Command,(int)commandOpenSell);
+         if (script.sparam == ActionCloseBuy())  this.App().commandmanager.Send(COrderCommand::Command,(int)commandCloseBuy);
+         if (script.sparam == ActionCloseSell())  this.App().commandmanager.Send(COrderCommand::Command,(int)commandCloseSell);
+         if (script.sparam == ActionCloseAll())  this.App().commandmanager.Send(COrderCommand::Command,(int)commandCloseAll);
       }
    }
    

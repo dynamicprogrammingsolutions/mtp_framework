@@ -7,60 +7,49 @@ public:
 
    TraitAppAccess
 
-   COrderCommand* command_open_buy;
-   COrderCommand* command_open_sell;
-   COrderCommand* command_close_buy;
-   COrderCommand* command_close_sell;
-   COrderCommand* command_close_all;
-   
    COrderManager* ordermanager;
    virtual void Initalize()
    {
       this.ordermanager = this.App().GetService(srvOrderManager);
-      command_open_buy = new COrderCommand(commandOpenBuy);
-      command_open_sell = new COrderCommand(commandOpenSell);
-      command_close_buy = new COrderCommand(commandCloseBuy);
-      command_close_sell = new COrderCommand(commandCloseSell);
-      command_close_all = new COrderCommand(commandCloseAll);
    }
    
    virtual void OnCloseSellSignal(bool valid)
    {
-      App().commandmanager.Send(COrderCommand::Command, command_close_sell);
+      App().commandmanager.Send(COrderCommand::Command, (int)commandCloseSell);
    }
    
    virtual void OnCloseBuySignal(bool valid)
    {
-      App().commandmanager.Send(COrderCommand::Command, command_close_buy);
+      App().commandmanager.Send(COrderCommand::Command, (int)commandCloseBuy);
    }
    
    virtual void OnCloseAllSignal(bool valid)
    {
-      App().commandmanager.Send(COrderCommand::Command, command_close_all);
+      App().commandmanager.Send(COrderCommand::Command, (int)commandCloseAll);
    }
    
    virtual void OnCloseBuyOpposite(bool valid)
    {
-      App().commandmanager.Send(COrderCommand::Command, command_close_sell);
+      App().commandmanager.Send(COrderCommand::Command, (int)commandCloseSell);
    }
    
    virtual void OnCloseSellOpposite(bool valid)
    {
-      App().commandmanager.Send(COrderCommand::Command, command_close_buy);
+      App().commandmanager.Send(COrderCommand::Command, (int)commandCloseBuy);
    }
    
    virtual void OnBuySignal(bool valid)
    {
       if (CloseOpposite()) OnCloseBuyOpposite(valid);
       if (BuySignalFilter(valid)) {
-         App().commandmanager.Send(COrderCommand::Command, command_open_buy);
+         App().commandmanager.Send(COrderCommand::Command, (int)commandOpenBuy);
       }
    }
    virtual void OnSellSignal(bool valid)
    {   
       if (CloseOpposite()) OnCloseSellOpposite(valid);
       if (SellSignalFilter(valid)) {
-         App().commandmanager.Send(COrderCommand::Command, command_open_sell);
+         App().commandmanager.Send(COrderCommand::Command, (int)commandOpenSell);
       }
    }
    
