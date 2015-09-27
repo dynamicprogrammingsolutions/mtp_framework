@@ -11,106 +11,57 @@ public:
   
    virtual void Register(int& id, CAppObject* callback)
    {
-      container.Add(callback);
-      id = container.Total();
+      if (id == 0) {
+         container.Add(new CArrayObj());
+         id = container.Total();
+      }
+      CArrayObj* callbacks = GetCallBacks(id);
+      callbacks.Add(callback);
    }
    
-   virtual CAppObject* GetCallBack(int id)
+   CArrayObj* GetCallBacks(int id)
    {
-      if (id > 0) {
-         return container.At(id-1);
-      }
-      return NULL;
+      return container.At(id-1);
    }
    
    virtual void Send(int id)
    {
       if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         callback.callback(id);
+         CArrayObj* callbacks = GetCallBacks(id);
+         int total = callbacks.Total();
+         for (int i = 0; i < callbacks.Total(); i++) {
+            CAppObject* callback = callbacks.At(i);
+            callback.callback(id);
+         }
       }
    }    
-   
-   virtual void Send(int id, int i)
-   {
-      if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         callback.callback(id,i);
-      }
-   } 
-
-   virtual void Send(int id, bool b)
-   {
-      if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         callback.callback(id,b);
-      }
-   } 
-
-   virtual void Send(int id, double d)
-   {
-      if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         callback.callback(id,d);
-      }
-   } 
    
    virtual void Send(int id, CObject* o = NULL, bool deleteobject = false)
    {
       if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         callback.callback(id,o);
+         CArrayObj* callbacks = GetCallBacks(id);
+         int total = callbacks.Total();
+         for (int i = 0; i < callbacks.Total(); i++) {
+            CAppObject* callback = callbacks.At(i);
+            callback.callback(id,o);
+         }
          if (deleteobject) delete o;
       }
       if (deleteobject) delete o;
-   } 
+   }
    
-   virtual bool SendB(int id, bool def = true)
+   virtual bool SendB(int id)
    {
       if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         return callback.callback_b(id);
+         CArrayObj* callbacks = GetCallBacks(id);
+         int total = callbacks.Total();
+         bool ret = true;
+         for (int i = 0; i < callbacks.Total(); i++) {
+            CAppObject* callback = callbacks.At(i);
+            ret &= callback.callback_b(id);
+         }
       }
-      return def;
-   }    
-   
-   virtual bool SendB(int id, int i, bool def = true)
-   {
-      if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         return callback.callback_b(id,i);
-      }
-      return def;
-   } 
-
-   virtual bool SendB(int id, bool b, bool def = true)
-   {
-      if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         return callback.callback_b(id,b);
-      }
-      return def;
-   } 
-
-   virtual bool SendB(int id, double d, bool def = true)
-   {
-      if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         return callback.callback_b(id,d);
-      }
-      return def;
-   } 
-   
-   virtual bool SendB(int id, CObject* o = NULL, bool def = true, bool deleteobject = false)
-   {
-      if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         bool ret = callback.callback_b(id,o);
-         if (deleteobject) delete o;
-         return ret;
-      }
-      if (deleteobject) delete o;
-      return def;
-   } 
+      return ret;
+   }
    
 };

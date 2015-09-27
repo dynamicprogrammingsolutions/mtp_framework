@@ -245,12 +245,46 @@ public:
    
    virtual void OpenBuy()
    {
-      ordermanager.NewOrder(symbol,ORDER_TYPE_BUY,mm,NULL,sl,tp);
+      if (App().eventmanager.SendB(EventOpeningBuy)) {
+         COrder* order = ordermanager.NewOrder(symbol,ORDER_TYPE_BUY,mm,NULL,sl,tp);
+         App().eventmanager.Send(EventOpenedBuy,order);
+      }
    }
    
    virtual void OpenSell()
    {
-      ordermanager.NewOrder(symbol,ORDER_TYPE_SELL,mm,NULL,sl,tp);      
+      if (App().eventmanager.SendB(EventOpeningSell)) {
+         COrder* order = ordermanager.NewOrder(symbol,ORDER_TYPE_SELL,mm,NULL,sl,tp);   
+         App().eventmanager.Send(EventOpenedSell,order);
+      }
+   }
+};
+
+class COrderEventListener : public CAppObject
+{
+   virtual bool callback_b(int i)
+   {
+      Print("event (1): "+i);
+      return true;
+   }
+   virtual void callback(int i, CObject* o)
+   {
+      COrder* order = o;
+      Print("order opened: "+order.id);
+   }
+};
+
+class COrderEventListener1 : public CAppObject
+{
+   virtual bool callback_b(int i)
+   {
+      Print("event (2): "+i);
+      return true;
+   }
+   virtual void callback(int i, CObject* o)
+   {
+      COrder* order = o;
+      Print("order opened: "+order.id);
    }
 };
 
@@ -344,6 +378,21 @@ public:
    virtual int Type() const { return classMain; }
    
    TraitAppAccess
+   
+   virtual void Initalize()
+   {
+      CAppObject* eventlistener = new COrderEventListener();
+      App().eventmanager.Register(COrderCommandHandlerBase::EventOpeningBuy,eventlistener);
+      App().eventmanager.Register(COrderCommandHandlerBase::EventOpeningSell,eventlistener);
+      App().eventmanager.Register(COrderCommandHandlerBase::EventOpenedBuy,eventlistener);
+      App().eventmanager.Register(COrderCommandHandlerBase::EventOpenedSell,eventlistener);
+
+      eventlistener = new COrderEventListener1();
+      App().eventmanager.Register(COrderCommandHandlerBase::EventOpeningBuy,eventlistener);
+      App().eventmanager.Register(COrderCommandHandlerBase::EventOpeningSell,eventlistener);
+      App().eventmanager.Register(COrderCommandHandlerBase::EventOpenedBuy,eventlistener);
+      App().eventmanager.Register(COrderCommandHandlerBase::EventOpenedSell,eventlistener);
+   }
 
    virtual void OnInit()
    {

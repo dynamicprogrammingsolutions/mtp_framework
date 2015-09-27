@@ -11,6 +11,9 @@ public:
    
    static int EventOpeningBuy;
    static int EventOpeningSell;
+
+   static int EventOpenedBuy;
+   static int EventOpenedSell;
    
    virtual void Initalize()
    {
@@ -59,3 +62,5 @@ public:
 
 int COrderCommandHandlerBase::EventOpeningBuy = 0;
 int COrderCommandHandlerBase::EventOpeningSell = 0;
+int COrderCommandHandlerBase::EventOpenedBuy = 0;
+int COrderCommandHandlerBase::EventOpenedSell = 0;
