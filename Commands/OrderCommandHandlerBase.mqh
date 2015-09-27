@@ -20,7 +20,7 @@ public:
    
    virtual void callback(int i1, int i2)
    {
-      switch (i2) {
+      switch ((ENUM_ORDER_COMMAND_TYPE)i2) {
       	case commandOpenBuy: /*App().eventmanager.Send(EventOpeningBuy);*/ OpenBuy(); break;
       	case commandOpenSell: /*App().eventmanager.Send(EventOpeningSell);*/ OpenSell(); break;
       	case commandCloseBuy: CloseBuy(); break;

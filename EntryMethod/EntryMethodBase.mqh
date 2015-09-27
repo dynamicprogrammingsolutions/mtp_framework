@@ -15,27 +15,27 @@ public:
    
    virtual void OnCloseSellSignal(bool valid)
    {
-      App().commandmanager.Send(COrderCommand::Command, (int)commandCloseSell);
+      if (valid) App().commandmanager.Send(COrderCommand::Command, (int)commandCloseSell);
    }
    
    virtual void OnCloseBuySignal(bool valid)
    {
-      App().commandmanager.Send(COrderCommand::Command, (int)commandCloseBuy);
+      if (valid) App().commandmanager.Send(COrderCommand::Command, (int)commandCloseBuy);
    }
    
    virtual void OnCloseAllSignal(bool valid)
    {
-      App().commandmanager.Send(COrderCommand::Command, (int)commandCloseAll);
+      if (valid) App().commandmanager.Send(COrderCommand::Command, (int)commandCloseAll);
    }
    
    virtual void OnCloseBuyOpposite(bool valid)
    {
-      App().commandmanager.Send(COrderCommand::Command, (int)commandCloseSell);
+      if (valid) App().commandmanager.Send(COrderCommand::Command, (int)commandCloseSell);
    }
    
    virtual void OnCloseSellOpposite(bool valid)
    {
-      App().commandmanager.Send(COrderCommand::Command, (int)commandCloseBuy);
+      if (valid) App().commandmanager.Send(COrderCommand::Command, (int)commandCloseBuy);
    }
    
    virtual void OnBuySignal(bool valid)

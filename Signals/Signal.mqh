@@ -31,15 +31,18 @@ public:
    ENUM_SIGNAL signal;
    ENUM_SIGNAL closesignal;
    ENUM_SIGNAL lastsignal;
+   ENUM_SIGNAL lastclosesignal;
 
    bool execute_enabled;
    bool valid;
+   bool closesignal_valid;
    
    CSignal()
    {
       signal = SIGNAL_NONE;
       closesignal = SIGNAL_NONE;
       valid = true;
+      closesignal_valid = true;
       execute_enabled = true;
    }
 
@@ -136,11 +139,14 @@ public:
    virtual void BeforeExecute() {
       if (execute_enabled) {
          lastsignal = signal;  
+         lastclosesignal = closesignal;
       }
       valid = true;
+      closesignal_valid = true;
       execute_enabled = true;
       if (!BeforeFilter()) {
          valid = false;
+         closesignal_valid = false;
          execute_enabled = false;
       }
    }
@@ -148,6 +154,9 @@ public:
    virtual void AfterExecute() {
       if (!AfterFilter()) {
          valid = false;
+      }
+      if (!AfterFilterClose()) {
+         closesignal_valid = false;
       }
    }
    
@@ -164,6 +173,10 @@ public:
       return true;
    }
    virtual bool AfterFilter()
+   {
+      return true;
+   }
+   virtual bool AfterFilterClose()
    {
       return true;
    }

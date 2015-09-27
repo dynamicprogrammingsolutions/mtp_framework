@@ -20,9 +20,9 @@ public:
    {
       mainsignal.Run(bar);
       switch (mainsignal.closesignal) {
-         case SIGNAL_BUY: entrymethod.OnCloseSellSignal(true); break;
-         case SIGNAL_SELL: entrymethod.OnCloseBuySignal(true); break;
-         case SIGNAL_BOTH: entrymethod.OnCloseAllSignal(true); break;
+         case SIGNAL_BUY: entrymethod.OnCloseSellSignal(mainsignal.closesignal_valid); break;
+         case SIGNAL_SELL: entrymethod.OnCloseBuySignal(mainsignal.closesignal_valid); break;
+         case SIGNAL_BOTH: entrymethod.OnCloseAllSignal(mainsignal.closesignal_valid); break;
       }
       switch (mainsignal.signal) {
          case SIGNAL_BUY: entrymethod.OnBuySignal(mainsignal.valid); break;

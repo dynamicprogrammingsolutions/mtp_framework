@@ -156,6 +156,11 @@ public:
       return true;
    }
    
+   virtual bool AfterFilterClose() {
+      if (trade_only_signal_change && (lastclosesignal == SIGNAL_NONE || closesignal == lastclosesignal)) return false;
+      return true;
+   }
+   
    virtual void OnTick() {
       CSignalContainer::OnTick();
       if (comments_enabled) addcomment("signal: "+signaltext(signal)+" valid:"+(string)valid+"\n");   
