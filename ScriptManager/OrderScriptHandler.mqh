@@ -14,22 +14,24 @@ public:
    string ActionCloseSell() { return "closesell"; }
    string ActionCloseAll() { return "closeall"; }
    
-   void callback(int i, CObject* o)
+   bool callback(const int i, CObject*& o)
    {
-      HandleCommand(o);
+      return HandleCommand(o);
    }
    
-   virtual void HandleCommand(CObject* command)
+   virtual bool HandleCommand(CObject* command)
    {
       CScript* script = command;
-      Print("Script: ",script.id," ",script.sparam);
       if (script.id == GetId()) {
+         Print("Script: ",script.id," ",script.sparam);
          if (script.sparam == ActionOpenBuy()) this.App().commandmanager.Send(COrderCommand::CommandOpenBuy);
          if (script.sparam == ActionOpenSell())  this.App().commandmanager.Send(COrderCommand::CommandOpenSell);
          if (script.sparam == ActionCloseBuy())  this.App().commandmanager.Send(COrderCommand::CommandCloseBuy);
          if (script.sparam == ActionCloseSell())  this.App().commandmanager.Send(COrderCommand::CommandCloseSell);
          if (script.sparam == ActionCloseAll())  this.App().commandmanager.Send(COrderCommand::CommandCloseAll);
+         return true;
       }
+      return false;
    }
    
    virtual void Initalize()

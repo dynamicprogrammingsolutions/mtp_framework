@@ -25,20 +25,16 @@ public:
       this.App().commandmanager.Register(COrderCommand::CommandCloseAll,GetPointer(this));
    }
    
-   virtual void callback(int i)
+   virtual bool callback(const int i, CObject*& obj)
    {
-      if (i == COrderCommand::CommandOpenBuy) OpenBuy();
-      if (i == COrderCommand::CommandOpenSell) OpenSell();
-      if (i == COrderCommand::CommandCloseBuy) CloseBuy();
-      if (i == COrderCommand::CommandCloseSell) CloseSell();
-      if (i == COrderCommand::CommandCloseAll) CloseAll();
-   }
-   
-   virtual CObject* callback_o(int i)
-   {
-      if (i == COrderCommand::CommandOpenBuy) return OpenBuy();
-      if (i == COrderCommand::CommandOpenSell) return OpenSell();
-      return NULL;
+      if (i == COrderCommand::CommandOpenBuy) obj = OpenBuy();
+      else if (i == COrderCommand::CommandOpenSell) obj = OpenSell();
+      else if (i == COrderCommand::CommandCloseBuy) CloseBuy();
+      else if (i == COrderCommand::CommandCloseSell) CloseSell();
+      else if (i == COrderCommand::CommandCloseAll) CloseAll();
+      else return false;
+      
+      return true;
    }
 
    virtual void CloseAll()

@@ -8,17 +8,7 @@ public:
       AbstractFunctionWarning(__FUNCTION__);
    }
 
-   virtual void Send(int id)
-   {
-      AbstractFunctionWarning(__FUNCTION__);
-   }
-
-   virtual void Send(int id, CObject* o, bool deleteobject = false)
-   {
-      AbstractFunctionWarning(__FUNCTION__);
-   }
-   
-   virtual bool SendB(int id)
+   virtual bool Send(int id, CObject* o = NULL, bool deleteobject = false)
    {
       AbstractFunctionWarning(__FUNCTION__);
       return false;

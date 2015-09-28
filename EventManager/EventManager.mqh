@@ -24,43 +24,25 @@ public:
       return container.At(id-1);
    }
    
-   virtual void Send(int id)
-   {
-      if (id > 0) {
-         CArrayObj* callbacks = GetCallBacks(id);
-         int total = callbacks.Total();
-         for (int i = 0; i < callbacks.Total(); i++) {
-            CAppObject* callback = callbacks.At(i);
-            callback.callback(id);
-         }
-      }
-   }    
+   /*
+      Callback should return bool for events triggered before an action, and should be true if the action is endabled.
+   */
    
-   virtual void Send(int id, CObject* o = NULL, bool deleteobject = false)
+   virtual bool Send(int id, CObject* o = NULL, bool deleteobject = false)
    {
-      if (id > 0) {
-         CArrayObj* callbacks = GetCallBacks(id);
-         int total = callbacks.Total();
-         for (int i = 0; i < callbacks.Total(); i++) {
-            CAppObject* callback = callbacks.At(i);
-            callback.callback(id,o);
-         }
-         if (deleteobject) delete o;
-      }
-      if (deleteobject) delete o;
-   }
-   
-   virtual bool SendB(int id)
-   {
+      CObject* originalobj;
       bool ret = true;
       if (id > 0) {
          CArrayObj* callbacks = GetCallBacks(id);
+         originalobj = o;
          int total = callbacks.Total();
          for (int i = 0; i < callbacks.Total(); i++) {
             CAppObject* callback = callbacks.At(i);
-            ret &= callback.callback_b(id);
+            ret &= callback.callback(id,o);
+            o = originalobj;
          }
       }
+      if (deleteobject) delete o;
       return ret;
    }
    

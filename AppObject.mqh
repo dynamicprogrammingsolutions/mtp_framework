@@ -45,20 +45,16 @@ public:
       appbase = _appbase;
    }
    
-   virtual void callback() { AbstractFunctionWarning(__FUNCTION__); }
+   // callback for command:
+   //    object parameter is used for return.
+   //    if true is returned it means, the command is handled, and other handlers will not be called.
    
-   virtual void callback(CObject* o) { AbstractFunctionWarning(__FUNCTION__); }
-
-   virtual void callback(int i) { AbstractFunctionWarning(__FUNCTION__); }
-   virtual void callback(int i1, int i2) { AbstractFunctionWarning(__FUNCTION__); }
-   virtual void callback(int i, CObject* o) { AbstractFunctionWarning(__FUNCTION__); }
-
-   virtual bool callback_b() { AbstractFunctionWarning(__FUNCTION__); return false; }
-   virtual bool callback_b(int i) { AbstractFunctionWarning(__FUNCTION__); return false; }
-   virtual bool callback_b(CObject* o) { AbstractFunctionWarning(__FUNCTION__); return false; }
-
-   virtual CObject* callback_o(int i) { AbstractFunctionWarning(__FUNCTION__); return NULL; }
+   // callback for event:
+   //    object parameter is only for input.
+   //    return value is used only for events that is called before the action, and false will mean that the action shouln't be done.
    
+   virtual bool callback(const int id, CObject*& obj) { AbstractFunctionWarning(__FUNCTION__); return false; }
+
 };
 
 // this is just for protection

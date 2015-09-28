@@ -11,51 +11,38 @@ public:
   
    virtual void Register(int& id, CAppObject* callback)
    {
-      container.Add(callback);
-      id = container.Total();
+      if (id == 0) {
+         container.Add(new CArrayObj());
+         id = container.Total();
+      }
+      CArrayObj* callbacks = GetCallBacks(id);
+      callbacks.Add(callback);
    }
    
-   virtual CAppObject* GetCallBack(int id)
+   CArrayObj* GetCallBacks(int id)
    {
-      if (id > 0) {
-         return container.At(id-1);
-      }
-      return NULL;
+      return container.At(id-1);
    }
-   
-   virtual void Send(int id)
-   {
-      if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         callback.callback(id);
-      }
-   }
-   
-   virtual CObject* SendO(int id)
-   {
-      if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         return callback.callback_o(id);
-      }
-      return NULL;
-   }  
-   
-   virtual void Send(int id, int i)
-   {
-      if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         callback.callback(id,i);
-      }
-   } 
 
-   virtual void Send(int id, CObject* o = NULL, bool deleteobject = false)
+   /*
+      The callback should return true if the command is handled right, in that case no further handlers will be called.
+   */
+
+   virtual CObject* Send(int id, CObject* o = NULL, bool deleteobject = false)
    {
+      CObject* originalobj;
       if (id > 0) {
-         CAppObject* callback = GetCallBack(id);
-         callback.callback(id,o);
-         if (deleteobject) delete o;
+         CArrayObj* callbacks = GetCallBacks(id);
+         originalobj = o;
+         int total = callbacks.Total();
+         for (int i = 0; i < callbacks.Total(); i++) {
+            CAppObject* callback = callbacks.At(i);
+            if (callback.callback(id,o)) break;
+            o = originalobj;
+         }
       }
       if (deleteobject) delete o;
+      return o;
    } 
    
 };

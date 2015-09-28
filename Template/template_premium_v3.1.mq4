@@ -340,10 +340,11 @@ public:
 
 class CSignalEventListener : public CAppObject
 {
-   virtual void callback(int i, CObject* o)
+   virtual bool callback(const int i, CObject*& o)
    {
       CSignal* signal = o;
       Print("Signal changed: ",signaltext(signal.signal),", ",signaltext_close(signal.closesignal));
+      return false;
    }
 };
 

@@ -10,5 +10,3 @@
 #include "ServiceProviders\ScriptManagerInterface.mqh"
 #include "ServiceProviders\EventManagerInterface.mqh"
 #include "ServiceProviders\CommandManagerInterface.mqh"
-
-#include "CommandInterface.mqh"
