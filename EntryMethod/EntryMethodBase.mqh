@@ -11,6 +11,7 @@ public:
    COrderCommand* command_open_sell;
    COrderCommand* command_close_buy;
    COrderCommand* command_close_sell;
+   COrderCommand* command_close_all;
 
    COrderManager* ordermanager;
    virtual void Initalize()
@@ -20,6 +21,7 @@ public:
       command_open_sell = new COpenSell(false);
       command_close_buy = new CCloseBuy(false);
       command_close_sell = new CCloseSell(false);
+      command_close_all = new CCloseAll(false);
    }
    
    virtual void OnCloseSellSignal(bool valid)
@@ -31,6 +33,11 @@ public:
    {
       App().Command(command_close_buy);
    }
+   
+   virtual void OnCloseAllSignal(bool valid)
+   {
+      App().Command(command_close_all);
+   }   
    
    virtual void OnCloseBuyOpposite(bool valid)
    {
