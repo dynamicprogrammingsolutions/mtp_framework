@@ -33,6 +33,13 @@ public:
       if (i == COrderCommand::CommandCloseSell) CloseSell();
       if (i == COrderCommand::CommandCloseAll) CloseAll();
    }
+   
+   virtual CObject* callback_o(int i)
+   {
+      if (i == COrderCommand::CommandOpenBuy) return OpenBuy();
+      if (i == COrderCommand::CommandOpenSell) return OpenSell();
+      return NULL;
+   }
 
    virtual void CloseAll()
    {
@@ -49,15 +56,17 @@ public:
 
    }
    
-   virtual void OpenBuy()
+   virtual COrder* OpenBuy()
    {
-
+      return NULL;
    }
    
-   virtual void OpenSell()
+   virtual COrder* OpenSell()
    {
-
+      return NULL;
    }
+   
+   
 };
 
 int COrderCommandHandlerBase::EventOpeningBuy = 0;

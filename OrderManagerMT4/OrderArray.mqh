@@ -136,6 +136,7 @@ public:
          bool ret = false;
          COrder *_order;
          for (int i = this.Total()-1; i >= 0; i--) {
+	    if (!isset(this.At(i))) continue;
             _order = this.At(i);
             //_order.Update();
             if (isset(_order)) {

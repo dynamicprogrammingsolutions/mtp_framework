@@ -18,6 +18,13 @@ public:
    {
       AbstractFunctionWarning(__FUNCTION__);
    }
+   
+   virtual CObject* SendO(int id)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return NULL;
+   }
+
 
    virtual void Send(int id, int i)
    {

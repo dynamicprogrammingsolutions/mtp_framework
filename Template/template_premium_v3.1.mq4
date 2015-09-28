@@ -243,14 +243,14 @@ public:
       ordermanager.CloseAll(ORDERSELECT_SHORT,STATESELECT_FILLED);
    }
    
-   virtual void OpenBuy()
+   virtual COrder* OpenBuy()
    {
-      COrder* order = ordermanager.NewOrder(symbol,ORDER_TYPE_BUY,mm,NULL,sl,tp);
+      return ordermanager.NewOrder(symbol,ORDER_TYPE_BUY,mm,NULL,sl,tp);
    }
    
-   virtual void OpenSell()
+   virtual COrder* OpenSell()
    {
-      COrder* order = ordermanager.NewOrder(symbol,ORDER_TYPE_SELL,mm,NULL,sl,tp);   
+      return ordermanager.NewOrder(symbol,ORDER_TYPE_SELL,mm,NULL,sl,tp);   
    }
 };
 

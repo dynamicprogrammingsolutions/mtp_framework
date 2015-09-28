@@ -29,7 +29,16 @@ public:
          CAppObject* callback = GetCallBack(id);
          callback.callback(id);
       }
-   }    
+   }
+   
+   virtual CObject* SendO(int id)
+   {
+      if (id > 0) {
+         CAppObject* callback = GetCallBack(id);
+         return callback.callback_o(id);
+      }
+      return NULL;
+   }  
    
    virtual void Send(int id, int i)
    {

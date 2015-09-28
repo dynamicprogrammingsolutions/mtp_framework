@@ -56,6 +56,8 @@ public:
    virtual bool callback_b() { AbstractFunctionWarning(__FUNCTION__); return false; }
    virtual bool callback_b(int i) { AbstractFunctionWarning(__FUNCTION__); return false; }
    virtual bool callback_b(CObject* o) { AbstractFunctionWarning(__FUNCTION__); return false; }
+
+   virtual CObject* callback_o(int i) { AbstractFunctionWarning(__FUNCTION__); return NULL; }
    
 };
 
