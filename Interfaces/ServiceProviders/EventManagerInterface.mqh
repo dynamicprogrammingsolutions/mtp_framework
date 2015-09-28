@@ -8,7 +8,7 @@ public:
       AbstractFunctionWarning(__FUNCTION__);
    }
 
-   virtual bool Send(int id, CObject* o = NULL, bool deleteobject = false)
+   virtual bool Send(const int id, CObject* o = NULL, const bool deleteobject = false)
    {
       AbstractFunctionWarning(__FUNCTION__);
       return false;

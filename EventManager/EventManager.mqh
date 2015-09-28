@@ -19,7 +19,7 @@ public:
       callbacks.Add(callback);
    }
    
-   CArrayObj* GetCallBacks(int id)
+   CArrayObj* GetCallBacks(const int id)
    {
       return container.At(id-1);
    }
@@ -28,7 +28,7 @@ public:
       Callback should return bool for events triggered before an action, and should be true if the action is endabled.
    */
    
-   virtual bool Send(int id, CObject* o = NULL, bool deleteobject = false)
+   virtual bool Send(const int id, CObject* o = NULL, const bool deleteobject = false)
    {
       CObject* originalobj;
       bool ret = true;

@@ -19,7 +19,7 @@ public:
       callbacks.Add(callback);
    }
    
-   CArrayObj* GetCallBacks(int id)
+   CArrayObj* GetCallBacks(const int id)
    {
       return container.At(id-1);
    }
@@ -28,7 +28,7 @@ public:
       The callback should return true if the command is handled right, in that case no further handlers will be called.
    */
 
-   virtual CObject* Send(int id, CObject* o = NULL, bool deleteobject = false)
+   virtual CObject* Send(const int id, CObject* o = NULL, const bool deleteobject = false)
    {
       CObject* originalobj;
       if (id > 0) {
