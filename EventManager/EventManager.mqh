@@ -9,6 +9,15 @@ public:
 public:
    CArrayObj container;
   
+   virtual int SetId(int& id)
+   {
+      if (id == 0) {
+         container.Add(new CArrayObj());
+         id = container.Total();
+      }
+      return id;
+   }
+  
    virtual void Register(int& id, CAppObject* callback)
    {
       if (id == 0) {
@@ -17,6 +26,14 @@ public:
       }
       CArrayObj* callbacks = GetCallBacks(id);
       callbacks.Add(callback);
+   }
+   
+   virtual void RegisterOnly(const int id, CAppObject* callback)
+   {
+      if (id > 0) {
+         CArrayObj* callbacks = GetCallBacks(id);
+         callbacks.Add(callback);
+      }
    }
    
    CArrayObj* GetCallBacks(const int id)

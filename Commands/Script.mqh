@@ -1,15 +1,29 @@
 //
-class CScript : public CObject
+class CScript : public CAppObject
 {
 public:
+   virtual int Type() const { return classScript; }
+   
+   TraitAppAccess
+   TraitHasCommands
+
+   static int Command;
+     
+   void GetCommands(int& commands[])
+   {
+     ArrayResize(commands,1);
+     commands[0] = CommandId(Command);
+   }
+     
+
    int id;
    long lparam;
    double dparam;
    string sparam;
    
-   static int Command;
-  
-   virtual int Type() const { return classScript; }
+   CScript()
+   {
+   }
    
    CScript(int _id, long _lparam, double _dparam, string _sparam)
    {

@@ -6,30 +6,37 @@ public:
    virtual int Type() const { return classOrderCommandHandlerBase; }
 
    TraitAppAccess
+   TraitHasEvents
+
+   static int EventOpeningBuy;
+   static int EventOpeningSell;
+   static int EventOpenedBuy;
+   static int EventOpenedSell;
+      
+   void GetEvents(int& events[])
+   {
+     int i = 0;
+     ArrayResize(events,4);
+     events[i++] = EventId(EventOpeningBuy);
+     events[i++] = EventId(EventOpeningSell);
+     events[i++] = EventId(EventOpenedBuy);
+     events[i++] = EventId(EventOpenedSell);
+   }
 
    COrderManager* ordermanager;
    
-   static int EventOpeningBuy;
-   static int EventOpeningSell;
-
-   static int EventOpenedBuy;
-   static int EventOpenedSell;
-   
    virtual void Initalize()
    {
-      this.ordermanager = this.App().GetService(srvOrderManager);
-      this.App().commandmanager.Register(COrderCommand::CommandOpenBuy,GetPointer(this));
-      this.App().commandmanager.Register(COrderCommand::CommandOpenSell,GetPointer(this));
-      this.App().commandmanager.Register(COrderCommand::CommandCloseBuy,GetPointer(this));
-      this.App().commandmanager.Register(COrderCommand::CommandCloseSell,GetPointer(this));
-      this.App().commandmanager.Register(COrderCommand::CommandCloseAll,GetPointer(this));
+      this.ordermanager = this.App().GetService(srvOrderManager);      
    }
    
    virtual bool callback(const int i, CObject*& obj)
    {
-      if (i == COrderCommand::CommandOpenBuy) obj = OpenBuy();
-      else if (i == COrderCommand::CommandOpenSell) obj = OpenSell();
-      else if (i == COrderCommand::CommandCloseBuy) CloseBuy();
+      if (i == COrderCommand::CommandOpenBuy) {
+         if (EventSend(EventOpeningBuy)) { obj = OpenBuy(); EventSend(EventOpenedBuy,obj); }
+      } else if (i == COrderCommand::CommandOpenSell) {
+         if (EventSend(EventOpeningSell)) { obj = OpenSell(); EventSend(EventOpenedSell); }
+      } else if (i == COrderCommand::CommandCloseBuy) CloseBuy();
       else if (i == COrderCommand::CommandCloseSell) CloseSell();
       else if (i == COrderCommand::CommandCloseAll) CloseAll();
       else return false;

@@ -4,8 +4,6 @@
 #include "EnumApplicationService.mqh"
 #include "Traits\Loader.mqh"
 
-#include "Interfaces\ApplicationInterface.mqh"
-
 #include "AppObject.mqh"
 #include "AppObjectArray.mqh"
 #include "AppObjectArrayObj.mqh"
@@ -14,4 +12,5 @@
 #include "ServiceProviderArray.mqh"
 #include "ServiceProviderArrayObj.mqh"
 
+#include "Interfaces\ApplicationInterface.mqh"
 #include "Interfaces\Loader.mqh"

@@ -36,12 +36,14 @@
 void register_services()
 {
   global_app().RegisterService(new CEventHandler(),srvEvent,"eventhandler");
+
+  global_app().RegisterService(new CEventManager(),srvEventManager,"eventmanager");
+  global_app().RegisterService(new CCommandManager(),srvCommandManager,"commandmanager");
+
   global_app().RegisterService(new CSymbolLoader(),srvSymbolLoader,"symbolloader");
   global_app().RegisterService(new COrderManager(),srvOrderManager,"ordermanager");
   global_app().RegisterService(new COrderFactory(),srvOrderFactory,"orderfactory");
   global_app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
   global_app().RegisterService(new CSymbolInfoVars(Symbol()),srvSymbolInfoVars,"symbolinfovars");
-  global_app().RegisterService(new CEventManager(),srvEventManager,"eventmanager");
-  global_app().RegisterService(new CCommandManager(),srvCommandManager,"commandmanager");
   
 }

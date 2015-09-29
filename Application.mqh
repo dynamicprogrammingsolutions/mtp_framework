@@ -1,5 +1,5 @@
 //
-#define MTP_FRAMEWORK_VERSION 1.1
+#define MTP_FRAMEWORK_VERSION 1.2
 
 #include "Loader.mqh"
 
@@ -52,8 +52,8 @@ public:
    
    virtual void Initalize()
    {
-      services.InitalizeServices();
       this.SetInitalized();
+      services.InitalizeServices();
    }
    
    void SetInitalized() { initalized = true; }
@@ -74,12 +74,62 @@ public:
       return services.IsRegistered(servicename);
    }
 
-   virtual CObject* GetService(string name) {
+   virtual CServiceProvider* GetService(string name) {
       return (CObject*)services.GetService(name);
    }
    
-   virtual CObject* GetService(ENUM_APPLICATION_SERVICE srv) {
+   virtual CServiceProvider* GetService(ENUM_APPLICATION_SERVICE srv) {
       return services.GetService(srv);
+   }
+
+   void SetCommandHandler(CAppObject* commandobject, CAppObject* handlerobject)
+   {
+      Prepare(commandobject);
+      Prepare(handlerobject);
+      commandobject.CommandHandler(handlerobject);
+   }
+   
+   void SetCommandHandler(CAppObject* commandobject, ENUM_APPLICATION_SERVICE handlerservice)
+   {
+      Prepare(commandobject);
+      commandobject.CommandHandler(GetService(handlerservice));
+   }
+
+   void SetCommandHandler(ENUM_APPLICATION_SERVICE commandservice, CAppObject* handlerobject)
+   {
+      Prepare(handlerobject);
+      GetService(commandservice).CommandHandler(handlerobject);
+   }
+   
+   void SetEventListener(CAppObject* eventobject, CAppObject* handlerobject)
+   {
+      Prepare(eventobject);
+      Prepare(handlerobject);
+      eventobject.EventListener(handlerobject);
+   }
+   
+   void SetEventListener(CAppObject* eventobject, ENUM_APPLICATION_SERVICE handlerservice)
+   {
+      Prepare(eventobject);
+      eventobject.EventListener(GetService(handlerservice));
+   }
+
+   void SetEventListener(ENUM_APPLICATION_SERVICE eventservice, CAppObject* handlerobject)
+   {
+      Prepare(handlerobject);
+      GetService(eventservice).EventListener(handlerobject);
+   }
+   
+   CAppObject* Prepare(CAppObject* obj)
+   {
+      if (!obj.Initalized()) {
+         obj.AppBase(GetPointer(this));
+         if (!obj.Initalized()) {
+            obj.SetInitalized();
+            obj.Initalize();
+         }
+      }
+      return obj;
    }
 
    void OnInit()

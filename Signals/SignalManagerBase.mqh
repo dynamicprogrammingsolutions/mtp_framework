@@ -1,3 +1,4 @@
+#include "..\Loader.mqh"
 #include "Signal.mqh"
 
 class CSignalManagerBase : public CServiceProvider
@@ -6,12 +7,19 @@ public:
    virtual int Type() const { return classSignalManagerBase; }
 
    TraitAppAccess
+   TraitHasEvents
+
+   static int Signal;
+
+   void GetEvents(int& events[])
+   {
+      ArrayResize(events,1);
+      events[0] = EventId(Signal);
+   }
 
    CSignal* mainsignal;
    CEntryMethodInterface* entrymethod;
    int bar;
-   
-   static int Signal;
    
    virtual void Initalize()
    {

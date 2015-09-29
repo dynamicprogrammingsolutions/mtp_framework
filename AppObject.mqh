@@ -4,7 +4,7 @@
 class CAppObject : public CObject
 {
 private:
-   CApplicationInterface* appbase;
+   CObject* appbase;
    
 protected:
 
@@ -19,21 +19,17 @@ protected:
    {
       if (!obj.Initalized()) {
          obj.AppBase(this.AppBase());
-         obj.Initalize();
-         obj.initalized = true;
+         if (!obj.initalized) {
+            obj.initalized = true;
+            obj.Initalize();
+         }
       }
       return obj;
    }
    
 public:
-   void SetInitalized() { initalized = true; }
-   bool Initalized() { return initalized; }
-   
-   virtual void Initalize() {
-      //AbstractFunctionWarning(__FUNCTION__);
-   }
-   
-   CApplicationInterface* AppBase() {
+
+   CObject* AppBase() {
       if (CheckPointer(appbase) == POINTER_INVALID) {
          Print("App not set in: ",EnumToString((ENUM_CLASS_NAMES)this.Type()));
          return global_application_object;
@@ -41,8 +37,16 @@ public:
          return appbase;
       }
    }
-   void AppBase(CApplicationInterface* _appbase) {
+   
+   void AppBase(CObject* _appbase) {
       appbase = _appbase;
+   }
+
+   void SetInitalized() { initalized = true; }
+   bool Initalized() { return initalized; }
+   
+   virtual void Initalize() {
+      //AbstractFunctionWarning(__FUNCTION__);
    }
    
    // callback for command:
@@ -55,7 +59,18 @@ public:
    
    virtual bool callback(const int id, CObject*& obj) { AbstractFunctionWarning(__FUNCTION__); return false; }
 
+   // redefined in TraitHasEvents, this is to have easy access from interfaces
+   virtual void EventListener(CAppObject* object)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+   }
+   
+   virtual void CommandHandler(CAppObject* object)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+   }
+   
 };
 
 // this is just for protection
-CApplicationInterface* global_application_object;
+CObject* global_application_object;

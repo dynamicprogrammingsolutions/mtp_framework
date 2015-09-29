@@ -170,12 +170,14 @@ public:
 class CSignalManager : public CSignalManagerBase
 {
 public:
-   virtual int Type() const { return classSignalManager; }   
+   TraitGetType { return classSignalManager; }
+   
    virtual void OnInit()
    {
       bar = _bar;
       mainsignal = new CMainSignal();      
    }
+   
    virtual void OnDeinit()
    {
       delete mainsignal;
@@ -186,7 +188,7 @@ public:
 class CEntryMethod : public CEntryMethodBase
 {
 public:
-   virtual int Type() const { return classEntryMethod; }
+   TraitGetType { return classEntryMethod; }
 
    virtual bool BuySignalFilter(bool valid)
    {
@@ -348,18 +350,31 @@ class CSignalEventListener : public CAppObject
    }
 };
 
+class COrderEventListener : public CAppObject
+{
+   virtual bool callback(const int id, CObject*& object)
+   {
+      if (id == COrderCommandHandlerBase::EventOpeningBuy) {
+         Print("opening buy");
+      }
+      if (id == COrderCommandHandlerBase::EventOpenedBuy) {
+         Print("opened buy");
+      }
+      if (id == COrderCommandHandlerBase::EventOpeningSell) {
+         Print("opening sell");
+      }
+      if (id == COrderCommandHandlerBase::EventOpenedSell) {
+         Print("opened sell");
+      }
+      return true;
+   }
+};
+
 class CMain : public CServiceProvider
 {
 public:
-   virtual int Type() const { return classMain; }
-   
+   TraitGetType { return classMain; }
    TraitAppAccess
-   
-   virtual void Initalize()
-   {
-      CAppObject* eventlistener = new CSignalEventListener();
-      App().eventmanager.Register(CSignalManagerBase::Signal,eventlistener);
-   }
 
    virtual void OnInit()
    {
@@ -430,16 +445,19 @@ int OnInit()
       #ifdef TRAILINGSTOP
          application.RegisterService(new CTrailingStopManager(),srvNone,"trailingstopmanager");
       #endif
-      application.RegisterService(new CMain(),srvMain,"main");
       application.RegisterService(new COrderDataSaver(), srvNone, "orderdatasaver");
       application.RegisterService(new CScriptManagerBase(),srvScriptManager,"scriptmanager");
       application.RegisterService(new COrderCommandHandler(),srvOrderCommandHandler,"ordercommandhandler");
-      application.RegisterService(new COrderScriptHandler(),srvNone,"orderscripthandler");
-      
       application.RegisterService(new CChartComment(),srvNone,"chartcomment");
+      application.RegisterService(new CMain(),srvMain,"main");
 
       application.Initalize();
-
+      
+      application.SetCommandHandler(new CScript(),new COrderScriptHandler());
+      application.SetCommandHandler(new COrderCommand(),srvOrderCommandHandler);
+      application.SetEventListener(srvSignalManager,new CSignalEventListener());
+      application.SetEventListener(srvOrderCommandHandler,new COrderEventListener());
+      
    }
 
    application.OnInit();

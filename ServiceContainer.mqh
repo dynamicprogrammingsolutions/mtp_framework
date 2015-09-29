@@ -83,8 +83,8 @@ public:
          CServiceProvider* service = ServiceProvider(i);
          if (!service.Initalized()) {
             Print("Initalizing Service ",EnumToString(service.srv)," '",service.name,"': ",EnumToString((ENUM_CLASS_NAMES)service.Type()));
-            service.Initalize();
             service.SetInitalized();
+            service.Initalize();
          } else {
             Print("Service Alread Initalized: ",EnumToString((ENUM_CLASS_NAMES)service.Type()));
          }
