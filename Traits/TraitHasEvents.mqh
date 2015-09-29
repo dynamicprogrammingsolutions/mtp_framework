@@ -1,4 +1,4 @@
-#define TraitHasEvents int EventId(int& id) { return App().eventmanager.SetId(id); } void EventRegister(int& id, CAppObject* callback) { App().eventmanager.Register(id,callback); } void EventRegisterOnly(int id, CAppObject* callback) { App().eventmanager.RegisterOnly(id,callback); } bool EventSend(const int id, CObject* object = NULL) { return App().eventmanager.Send(id,object); } virtual void EventListener(CAppObject* object) { int events[]; GetEvents(events); for (int i = 0; i < ArraySize(events); i++) { EventRegisterOnly(events[i],object); } }
+#define TraitHasEvents int EventId(int& id) { return App().eventmanager.SetId(id); } void EventRegister(int& id, CAppObject* callback) { App().eventmanager.Register(id,callback); } void EventRegisterOnly(int id, CAppObject* callback) { App().eventmanager.RegisterOnly(id,callback); } bool EventSend(const int id, CObject* object = NULL, const bool deleteobject = false) { return App().eventmanager.Send(id,object,deleteobject); } virtual void EventListener(CAppObject* object) { int events[]; GetEvents(events); for (int i = 0; i < ArraySize(events); i++) { EventRegisterOnly(events[i],object); } }
 
 /*
 Requires:
@@ -32,9 +32,9 @@ void EventRegisterOnly(int id, CAppObject* callback)
   App().eventmanager.RegisterOnly(id,callback);
 }
 
-bool EventSend(const int id, CObject* object = NULL)
+bool EventSend(const int id, CObject* object = NULL, const bool deleteobject = false)
 {
-   return App().eventmanager.Send(id,object);
+   return App().eventmanager.Send(id,object,deleteobject);
 }
 
 virtual void EventListener(CAppObject* object)

@@ -6,6 +6,7 @@ public:
    virtual int Type() const { return classEntryMethodBase; }
 
    TraitAppAccess
+   TraitSendCommands
 
    COrderManager* ordermanager;
    virtual void Initalize()
@@ -15,41 +16,41 @@ public:
    
    virtual void OnCloseSellSignal(bool valid)
    {
-      if (valid) App().commandmanager.Send(COrderCommand::CommandCloseSell);
+      if (valid) CommandSend(COrderCommand::CommandCloseSell);
    }
    
    virtual void OnCloseBuySignal(bool valid)
    {
-      if (valid) App().commandmanager.Send(COrderCommand::CommandCloseBuy);
+      if (valid) CommandSend(COrderCommand::CommandCloseBuy);
    }
    
    virtual void OnCloseAllSignal(bool valid)
    {
-      if (valid) App().commandmanager.Send(COrderCommand::CommandCloseAll);
+      if (valid) CommandSend(COrderCommand::CommandCloseAll);
    }
    
    virtual void OnCloseBuyOpposite(bool valid)
    {
-      if (valid) App().commandmanager.Send(COrderCommand::CommandCloseSell);
+      if (valid) CommandSend(COrderCommand::CommandCloseSell);
    }
    
    virtual void OnCloseSellOpposite(bool valid)
    {
-      if (valid) App().commandmanager.Send(COrderCommand::CommandCloseBuy);
+      if (valid) CommandSend(COrderCommand::CommandCloseBuy);
    }
    
    virtual void OnBuySignal(bool valid)
    {
       if (CloseOpposite()) OnCloseBuyOpposite(valid);
       if (BuySignalFilter(valid)) {
-         App().commandmanager.Send(COrderCommand::CommandOpenBuy);
+         CommandSend(COrderCommand::CommandOpenBuy);
       }
    }
    virtual void OnSellSignal(bool valid)
    {   
       if (CloseOpposite()) OnCloseSellOpposite(valid);
       if (SellSignalFilter(valid)) {
-         App().commandmanager.Send(COrderCommand::CommandOpenSell);
+         CommandSend(COrderCommand::CommandOpenSell);
       }
    }
    

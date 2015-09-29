@@ -120,6 +120,17 @@ public:
       GetService(eventservice).EventListener(handlerobject);
    }
    
+   void SetEventListener(int& id, CAppObject* handlerobject)
+   {
+      Prepare(handlerobject);
+      this.eventmanager.Register(id, handlerobject);
+   }
+
+   void SetEventListener(int id, ENUM_APPLICATION_SERVICE handlerservice)
+   {
+      this.eventmanager.Register(id, GetService(handlerservice));
+   }
+   
    CAppObject* Prepare(CAppObject* obj)
    {
       if (!obj.Initalized()) {

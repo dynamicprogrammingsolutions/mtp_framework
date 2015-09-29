@@ -4,9 +4,11 @@
 
 class CScriptManagerBase : public CScriptManagerInterface
 {
-    CArrayInt scriptids;
+   CArrayInt scriptids;
+   
 public:
    TraitAppAccess
+   TraitSendCommands
 
    virtual int Type() const { return classScriptManagerBase; }
 
@@ -52,7 +54,7 @@ public:
    }
    virtual void HandleScript(int id, long lparam, double dparam, string sparam)
    {
-      this.App().commandmanager.Send(CScript::Command,new CScript(id,lparam,dparam,sparam),true);
+      CommandSend(CScript::Command,new CScript(id,lparam,dparam,sparam),true);
    }
    virtual void OnTick()
    {

@@ -245,12 +245,12 @@ public:
       ordermanager.CloseAll(ORDERSELECT_SHORT,STATESELECT_FILLED);
    }
    
-   virtual COrder* OpenBuy()
+   virtual CObject* OpenBuy()
    {
       return ordermanager.NewOrder(symbol,ORDER_TYPE_BUY,mm,NULL,sl,tp);
    }
    
-   virtual COrder* OpenSell()
+   virtual CObject* OpenSell()
    {
       return ordermanager.NewOrder(symbol,ORDER_TYPE_SELL,mm,NULL,sl,tp);   
    }
@@ -358,13 +358,15 @@ class COrderEventListener : public CAppObject
          Print("opening buy");
       }
       if (id == COrderCommandHandlerBase::EventOpenedBuy) {
-         Print("opened buy");
+         COrder* order = object;
+         Print("opened buy: ",order.id);
       }
       if (id == COrderCommandHandlerBase::EventOpeningSell) {
          Print("opening sell");
       }
       if (id == COrderCommandHandlerBase::EventOpenedSell) {
-         Print("opened sell");
+         order = object;
+         Print("opened sell: ",order.id);
       }
       return true;
    }
@@ -455,8 +457,11 @@ int OnInit()
       
       application.SetCommandHandler(new CScript(),new COrderScriptHandler());
       application.SetCommandHandler(new COrderCommand(),srvOrderCommandHandler);
+      
       application.SetEventListener(srvSignalManager,new CSignalEventListener());
       application.SetEventListener(srvOrderCommandHandler,new COrderEventListener());
+      //application.SetEventListener(COrderCommandHandlerBase::EventOpeningBuy,new COrderEventListener());
+      //application.SetEventListener(COrderCommandHandlerBase::EventOpeningSell,new COrderEventListener());
       
    }
 

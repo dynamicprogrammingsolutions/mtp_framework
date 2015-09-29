@@ -35,7 +35,7 @@ public:
       if (i == COrderCommand::CommandOpenBuy) {
          if (EventSend(EventOpeningBuy)) { obj = OpenBuy(); EventSend(EventOpenedBuy,obj); }
       } else if (i == COrderCommand::CommandOpenSell) {
-         if (EventSend(EventOpeningSell)) { obj = OpenSell(); EventSend(EventOpenedSell); }
+         if (EventSend(EventOpeningSell)) { obj = OpenSell(); EventSend(EventOpenedSell,obj); }
       } else if (i == COrderCommand::CommandCloseBuy) CloseBuy();
       else if (i == COrderCommand::CommandCloseSell) CloseSell();
       else if (i == COrderCommand::CommandCloseAll) CloseAll();
@@ -59,12 +59,12 @@ public:
 
    }
    
-   virtual COrder* OpenBuy()
+   virtual CObject* OpenBuy()
    {
       return NULL;
    }
    
-   virtual COrder* OpenSell()
+   virtual CObject* OpenSell()
    {
       return NULL;
    }

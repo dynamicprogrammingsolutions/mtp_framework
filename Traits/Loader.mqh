@@ -3,3 +3,4 @@
 #include "TraitGetType.mqh"
 #include "TraitHasEvents.mqh"
 #include "TraitHasCommands.mqh"
+#include "TraitSendCommands.mqh"
