@@ -250,16 +250,16 @@ bool COrderBase::Execute()
    CHistoryOrderInfo historyorder;
    if (executestate == ES_NOT_EXECUTED) {
       bool success;
+      loadsymbol(symbol);
       if (ordertype_market(ordertype)) {
          if (price == 0) {
-            loadsymbol(symbol);
             if (ordertype == ORDER_TYPE_SELL) { price = _symbol.Bid(); }
             else if (ordertype == ORDER_TYPE_BUY) { price = _symbol.Ask(); }
          }
-         success = trade.PositionOpen(symbol,ordertype,volume,price,0,0,comment);
+         success = trade.PositionOpen(symbol,ordertype,_symbol.LotRound(volume),_symbol.PriceRound(price),0,0,comment);
       } else if (ordertype_pending(ordertype)) {
          if (price > 0) {
-            success = trade.OrderOpen(symbol,ordertype,volume,limit_price,price,0,0,type_time,expiration,comment);
+            success = trade.OrderOpen(symbol,ordertype,_symbol.LotRound(volume),limit_price,_symbol.PriceRound(price),0,0,type_time,expiration,comment);
          } else {
             if (event.Warning ()) event.Warning ("No Price",__FUNCTION__);
          }
@@ -278,7 +278,7 @@ bool COrderBase::Execute()
          } 
       } else {
          retcode = trade.ResultRetcode();
-         if (event.Warning ()) event.Warning ("Order "+(string)this.id+" Open Failed - ordertype:"+(string)ordertype+", volume:"+(string)volume+", price:"+(string)price,__FUNCTION__);         
+         if (event.Warning ()) event.Warning ("Order "+(string)this.id+" Open Failed - ordertype:"+EnumToString(ordertype)+", volume:"+(string)volume+", price:"+(string)price+" current price: "+(string)_symbol.Ask()+"/"+(string)_symbol.Bid(),__FUNCTION__);         
       }
       
    } else {

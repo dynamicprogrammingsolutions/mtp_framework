@@ -98,7 +98,7 @@ class CTrailingStop : CAppObject
       //Print("TS sl:",_sl);
       int newsl = _sl;
       int orderprofit = in_order.GetProfitTicks();   
-      newsl = Calc(orderprofit, _sl);      
+      newsl = (int)Calc(orderprofit, _sl);      
       if (newsl != _sl)
       {
          in_order.SetStopLoss(getstoplossprice(in_order.symbol,in_order.GetType(),newsl,in_order.Price()));
@@ -128,11 +128,13 @@ class CTrailingStop : CAppObject
       double avgprice = in_orderarr.AvgPrice(select,STATESELECT_FILLED);
       if (avgprice == 0) return false;
       
-      int _sl;
+      int _sl = 0;
+      int i;
+      COrder* _order;
       if (select == ORDERSELECT_BUY) {
          double highestsl = 0;
-         for (int i = 0; i < in_orderarr.Total(); i++) {
-            COrder* _order = in_orderarr.At(i);
+         for (i = 0; i < in_orderarr.Total(); i++) {
+            _order = in_orderarr.At(i);
             if (!ordertype_select(select,_order.GetType())) continue;
             if (_order.GetStopLoss() != 0) highestsl = MathMaxNoZero(highestsl,_order.GetStopLoss());
          }
@@ -145,7 +147,7 @@ class CTrailingStop : CAppObject
          for (i = 0; i < in_orderarr.Total(); i++) {
             _order = in_orderarr.At(i);
             if (!ordertype_select(select,_order.GetType())) continue;
-            if (_order.GetStopLoss() != 0) lowestsl = MathMinNoZero(highestsl,_order.GetStopLoss());
+            if (_order.GetStopLoss() != 0) lowestsl = MathMinNoZero(lowestsl,_order.GetStopLoss());
          }
          if (lowestsl != 0)
             _sl = _symbol.InTicks(lowestsl-avgprice);
@@ -153,14 +155,14 @@ class CTrailingStop : CAppObject
       
       //int _sl = in_order.GetStopLossTicks();
       int newsl = _sl;
-      int orderprofit;
+      int orderprofit = 0;
       if (select == ORDERSELECT_BUY) {
          orderprofit = _symbol.InTicks(_symbol.Bid()-avgprice);
       }
       if (select == ORDERSELECT_SELL) {
          orderprofit = _symbol.InTicks(avgprice-_symbol.Ask());
       }
-      newsl = Calc(orderprofit, _sl);
+      newsl = (int)Calc(orderprofit, _sl);
       
       //Print("avgprice: "+avgprice+" orderprofit:"+orderprofit+" old sl: "+_sl+" newsl:"+newsl+" highestsl:"+lowestsl+" lowestsl:"+lowestsl+" ask:"+_symbol.Ask()+" bid:"+_symbol.Bid());
             

@@ -8,6 +8,11 @@ protected:
    string attachedtoticket;
    string stoploss_name;
    string takeprofit_name;
+   
+   double sl;
+   double tp;
+   bool sl_set;
+   bool tp_set;
 
 public:
    CAttachedOrderArray attachedorders;
@@ -39,7 +44,12 @@ public:
    
    bool CheckOrderInfo() { if (CheckPointer(orderinfo) == POINTER_INVALID) return(false); else return(true); }   
    ENUM_ORDER_TYPE GetType() { return(this.ordertype); }
-   int GetProfitTicks() { if (State() == ORDER_STATE_PLACED) return(0); else return(gettakeprofitticks(this.symbol, this.GetType(), this.CurrentPrice(), this.Price())); }
+   int GetProfitTicks() { if (State() == ORDER_STATE_PLACED) return(0); else return(gettakeprofitticks(this.symbol, this.GetType(), this.GetClosePrice(), this.GetOpenPrice())); }
+   
+   double GetClosePrice() {
+      if (lastcloseprice != 0) return lastcloseprice;
+      else return CurrentPrice();
+   }
    
    bool COrder::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price, const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0);
    
@@ -53,7 +63,13 @@ public:
    bool ModifyStopLoss(double _price);
    bool ModifyTakeProfit(double _price);
    bool RemoveStopLoss(); // TODO: not suitable for removing and then replacing the SL
-   double GetLots() {  return(volume-closedvolume);  }
+   
+   void SetStopLoss(const double value) { sl_set = true; if (executestate != ES_CANCELED) sl = value; else Print("Cannot change canceled order data (sl)"); }
+   void SetTakeProfit(const double value) { tp_set = true; if (executestate != ES_CANCELED) tp = value; else Print("Cannot change canceled order data (tp)"); }
+   virtual bool Modify();
+   
+   // This doesn't result the same as in MT4 for partially closed orders
+   double GetLots() { return(volume); }
 
    bool RemoveTakeProfit();
    int GetStopLossTicks();
@@ -218,6 +234,21 @@ bool COrder::RemoveTakeProfit()
       }
    }
    return(false); 
+}
+
+bool COrder::Modify()
+{
+   bool ret = true;
+   ret &= COrderBase::Modify();
+   if (sl_set) {
+      if (sl == 0) this.RemoveStopLoss();
+      else this.ModifyStopLoss(sl);
+   }
+   if (tp_set) {
+      if (tp == 0) this.RemoveTakeProfit();
+      else this.ModifyTakeProfit(tp);
+   }
+   return false;
 }
 
 int COrder::GetStopLossTicks()

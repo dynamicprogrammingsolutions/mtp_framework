@@ -2,14 +2,28 @@
 #include "OrderSet.mqh"
 
 class COrderSetArray : public CServiceProviderArrayObj {
+private:
+   CAppObject* newobjectcallback;
+
 public:
    virtual int Type() const { return classMT4OrderSetArray; }
 
 public:
+   COrderSetArray()
+   {
+      newobjectcallback = new COrderSet();
+   }
+   
+   COrderSetArray(CAppObject* newobj)
+   {
+      newobjectcallback = newobj;
+   }
 
    virtual COrderSet* NewSetObject()
    {
-      return new COrderSet();
+      CAppObject* obj;
+      newobjectcallback.callback(0,obj);
+      return obj;
    }
 
    COrderSet* NewSet()

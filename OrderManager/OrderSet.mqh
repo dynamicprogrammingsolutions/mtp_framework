@@ -4,6 +4,12 @@ public:
    virtual int Type() const { return classMT4OrderSet; }
 
 public:
+   bool callback(const int _id,CObject *&obj)
+   {
+      obj = new COrderSet();
+      return true;
+   }
+
    int id;
    static int highest_id;
    bool closed;

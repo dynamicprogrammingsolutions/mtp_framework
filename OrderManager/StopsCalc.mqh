@@ -157,41 +157,21 @@ public:
 class CEntryPrice : public CEntry {
 public:
    bool addspread;
-   double chartprice;
    CEntryPrice(double _price, bool _addspread = false) {
       addspread = _addspread;
-      chartprice = _price;
-      this.SetPrice(chartprice);
+      this.SetPrice(_price);
    }
-   virtual CStopsCalcInterface* SetPrice(double _price)
+   //TODO: move the spread adding to getprice
+   virtual double GetPrice()
    {
-      if (!addspread) {
-         CStopsCalc::SetPrice(_price);
-      } else if (symbol_set && symbol_set) {
-         if (ordertype_long(this.ordertype)) {
-            loadsymbol(this.symbol);
-            Print("adding spread to price "+(string)_price+" spread: "+(string)_symbol.SpreadInPrice());
-            CStopsCalc::SetPrice(_price+_symbol.SpreadInPrice());
-         } else {
-            CStopsCalc::SetPrice(_price);
-         }
+      double _price = CEntry::GetPrice();
+      if (addspread && ordertype_long(this.ordertype)) {
+         loadsymbol(this.symbol);
+         //Print("adding spread to price "+(string)_price+" spread: "+(string)_symbol.SpreadInPrice());
+         _price = _price+_symbol.SpreadInPrice();
       }
-      return (CStopsCalcInterface*)GetPointer(this);
+      return _price;
    }
-   virtual CStopsCalcInterface* SetOrderType(ENUM_ORDER_TYPE _ordertype)
-   {
-      CStopsCalc::SetOrderType(_ordertype);
-      if (!price_set && symbol_set)
-         this.SetPrice(chartprice);
-      return (CStopsCalcInterface*)GetPointer(this);
-   }
-   virtual CStopsCalcInterface* SetSymbol(string __symbol)
-   {
-      CStopsCalc::SetSymbol(__symbol);
-      if (!price_set && ordertype_set) 
-         this.SetPrice(chartprice);
-      return (CStopsCalcInterface*)GetPointer(this);
-   }  
 };
 
 class CStopLossTicks : public CStopLoss {

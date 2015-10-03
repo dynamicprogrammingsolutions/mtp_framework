@@ -35,15 +35,26 @@
 
 void register_services()
 {
-  global_app().RegisterService(new CEventHandler(),srvEvent,"eventhandler");
+   // logs events like error and notifications
+   global_app().RegisterService(new CEventHandler(),srvEvent,"eventhandler");
 
-  global_app().RegisterService(new CEventManager(),srvEventManager,"eventmanager");
-  global_app().RegisterService(new CCommandManager(),srvCommandManager,"commandmanager");
-
-  global_app().RegisterService(new CSymbolLoader(),srvSymbolLoader,"symbolloader");
-  global_app().RegisterService(new COrderManager(),srvOrderManager,"ordermanager");
-  global_app().RegisterService(new COrderFactory(),srvOrderFactory,"orderfactory");
-  global_app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
-  global_app().RegisterService(new CSymbolInfoVars(Symbol()),srvSymbolInfoVars,"symbolinfovars");
+   // manages events, handlers are registered by SetEventHandler() method
+   global_app().RegisterService(new CEventManager(),srvEventManager,"eventmanager");
+   
+   // manages commands, handlers are registered by SetCommandHandler() method
+   global_app().RegisterService(new CCommandManager(),srvCommandManager,"commandmanager");
+   
+   // loads symbol info
+   global_app().RegisterService(new CSymbolLoader(),srvSymbolLoader,"symbolloader");
+   
+   // manages orders
+   global_app().RegisterService(new COrderManager(),srvOrderManager,"ordermanager");
+   
+   // creates order objects
+   global_app().RegisterService(new COrderFactory(),srvOrderFactory,"orderfactory");
+   global_app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
+   
+   // sets global vars for symbol info easy access
+   global_app().RegisterService(new CSymbolInfoVars(Symbol()),srvSymbolInfoVars,"symbolinfovars");
   
 }
