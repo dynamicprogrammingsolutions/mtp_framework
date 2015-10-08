@@ -25,7 +25,7 @@ public:
       savetofile_at_terminal_close = true;
    
       loadfromfile = true;
-      datafile = "save_dps";
+      datafile = "save_dps_"+__DATETIME__;
    }
 
    virtual void OnInit()

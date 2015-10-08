@@ -79,6 +79,33 @@ class CTrailingStop : CAppObject
       return(ret);
    }
    
+   double CalcTP(double orderprofit, const double ordertp)
+   {
+      double ret = ordertp;
+   
+      double _tp = ordertp;
+      double newtp = _tp;
+   
+      if ((lockin != 0) && (orderprofit <= lockin) && (newtp > lockinprofit)) {
+         newtp = lockinprofit;
+      }
+      if (trailingstop_round && trailingstop > 0) {
+         double trailingstart = activate+trailingstop;
+         if (orderprofit <= trailingstart) {
+         	double profitfromstart = trailingstart-orderprofit;
+         	orderprofit = trailingstart-(MathFloor(profitfromstart/step)*step);
+         }
+      }
+      if ((trailingstop != 0) && (orderprofit <= activate) && ((newtp == EMPTY_VALUE) || (newtp >= orderprofit + trailingstop - step))
+      && ((stoptrailing == 0) || (orderprofit >= stoptrailing))) {
+         newtp = orderprofit + trailingstop;
+      }
+      if (newtp != _tp)
+      {
+         ret = newtp;
+      }
+      return(ret);
+   }
    
    bool OnOrder(ulong ticket)
    {
@@ -102,6 +129,28 @@ class CTrailingStop : CAppObject
       if (newsl != _sl)
       {
          in_order.SetStopLoss(getstoplossprice(in_order.symbol,in_order.GetType(),newsl,in_order.Price()));
+         in_order.Modify();
+         //Print("modified new sl:",in_order.sl);
+         ret = true;
+      }
+      return(ret);
+   }
+   
+   bool TrailingTPOnOrder(COrder* in_order)
+   {      
+      if (in_order == NULL) return(false);
+      //in_order.Update();
+      if (in_order.State() != ORDER_STATE_FILLED) return(false);
+      bool ret = false;
+      loadsymbol(in_order.symbol);
+      int _tp = in_order.GetTakeProfitTicks();
+      //Print("TS sl:",_sl);
+      int newtp = _tp;
+      int orderprofit = in_order.GetProfitTicks();   
+      newtp = (int)CalcTP(orderprofit, _tp);      
+      if (newtp != _tp)
+      {
+         in_order.SetTakeProfit(gettakeprofitprice(in_order.symbol,in_order.GetType(),newtp,in_order.Price()));
          in_order.Modify();
          //Print("modified new sl:",in_order.sl);
          ret = true;
@@ -201,6 +250,22 @@ class CTrailingStop : CAppObject
          if (!ordertype_select(type,_order.GetType())) continue;
          if (!state_select(state,_order.State())) continue;
          OnOrder(_order);
+      }
+      return(ret);
+   }
+   
+   bool TrailingTPOnAll(ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY)
+   {
+      if (trailingstop == 0 && lockin == 0) return(false);
+      
+      //if (event.Debug ()) event.Debug ("Trailing Stop",__FUNCTION__);
+      bool ret = false;
+      for (int i=0; i < om.OrdersTotal(); i++)
+      {
+         COrder* _order = om.GetOrderByIdx(i);
+         if (!ordertype_select(type,_order.GetType())) continue;
+         if (!state_select(state,_order.State())) continue;
+         TrailingTPOnOrder(_order);
       }
       return(ret);
    }

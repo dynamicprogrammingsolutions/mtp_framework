@@ -161,13 +161,11 @@ public:
       addspread = _addspread;
       this.SetPrice(_price);
    }
-   //TODO: move the spread adding to getprice
    virtual double GetPrice()
    {
       double _price = CEntry::GetPrice();
       if (addspread && ordertype_long(this.ordertype)) {
          loadsymbol(this.symbol);
-         //Print("adding spread to price "+(string)_price+" spread: "+(string)_symbol.SpreadInPrice());
          _price = _price+_symbol.SpreadInPrice();
       }
       return _price;
@@ -185,8 +183,19 @@ public:
 
 class CStopLossPrice : public CStopLoss {
 public:
-   CStopLossPrice(double _price) {
+   bool addspread;
+   CStopLossPrice(double _price, bool _addspread = false) {
+      addspread = _addspread;
       this.SetPrice(_price);
+   }
+   virtual double GetPrice()
+   {
+      double _price = CStopLoss::GetPrice();
+      if (addspread && ordertype_short(this.ordertype)) {
+         loadsymbol(this.symbol);
+         _price = _price+_symbol.SpreadInPrice();
+      }
+      return _price;
    }
 };
 
@@ -200,8 +209,19 @@ public:
 
 class CTakeProfitPrice : public CTakeProfit {
 public:
-   CTakeProfitPrice(double _price) {
+   bool addspread;
+   CTakeProfitPrice(double _price, bool _addspread = false) {
+      addspread = _addspread;
       this.SetPrice(_price);
+   }
+   virtual double GetPrice()
+   {
+      double _price = CTakeProfit::GetPrice();
+      if (addspread && ordertype_short(this.ordertype)) {
+         loadsymbol(this.symbol);
+         _price = _price+_symbol.SpreadInPrice();
+      }
+      return _price;
    }
 };
 

@@ -66,6 +66,12 @@ public:
    
    void SetStopLoss(const double value) { sl_set = true; if (executestate != ES_CANCELED) sl = value; else Print("Cannot change canceled order data (sl)"); }
    void SetTakeProfit(const double value) { tp_set = true; if (executestate != ES_CANCELED) tp = value; else Print("Cannot change canceled order data (tp)"); }
+   
+   bool Closed() { return State()==ORDER_STATE_FILLED && this.closed; }
+   bool Deleted() { return State()==ORDER_STATE_CANCELED && this.closed; }
+   bool ClosedOrDeleted() { return Closed() || Deleted(); }
+
+   
    virtual bool Modify();
    
    // This doesn't result the same as in MT4 for partially closed orders
