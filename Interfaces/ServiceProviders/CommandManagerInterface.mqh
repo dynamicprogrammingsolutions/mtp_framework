@@ -1,4 +1,6 @@
 //
+#include "..\..\Loader.mqh"
+
 class CCommandManagerInterface : public CServiceProvider
 {
 public:

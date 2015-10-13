@@ -1,4 +1,5 @@
 //
+#include "..\..\Loader.mqh"
 
 class CSymbolLoaderInterface : public CServiceProviderArrayObj
 {

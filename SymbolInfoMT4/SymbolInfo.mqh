@@ -102,7 +102,7 @@ public:
    //--- tick parameters
    int               Digits()                       const { return(m_digits);             }
    double            Point()                        const { return(m_point);              }
-   double            TickValue()                    const { return(m_tick_value);         }
+   virtual double    TickValue()                    { return(m_tick_value);         }
    double            TickValueProfit()              const { return(m_tick_value_profit);  }
    double            TickValueLoss()                const { return(m_tick_value_loss);    }
    double            TickSize()                     { return(m_tick_size);          }

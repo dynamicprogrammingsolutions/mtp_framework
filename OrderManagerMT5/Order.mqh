@@ -4,6 +4,7 @@ class COrder : public COrderBase
 {
 public:
    virtual int Type() const { return classMT5Order; }
+   
 protected:
    string attachedtoticket;
    string stoploss_name;
@@ -18,6 +19,8 @@ public:
    CAttachedOrderArray attachedorders;
 
    bool closed;
+   bool close_attempted;
+   
    bool do_not_archive;
    bool do_not_delete;
 
@@ -43,20 +46,22 @@ public:
    }
    
    bool CheckOrderInfo() { if (CheckPointer(orderinfo) == POINTER_INVALID) return(false); else return(true); }   
-   ENUM_ORDER_TYPE GetType() { return(this.ordertype); }
-   int GetProfitTicks() { if (State() == ORDER_STATE_PLACED) return(0); else return(gettakeprofitticks(this.symbol, this.GetType(), this.GetClosePrice(), this.GetOpenPrice())); }
    
-   double GetClosePrice() {
+   virtual int GetProfitTicks() { if (State() == ORDER_STATE_PLACED) return(0); else return(gettakeprofitticks(this.symbol, this.GetType(), this.GetClosePrice(), this.GetOpenPrice())); }
+   
+   virtual double GetClosePrice() {
       if (lastcloseprice != 0) return lastcloseprice;
       else return CurrentPrice();
    }
    
-   bool COrder::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price, const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0);
+   virtual datetime GetCloseTime() { return lastclosetime; }
    
-   bool CreateAttached(ENUM_ORDER_TYPE _ordertype, double _volume, double _price, double _limit_price, string _name, string _comment);
+   virtual bool NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price, const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0);
    
-   bool AddStopLoss(double _price, double stopvolume = 0);
-   bool AddTakeProfit(double _price, double stopvolume = 0);
+   virtual bool CreateAttached(ENUM_ORDER_TYPE _ordertype, double _volume, double _price, double _limit_price, string _name, string _comment);
+   
+   virtual bool AddStopLoss(double _price, double stopvolume = 0);
+   virtual bool AddTakeProfit(double _price, double stopvolume = 0);
    
    bool AddStopLoss(CStopLoss* _stoploss, double stopvolume = 0);
    
@@ -64,27 +69,27 @@ public:
    bool ModifyTakeProfit(double _price);
    bool RemoveStopLoss(); // TODO: not suitable for removing and then replacing the SL
    
-   void SetStopLoss(const double value) { sl_set = true; if (executestate != ES_CANCELED) sl = value; else Print("Cannot change canceled order data (sl)"); }
-   void SetTakeProfit(const double value) { tp_set = true; if (executestate != ES_CANCELED) tp = value; else Print("Cannot change canceled order data (tp)"); }
+   virtual void SetStopLoss(const double value) { sl_set = true; if (executestate != ES_CANCELED) sl = value; else Print("Cannot change canceled order data (sl)"); }
+   virtual void SetTakeProfit(const double value) { tp_set = true; if (executestate != ES_CANCELED) tp = value; else Print("Cannot change canceled order data (tp)"); }
    
-   bool Closed() { return State()==ORDER_STATE_FILLED && this.closed; }
-   bool Deleted() { return State()==ORDER_STATE_CANCELED && this.closed; }
-   bool ClosedOrDeleted() { return Closed() || Deleted(); }
+   virtual bool Closed() { return State()==ORDER_STATE_FILLED && this.closed; }
+   virtual bool Deleted() { return State()==ORDER_STATE_CANCELED && this.closed; }
+   virtual bool ClosedOrDeleted() { return Closed() || Deleted(); }
 
    
    virtual bool Modify();
    
    // This doesn't result the same as in MT4 for partially closed orders
-   double GetLots() { return(volume); }
+   virtual double GetLots() { return(volume); }
 
    bool RemoveTakeProfit();
-   int GetStopLossTicks();
-   double GetStopLoss();
+   virtual int GetStopLossTicks();
+   virtual double GetStopLoss();
    CAttachedOrder* GetStopLossOrder();
-   int GetTakeProfitTicks();
-   double GetTakeProfit();
+   virtual int GetTakeProfitTicks();
+   virtual double GetTakeProfit();
    CAttachedOrder *GetTakeProfitOrder();
-   bool Close(double closevolume = 0, double closeprice = 0);
+   virtual bool Close(double closevolume = 0, double closeprice = 0);
    virtual void OnTick();
    
    
@@ -305,6 +310,8 @@ CAttachedOrder* COrder::GetTakeProfitOrder()
 bool COrder::Close(double closevolume = 0, double closeprice = 0)
 {
    activity = activity | (ushort)ACTIVITY_CLOSE;
+   close_attempted = true;
+   
    if (event.Verbose ()) event.Verbose ("Closing Order closevolume="+(string)closevolume+" closeprice="+(string)closeprice,__FUNCTION__);
    //CTrade trade;
    ENUM_ORDER_TYPE closeordertype;
@@ -344,7 +351,8 @@ bool COrder::Close(double closevolume = 0, double closeprice = 0)
       lastcloseprice = closeprice;
       lastclosetime = TimeCurrent();
       
-      this.Update(); 
+      this.OnTick();
+      
       return(true);
    } else {
       if (event.Error ()) event.Error ("Failed to create attached order type:"+(string)closeordertype+" volume:"+(string)closevolume+" price:"+(string)closeprice,__FUNCTION__);
@@ -375,7 +383,7 @@ void COrder::OnTick()
             switch (attachedorder.executestate) {
             case ES_NOT_EXECUTED:
                if (event.Info ()) event.Info ("main order "+(string)this.ticket+" executed, executing attached order "+(string)attachedorder.ticket,__FUNCTION__);
-               if (!attachedorder.Execute()) {
+               if (!attachedorder.Execute() && !close_attempted) {
                   if (event.Warning ()) event.Warning ("attached order failed, closing main order "+(string)this.ticket,__FUNCTION__);
                   this.Close(volume);               
                }

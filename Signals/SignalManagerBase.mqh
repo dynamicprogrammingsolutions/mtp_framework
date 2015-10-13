@@ -44,6 +44,7 @@ public:
          case SIGNAL_SELL: entrymethod.OnSellSignal(mainsignal.valid); break;
          case SIGNAL_BOTH: entrymethod.OnBothSignal(mainsignal.valid); break;
       }
+      
       mainsignal.OnTick();
    }
    

@@ -1,5 +1,5 @@
 //
-class COrderBase : public COrderBaseInterface
+class COrderBase : public COrderInterface
 {
 public:
    virtual int Type() const { return classMT5OrderBase; }
@@ -105,9 +105,9 @@ public:
    bool GetOrderInfoB();
    bool CheckOrderInfo() { if (CheckPointer(orderinfo) == POINTER_INVALID) return(false); else return(true); }   
 
-   bool Execute();
+   virtual bool Execute();
    bool WaitForExecute();
-   bool Cancel();
+   virtual bool Cancel();
    
    virtual bool Modify();
    bool Modify(double m_price, ENUM_ORDER_TYPE_TIME m_type_time, datetime m_expiration);
@@ -115,11 +115,14 @@ public:
    virtual bool Update();
    virtual void OnTick();
 
-   ulong GetTicket() { return(this.ticket); }
-   int GetMagicNumber() { return(this.magic); }
-   string GetSymbol() { return(this.symbol); }
-   string GetComment() { return(this.comment); }
-      
+   virtual long GetTicket() { return((long)this.ticket); }
+   virtual int GetMagicNumber() { return(this.magic); }
+   virtual string GetSymbol() { return(this.symbol); }
+   virtual string GetComment() { return(this.comment); }
+   
+   virtual ENUM_ORDER_TYPE GetType() { return ordertype; }
+   virtual datetime GetExpiration() { return expiration; }
+   
    bool Select() { if (this.executestate == ES_EXECUTED) return(GetOrderInfoB()); else return(false); } 
    
    ENUM_ORDER_STATE State();
@@ -127,17 +130,18 @@ public:
    
    double Price();
    double CurrentPrice();
-   datetime GetOpenTime() { return(MathMax(this.executetime,this.filltime)); }
-   double GetOpenPrice() { return(this.price); }
+   virtual datetime GetOpenTime() { return(MathMax(this.executetime,this.filltime)); }
+   virtual double GetOpenPrice() { return(this.price); }
    
-   void SetOrderType(const ENUM_ORDER_TYPE value) { if (executestate == ES_NOT_EXECUTED) ordertype=value; else Print("Cannot change executed order data (ordertype)"); }
-   void SetMagic(const int value) { if (executestate == ES_NOT_EXECUTED) magic=value; else Print("Cannot change executed order data (magic)"); }
-   void SetSymbol(const string value) { if (executestate == ES_NOT_EXECUTED) symbol=value; else Print("Cannot change executed order data (symbol)"); }
-   void SetComment(const string value) { if (executestate == ES_NOT_EXECUTED) comment=value; else Print("Cannot change executed order data (comment)"); }
-   void SetLots(const double value) { if (executestate == ES_NOT_EXECUTED) volume=value; else Print("Cannot change executed order data (lots)"); }
+   virtual void SetOrderType(const ENUM_ORDER_TYPE value) { if (executestate == ES_NOT_EXECUTED) ordertype=value; else Print("Cannot change executed order data (ordertype)"); }
+   virtual void SetMagic(const int value) { if (executestate == ES_NOT_EXECUTED) magic=value; else Print("Cannot change executed order data (magic)"); }
+   virtual void SetSymbol(const string value) { if (executestate == ES_NOT_EXECUTED) symbol=value; else Print("Cannot change executed order data (symbol)"); }
+   virtual void SetComment(const string value) { if (executestate == ES_NOT_EXECUTED) comment=value; else Print("Cannot change executed order data (comment)"); }
+   virtual void SetLots(const double value) { if (executestate == ES_NOT_EXECUTED) volume=value; else Print("Cannot change executed order data (lots)"); }
+   virtual void SetExpiration(const datetime value) { expiration_set = true; if (executestate != ES_CANCELED) expiration = value; else Print("Cannot change canceled order data (expiration)"); }
    
-   void SetExpiration(const datetime value) { expiration_set = true; if (executestate != ES_CANCELED) expiration = value; else Print("Cannot change canceled order data (expiration)"); }
-   void SetPrice(const double value) { price_set = true; if (executestate != ES_CANCELED) price = value; else Print("Cannot change canceled order data (price)"); }
+   virtual void SetPrice(const double value) { price_set = true; if (executestate != ES_CANCELED) price = value; else Print("Cannot change canceled order data (price)"); }
+   
    void SetTypeTime(const ENUM_ORDER_TYPE_TIME value) { typetime_set = true; if (executestate != ES_CANCELED) type_time = value; else Print("Cannot change canceled order data (typetime)"); }
    
    static void DeleteIf(CStopLoss* obj) { if (obj.DeleteAfterUse()) delete obj; }
@@ -315,7 +319,7 @@ bool COrderBase::Cancel()
    if (executestate == ES_EXECUTED) {
       if (state <= ORDER_STATE_PLACED) {
          if (trade.OrderDelete(ticket)) {
-            Update();
+            this.OnTick();
          } else {
             if (event.Warning ()) event.Warning ("Order Delete Failed",__FUNCTION__);
          }
@@ -330,7 +334,7 @@ bool COrderBase::Cancel()
       executestate = ES_CANCELED;
       if (event.Info ()) event.Info ("Order Not Yet Executed, Execution Canceled",__FUNCTION__);
    } else if (executestate == ES_CANCELED) {
-      if (event.Info ()) event.Info ("Order Not Executed, Execution Already Canceled",__FUNCTION__);
+      //if (event.Info ()) event.Info ("Order Not Executed, Execution Already Canceled",__FUNCTION__);
    } else {
       if (event.Error ()) event.Error ("Invalid Execute State",__FUNCTION__);
       return(false);

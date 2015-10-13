@@ -1,5 +1,6 @@
 //
 
+#include "TestManager\Loader.mqh"
 #include "EventHandler\EventHandler.mqh"
 #include "SymbolLoader\SymbolLoader.mqh"
 #ifdef __MQL4__
@@ -30,6 +31,8 @@
 #include "CommandManager\CommandManager.mqh"
 
 #include "libraries\comments.mqh"
+
+#include "Tests\Loader.mqh"
 
 
 

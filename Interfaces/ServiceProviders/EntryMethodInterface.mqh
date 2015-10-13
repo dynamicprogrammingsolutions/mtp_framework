@@ -1,3 +1,5 @@
+//
+#include "..\..\Loader.mqh"
 
 class CEntryMethodInterface : public CServiceProvider
 {

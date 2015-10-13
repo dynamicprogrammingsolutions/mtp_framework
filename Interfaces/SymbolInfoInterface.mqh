@@ -20,6 +20,7 @@ class CSymbolInfoInterface : public CAppObject
       virtual int MinStopLoss() { AbstractFunctionWarning(__FUNCTION__); return(0); }
       virtual int SpreadInTicks() { AbstractFunctionWarning(__FUNCTION__); return(0); }
       virtual double SpreadInPrice() { AbstractFunctionWarning(__FUNCTION__); return(0); }
+      virtual double TickValue() { AbstractFunctionWarning(__FUNCTION__); return(0); }
       virtual double LotValue() { AbstractFunctionWarning(__FUNCTION__); return(0); }
       virtual bool IsFractional(double treshold = 0) { AbstractFunctionWarning(__FUNCTION__); return false; }
       virtual double ConvertFractional(double pips) { AbstractFunctionWarning(__FUNCTION__); return 0; }

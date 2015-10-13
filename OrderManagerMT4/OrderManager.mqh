@@ -144,8 +144,8 @@ public:
    double COrderManager::TotalProfit(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1);
    double COrderManager::TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1, bool _commission = true, bool swap = true);
    
-   virtual COrderBaseInterface* NewOrderObject() { return app.orderfactory.Create(); }
-   virtual COrderBaseInterface* NewAttachedOrderObject() { return app.attachedorderfactory.Create(); }
+   virtual COrderInterface* NewOrderObject() { return app.orderfactory.Create(); }
+   virtual COrderInterface* NewAttachedOrderObject() { return app.attachedorderfactory.Create(); }
    
    bool GetOrders(ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY, string in_symbol = "", int in_magic = -1, bool no_loop_and_reset = false)
    {

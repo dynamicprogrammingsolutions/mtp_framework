@@ -5,3 +5,4 @@ case srvOrderFactory: orderfactory = service; break;
 case srvAttachedOrderFactory: attachedorderfactory = service; break;
 case srvEventManager: eventmanager = service; break;
 case srvCommandManager: commandmanager = service; break;
+case srvTestManager: testmanager = service; break;

@@ -61,7 +61,10 @@ public:
    }
    virtual void UpdateSet(COrderSet* set, int idx)
    {
-      if (set.closed) this.Delete(idx);
+      if (set.closed) {
+	 set.FreeMode(false);
+	 this.Delete(idx);
+      }
    }
    virtual void AfterUpdate()
    {

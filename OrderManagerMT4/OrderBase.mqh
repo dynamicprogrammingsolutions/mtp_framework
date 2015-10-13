@@ -15,7 +15,7 @@
 #include "..\libraries\commonfunctions.mqh"
 #include "..\libraries\file.mqh"
 
-class COrderBase : public COrderBaseInterface
+class COrderBase : public COrderInterface
 {
 public:
    virtual int Type() const { return classMT4OrderBase; }
@@ -152,10 +152,10 @@ public:
    bool GetOrderInfoB();
    bool CheckOrderInfo() { if (CheckPointer(orderinfo) == POINTER_INVALID) return(false); else return(true); }   
    
-   bool Execute();
-   bool Cancel();
-   bool COrderBase::Close(double closevolume = 0, double closeprice = 0);
-   bool Modify();
+   virtual bool Execute();
+   virtual bool Cancel();
+   virtual bool Close(double closevolume = 0, double closeprice = 0);
+   virtual bool Modify();
    bool CheckForSimulation(double currentprice);
    virtual bool Update();
    virtual void OnTick();
@@ -167,10 +167,10 @@ public:
    void DeleteVStopLines();
    void UpdateVStopLines();
    
-   int GetTicket() { return(this.ticket); }
-   int GetMagicNumber() { return(this.magic); }
-   string GetSymbol() { return(this.symbol); }
-   string GetComment() { return(this.comment); }
+   virtual long GetTicket() { return((long)this.ticket); }
+   virtual int GetMagicNumber() { return(this.magic); }
+   virtual string GetSymbol() { return(this.symbol); }
+   virtual string GetComment() { return(this.comment); }
    
    
    bool Select() { if (this.executestate != ES_NOT_EXECUTED) return(GetOrderInfoB()); else return(false); } 
@@ -203,42 +203,42 @@ public:
    }
    
    // Change After State Change:
-   ENUM_ORDER_TYPE GetType() { if (!CheckOrderInfo()) return(this.ordertype); else return(orderinfo.GetType()); }
+   virtual ENUM_ORDER_TYPE GetType() { if (!CheckOrderInfo()) return(this.ordertype); else return(orderinfo.GetType()); }
    
-   datetime GetOpenTime() { if (!CheckOrderInfo()) return(MathMax(this.executetime,this.filltime)); else return(orderinfo.GetOpenTime()); }
+   virtual datetime GetOpenTime() { if (!CheckOrderInfo()) return(MathMax(this.executetime,this.filltime)); else return(orderinfo.GetOpenTime()); }
    
-   double GetOpenPrice() { if (!CheckOrderInfo()) return(this.price); else return(orderinfo.GetOpenPrice()); }
+   virtual double GetOpenPrice() { if (!CheckOrderInfo()) return(this.price); else return(orderinfo.GetOpenPrice()); }
    
-   double GetLots() { if (!CheckOrderInfo()) return(this.volume); else return(orderinfo.GetLots()); }
-   double GetClosePrice() { if (!CheckOrderInfo()) return(0); else return(orderinfo.GetClosePrice()); }
-   datetime GetCloseTime() { if (!CheckOrderInfo()) return(-1); else return(orderinfo.GetCloseTime()); }
+   virtual double GetLots() { if (!CheckOrderInfo()) return(this.volume); else return(orderinfo.GetLots()); }
+   virtual double GetClosePrice() { if (!CheckOrderInfo()) return(0); else return(orderinfo.GetClosePrice()); }
+   virtual datetime GetCloseTime() { if (!CheckOrderInfo()) return(-1); else return(orderinfo.GetCloseTime()); }
 
    double GetInternalTP() { return(tp); }
    double GetInternalSL() { return(sl); }
    double GetInternalPrice() { return(price); }
    double GetInternalLot() { return(volume); }
 
-   int GetStopLossTicks() { double _sl = this.GetStopLoss(); return(_sl==0?EMPTY_VALUE:getstoplossticks(this.symbol, this.GetType(), _sl, this.Price())); }   
-   double GetStopLoss() { if (this.sl_virtual || executestate == ES_VIRTUAL) return(sl); if (!CheckOrderInfo()) return(0); return(this.orderinfo.GetStopLoss()); }   
-   int GetTakeProfitTicks() { double _tp = this.GetTakeProfit(); return(_tp==0?EMPTY_VALUE:gettakeprofitticks(this.symbol, this.GetType(), _tp, this.Price())); }
-   double GetTakeProfit() { if (this.tp_virtual || executestate == ES_VIRTUAL) return(tp); if (!CheckOrderInfo()) return(0); return(this.orderinfo.GetTakeProfit()); }   
-   int GetProfitTicks() { if (State() == ORDER_STATE_PLACED) return(0); else return(gettakeprofitticks(this.symbol, this.GetType(), this.CurrentPrice(), this.Price())); }
+   virtual int GetStopLossTicks() { double _sl = this.GetStopLoss(); return(_sl==0?EMPTY_VALUE:getstoplossticks(this.symbol, this.GetType(), _sl, this.Price())); }   
+   virtual double GetStopLoss() { if (this.sl_virtual || executestate == ES_VIRTUAL) return(sl); if (!CheckOrderInfo()) return(0); return(this.orderinfo.GetStopLoss()); }   
+   virtual int GetTakeProfitTicks() { double _tp = this.GetTakeProfit(); return(_tp==0?EMPTY_VALUE:gettakeprofitticks(this.symbol, this.GetType(), _tp, this.Price())); }
+   virtual double GetTakeProfit() { if (this.tp_virtual || executestate == ES_VIRTUAL) return(tp); if (!CheckOrderInfo()) return(0); return(this.orderinfo.GetTakeProfit()); }   
+   virtual int GetProfitTicks() { if (State() == ORDER_STATE_PLACED) return(0); else return(gettakeprofitticks(this.symbol, this.GetType(), this.CurrentPrice(), this.Price())); }
    //int GetProfitMoney() { if (!CheckOrderInfo()) return(0); return(this.orderinfo.Get()); }
 
    // Change after select:   
    //ENUM_ORDER_STATE State() { if (!CheckOrderInfo()) return(this.state); else return(orderinfo.State()); }
-   datetime GetExpiration() { if (!CheckOrderInfo()) return(this.expiration); else return(orderinfo.GetExpiration()); }
+   virtual datetime GetExpiration() { if (!CheckOrderInfo()) return(this.expiration); else return(orderinfo.GetExpiration()); }
 
-   void SetOrderType(const ENUM_ORDER_TYPE value) { if (executestate == ES_NOT_EXECUTED) ordertype=value; else Print("Cannot change executed order data (ordertype)"); }
-   void SetMagic(const int value) { if (executestate == ES_NOT_EXECUTED) magic=value; else Print("Cannot change executed order data (magic)"); }
-   void SetSymbol(const string value) { if (executestate == ES_NOT_EXECUTED) symbol=value; else Print("Cannot change executed order data (symbol)"); }
-   void SetComment(const string value) { if (executestate == ES_NOT_EXECUTED) comment=value; else Print("Cannot change executed order data (comment)"); }
-   void SetLots(const double value) { if (executestate == ES_NOT_EXECUTED) volume=value; else Print("Cannot change executed order data (lots)"); }
-   void SetExpiration(const datetime value) { expiration_set = true; if (executestate != ES_CANCELED) expiration = value; else Print("Cannot change canceled order data (expiration)"); }
+   virtual void SetOrderType(const ENUM_ORDER_TYPE value) { if (executestate == ES_NOT_EXECUTED) ordertype=value; else Print("Cannot change executed order data (ordertype)"); }
+   virtual void SetMagic(const int value) { if (executestate == ES_NOT_EXECUTED) magic=value; else Print("Cannot change executed order data (magic)"); }
+   virtual void SetSymbol(const string value) { if (executestate == ES_NOT_EXECUTED) symbol=value; else Print("Cannot change executed order data (symbol)"); }
+   virtual void SetComment(const string value) { if (executestate == ES_NOT_EXECUTED) comment=value; else Print("Cannot change executed order data (comment)"); }
+   virtual void SetLots(const double value) { if (executestate == ES_NOT_EXECUTED) volume=value; else Print("Cannot change executed order data (lots)"); }
+   virtual void SetExpiration(const datetime value) { expiration_set = true; if (executestate != ES_CANCELED) expiration = value; else Print("Cannot change canceled order data (expiration)"); }
    
-   void SetPrice(const double value) { price_set = true; if (executestate != ES_CANCELED) price = value; else Print("Cannot change canceled order data (price)"); }
-   void SetStopLoss(const double value) { sl_set = true; if (executestate != ES_CANCELED) sl = value; else Print("Cannot change canceled order data (sl)"); }
-   void SetTakeProfit(const double value) { tp_set = true; if (executestate != ES_CANCELED) tp = value; else Print("Cannot change canceled order data (tp)"); }
+   virtual void SetPrice(const double value) { price_set = true; if (executestate != ES_CANCELED) price = value; else Print("Cannot change canceled order data (price)"); }
+   virtual void SetStopLoss(const double value) { sl_set = true; if (executestate != ES_CANCELED) sl = value; else Print("Cannot change canceled order data (sl)"); }
+   virtual void SetTakeProfit(const double value) { tp_set = true; if (executestate != ES_CANCELED) tp = value; else Print("Cannot change canceled order data (tp)"); }
    
    bool SetStopLoss(CStopLoss* _sl, bool check = false);
    bool SetTakeProfit(CTakeProfit* _tp, bool check = false);

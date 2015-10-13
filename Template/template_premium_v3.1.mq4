@@ -29,6 +29,7 @@
 
 input double lotsize = 0.1;
 
+input double entrypips = 0;
 input double stoploss = 20;
 input double takeprofit = 40;
 
@@ -67,6 +68,7 @@ input int _magic = 1234;
 input int slippage = 3;
 
 input bool printcomment = false;
+input bool run_tests = false;
 
 ulong benchmark_sum;
 ulong benchmark_cnt;
@@ -183,6 +185,12 @@ public:
       delete mainsignal;
    }
    
+   virtual void OnTick()
+   {
+      if (App().testmanager != NULL && App().testmanager.IsRunning()) return;
+      CSignalManagerBase::OnTick();
+   }
+   
 };
 
 class CEntryMethod : public CEntryMethodBase
@@ -193,14 +201,20 @@ public:
    virtual bool BuySignalFilter(bool valid)
    {
       if (!short_enabled) return false;
-      if (ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED) >= maxorders) return false;
+      if (ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED) >= maxorders) {
+         Print("cnt orders: "+(string)ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED));
+         return false;
+      }
       return valid;
    }
    
    virtual bool SellSignalFilter(bool valid)
    {
       if (!long_enabled) return false;
-      if (ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED) >= maxorders) return false;
+      if (ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED) >= maxorders) {
+         Print("cnt orders: "+(string)ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED));
+         return false;
+      }
       return valid;
    }
    virtual bool CloseOpposite()
@@ -215,6 +229,10 @@ public:
    CStopLoss* sl;
    CTakeProfit* tp;
    CMoneyManagement* mm;
+   CEntry* entry;
+   
+   ENUM_ORDER_TYPE buy_cmd;
+   ENUM_ORDER_TYPE sell_cmd;
 
    virtual void Initalize()
    {
@@ -226,33 +244,49 @@ public:
       mm = new CMoneyManagementFixed(lotsize);
       sl = new CStopLossTicks(convertfract(stoploss));
       tp = new CTakeProfitTicks(convertfract(takeprofit));
+      if (entrypips == 0) {
+         entry = NULL;
+         buy_cmd = ORDER_TYPE_BUY;
+         sell_cmd = ORDER_TYPE_SELL;
+         Print("using market orders");
+      } else if (entrypips > 0) {
+         entry = new CEntryTicks(convertfract(entrypips));
+         buy_cmd = ORDER_TYPE_BUY_STOP;
+         sell_cmd = ORDER_TYPE_SELL_STOP;
+         Print("using stop orders");
+      } else if (entrypips < 0) {
+         entry = new CEntryTicks(-convertfract(entrypips));
+         buy_cmd = ORDER_TYPE_BUY_LIMIT;
+         sell_cmd = ORDER_TYPE_SELL_LIMIT;
+         Print("using limit orders");
+      }
    }
 
    virtual int Type() const { return classOrderCommandHandler; }
    
    virtual void CloseAll()
    {
-      ordermanager.CloseAll(ORDERSELECT_ANY,STATESELECT_FILLED);
+      ordermanager.CloseAll(ORDERSELECT_ANY,STATESELECT_ONGOING);
    }
 
    virtual void CloseBuy()
    {
-      ordermanager.CloseAll(ORDERSELECT_LONG,STATESELECT_FILLED);
+      ordermanager.CloseAll(ORDERSELECT_LONG,STATESELECT_ONGOING);
    }
    
    virtual void CloseSell()
    {
-      ordermanager.CloseAll(ORDERSELECT_SHORT,STATESELECT_FILLED);
+      ordermanager.CloseAll(ORDERSELECT_SHORT,STATESELECT_ONGOING);
    }
    
    virtual CObject* OpenBuy()
    {
-      return ordermanager.NewOrder(symbol,ORDER_TYPE_BUY,mm,NULL,sl,tp);
+      return ordermanager.NewOrder(symbol,buy_cmd,mm,entry,sl,tp);
    }
    
    virtual CObject* OpenSell()
    {
-      return ordermanager.NewOrder(symbol,ORDER_TYPE_SELL,mm,NULL,sl,tp);   
+      return ordermanager.NewOrder(symbol,sell_cmd,mm,entry,sl,tp);   
    }
 };
 
@@ -354,11 +388,12 @@ class COrderEventListener : public CAppObject
 {
    virtual bool callback(const int id, CObject*& object)
    {
+      COrder* order;
       if (id == COrderCommandHandlerBase::EventOpeningBuy) {
          Print("opening buy");
       }
       if (id == COrderCommandHandlerBase::EventOpenedBuy) {
-         COrder* order = object;
+         order = object;
          Print("opened buy: ",order.id);
       }
       if (id == COrderCommandHandlerBase::EventOpeningSell) {
@@ -411,7 +446,7 @@ public:
       #ifdef __MQL4__
          ((COrderManager*)(application.ordermanager)).LoadOpenOrders(Symbol(),_magic);
       #endif
-            
+      
    }
    
    virtual void OnDeinit()
@@ -452,6 +487,12 @@ int OnInit()
       application.RegisterService(new COrderCommandHandler(),srvOrderCommandHandler,"ordercommandhandler");
       application.RegisterService(new CChartComment(),srvNone,"chartcomment");
       application.RegisterService(new CMain(),srvMain,"main");
+      
+      if (run_tests) {
+         application.RegisterService(new CTestManager(), srvTestManager, "testmanager");
+         application.testmanager.AddTest(new CTestSymbolInfo(new CMTPSymbolInfo(), Symbol()));
+         application.testmanager.Start();
+      }
 
       application.Initalize();
       
