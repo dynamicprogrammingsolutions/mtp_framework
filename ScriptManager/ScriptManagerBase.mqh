@@ -57,9 +57,11 @@ public:
    }
    virtual void OnTick()
    {
+#ifdef __MQL4__
       if (IsTesting() && IsVisualMode()) {
          CheckObjects();
       }
+#endif
    }   
    virtual void OnChartEvent(int id, long lparam, double dparam, string sparam)
    {   
