@@ -174,27 +174,37 @@ public:
       return gotorder;
    }
    
-   void LoadOpenOrders(string __symbol, int __magic)
+   int LoadOpenOrders(string __symbol, int __magic)
    {
-      for (int i = OrdersTotal()-1; i >= 0; i--) {
+      int cnt = 0;
+      for (int i = OriginalOrdersTotal()-1; i >= 0; i--) {
          if (OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) {
             COrder* exord;
             exord = ExistingOrder(OrderTicket());
-            if (exord != NULL) {  
+            if (exord != NULL) {
+               Print("new order found: ticket "+exord.GetTicket());
                if (exord.symbol != __symbol || exord.magic != __magic) {         
                   int idx = GetIdxByTicket(exord.GetTicket());
                   if (idx >= 0)
                      orders.Delete(idx);
-               }                     
+               } else {
+                  cnt++;
+               }                 
             } else {
                //Print("Order Adding Failed");
             }
          }
       }
       AssignAttachedOrders();
+      return cnt;
    }
 
 };
+   
+int OriginalOrdersTotal()
+{
+   return OrdersTotal();
+}
 
 //COrderManager* om;
 
