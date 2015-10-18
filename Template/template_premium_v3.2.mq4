@@ -32,7 +32,7 @@ ToDo:
 */
 
 #include <mtp_framework_1.3\Loader.mqh>
-#include <mtp_framework_1.3\DefaultServices.mqh>   
+#include <mtp_framework_1.3\EADefaultLoader.mqh>   
 
 input double lotsize = 0.1;
 
@@ -195,7 +195,6 @@ public:
    {
       if (!short_enabled) return false;
       if (ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED) >= maxorders) {
-         Print("cnt orders: "+(string)ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED));
          return false;
       }
       return valid;
@@ -205,7 +204,6 @@ public:
    {
       if (!long_enabled) return false;
       if (ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED) >= maxorders) {
-         Print("cnt orders: "+(string)ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED));
          return false;
       }
       return valid;

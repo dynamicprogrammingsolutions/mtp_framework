@@ -2,8 +2,10 @@
 #include "..\Loader.mqh"
 
 #ifdef __MQL4__
-  #include "..\SymbolInfoMT4\MTPSymbolInfo.mqh"
-#else
+#include "..\SymbolInfoMT4\MTPSymbolInfo.mqh"
+#endif
+
+#ifdef __MQL5__
 #include "..\SymbolInfoMT5\MTPSymbolInfo.mqh"
 #endif
 

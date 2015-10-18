@@ -39,6 +39,55 @@ public:
    
    int retrainhistory;
    
+   bool COrderManager::Save(const int handle)
+   {
+      MTPFileBin file;
+      file.Handle(handle);            
+      if (file.Invalid()) {
+         Print("Invalid Handle");
+         return false;
+      }
+   
+      Print(__FUNCTION__+" Start Saving pos: "+(string)file.Tell());
+   
+      Print(__FUNCTION__+" Saving Orders pos: "+(string)file.Tell());
+   
+      if (!file.WriteObject(GetPointer(orders))) return file.Error("orders",__FUNCTION__);
+   
+      Print(__FUNCTION__+" Saving History Orders pos: "+(string)file.Tell());
+   
+      if (!file.WriteObject(GetPointer(historyorders))) return file.Error("historyorders",__FUNCTION__);
+   
+      Print(__FUNCTION__+" End Saving pos: "+(string)file.Tell());
+   
+      return(true);
+   }
+   
+   bool COrderManager::Load(const int handle)
+   {      
+      MTPFileBin file;
+      file.Handle(handle);    
+              
+      if (file.Invalid()) {
+         Print("Invalid Handle");
+         return false;
+      }                 
+   
+      Print(__FUNCTION__+" Start Loading pos: "+(string)file.Tell());
+   
+      Print(__FUNCTION__+" Loading Orders pos: "+(string)file.Tell());
+   
+      if (!file.ReadObject(GetPointer(orders))) return file.Error("orders",__FUNCTION__);
+   
+      Print(__FUNCTION__+" Loading HistoryOrders pos: "+(string)file.Tell());
+   
+      if (!file.ReadObject(GetPointer(historyorders))) return file.Error("historyorders",__FUNCTION__);
+   
+      Print(__FUNCTION__+" End Loading pos: "+(string)file.Tell());
+   
+      return(true);
+   }   
+   
    COrderManager()
    {
       orders = new COrderArray(neworder);
@@ -97,7 +146,7 @@ public:
    }
 
    virtual COrderInterface* NewOrderObject() { return app.NewObject(neworder); }
-   virtual COrderInterface* NewAttachedOrderObject() { return new CAttachedOrder(this.app); }
+   virtual COrderInterface* NewAttachedOrderObject() { return app.GetDependency(classOrder,classAttachedOrder); }
 
    COrder* NewOrder(string in_symbol,ENUM_ORDER_TYPE _ordertype,double _volume,double _price,double _stoploss,double _takeprofit,string _comment="",datetime _expiration=0);
    COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,double volume,CEntry* _price,

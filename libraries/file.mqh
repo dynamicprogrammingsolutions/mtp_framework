@@ -430,7 +430,7 @@ int MTPFileBinBase::WriteString(const string value)
       int size=StringLen(value);
       //--- write
       if(FileWriteInteger(m_handle,size)==sizeof(int))
-         return(FileWriteString(m_handle,value,size));
+         return((int)FileWriteString(m_handle,value,size));
      }
 //--- failure
    return(-1);
@@ -442,7 +442,7 @@ int MTPFileBinBase::WriteString(const string value,const int size)
   {
 //--- check handle
    if(m_handle!=INVALID_HANDLE)
-      return(FileWriteString(m_handle,value,size));
+      return((int)FileWriteString(m_handle,value,size));
 //--- failure
    return(-1);
   }
@@ -854,7 +854,7 @@ uint MTPFileBin::WriteDateTime(datetime value)
   {
 //--- check handle
    if(m_handle!=INVALID_HANDLE)
-      return(FileWriteInteger(m_handle,value,sizeof(int)));
+      return((int)FileWriteInteger(m_handle,(int)value,sizeof(int)));
 //--- failure
    return(0);
   }

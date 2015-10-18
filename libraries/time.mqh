@@ -176,6 +176,43 @@ bool AtTimeDt(datetime& lasttime, datetime at, int maxdelay = 1800)
    return(ret);
 }   
 
+#ifdef __MQL5__
+int TimeHour(datetime time)
+{
+   MqlDateTime _time;
+   TimeToStruct(time,_time);
+   return(_time.hour);
+}
+
+int TimeDayOfWeek(datetime time)
+{
+   MqlDateTime _time;
+   TimeToStruct(time,_time);
+   return(_time.day_of_week);
+}
+
+int TimeDay(datetime time)
+{
+   MqlDateTime _time;
+   TimeToStruct(time,_time);
+   return(_time.day);
+}
+
+int TimeYear(datetime time)
+{
+   MqlDateTime _time;
+   TimeToStruct(time,_time);
+   return(_time.year);
+}
+
+int TimeMonth(datetime time)
+{
+   MqlDateTime _time;
+   TimeToStruct(time,_time);
+   return(_time.mon);
+}
+
+#endif
 
 
 int TimeSec(datetime time)
@@ -194,7 +231,7 @@ int TimeMin(datetime time)
 
 int AutoGMTShift()
 {
-   return(MathRound((TimeGMT()-TimeCurrent())/3600.0));
+   return((int)MathRound((TimeGMT()-TimeCurrent())/3600.0));
 }
 
 int GetGMTShift(bool custom_gmt_shift = false, int gmtshift = 0)

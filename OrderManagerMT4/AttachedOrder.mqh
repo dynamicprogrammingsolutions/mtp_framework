@@ -4,16 +4,15 @@ class CAttachedOrder : public COrderBase
 {
 public:
    TraitGetType { return classMT4AttachedOrder; }
-   //TraitNewObject { return new CAttachedOrder(); }
+   TraitNewObject { return new CAttachedOrder(); }
 
 public:
    string name;  
 public: 
    static bool price_virtual_default_attached;
 
-   CAttachedOrder(CApplication* app)
+   CAttachedOrder()
    {
-      app.Prepare(GetPointer(this));
       this.price_virtual = CAttachedOrder::price_virtual_default_attached;
    }
 

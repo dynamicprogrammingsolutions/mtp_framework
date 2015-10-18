@@ -169,7 +169,7 @@ public:
    double COrderManager::TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1, bool _commission = true, bool swap = true);
    
    virtual COrderInterface* NewOrderObject() { return this.app.NewObject(neworder); }
-   virtual COrderInterface* NewAttachedOrderObject() { return new CAttachedOrder(this.AppBase()); }
+   virtual COrderInterface* NewAttachedOrderObject() { return app.GetDependency(classOrder,classAttachedOrder); }
    
    bool GetOrders(ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY, string in_symbol = "", int in_magic = -1, bool no_loop_and_reset = false)
    {

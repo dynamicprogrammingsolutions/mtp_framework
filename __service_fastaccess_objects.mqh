@@ -4,3 +4,4 @@ COrderManagerInterface* ordermanager;
 CEventManagerInterface* eventmanager;
 CCommandManagerInterface* commandmanager;
 CTestManagerInterface* testmanager;
+CDependencyManagerInterface* dependencymanager;

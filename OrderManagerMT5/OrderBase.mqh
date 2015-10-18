@@ -70,6 +70,90 @@ public:
    ENUM_ORDER_TYPE_TIME type_time;   
 
 public:
+  
+  virtual bool Save(const int handle)
+   {
+      MTPFileBin file;
+      file.Handle(handle);            
+      if (file.Invalid()) return false;
+
+      Print(__FUNCTION__+" Start Saving pos: "+(string)file.Tell());
+      
+      file.WriteInteger(executestate);
+      file.WriteInteger(state);
+      file.WriteLong(ticket);
+      file.WriteString(symbol);
+      
+      file.WriteInteger(ordertype);
+      file.WriteDouble(volume);
+      file.WriteDouble(price);
+      file.WriteDateTime(expiration);
+      
+      file.WriteInteger(id);
+      file.WriteString(comment);
+      file.WriteInteger(magic);
+      
+      file.WriteDateTime(executetime);
+      file.WriteDateTime(filltime);
+      
+      file.WriteDouble(openprice);
+      file.WriteDouble(limit_price);
+      file.WriteInteger(type_time);
+      
+      file.WriteBool(price_set);
+      file.WriteBool(expiration_set);
+      file.WriteBool(typetime_set);
+      
+      Print(__FUNCTION__+" End Saving pos: "+(string)file.Tell());
+        
+      return(true);  
+   }
+   
+   virtual bool Load(const int handle)
+   {
+      MTPFileBin file;
+      file.Handle(handle);            
+      if (file.Invalid()) return false;
+      
+      Print(__FUNCTION__+" Start Loading pos: "+(string)file.Tell());
+      
+      int itemp;
+      
+      file.ReadInteger(itemp);
+      executestate = (ENUM_EXECUTE_STATE)itemp;
+      file.ReadInteger(itemp);
+      state = (ENUM_ORDER_STATE)itemp;
+      
+      file.ReadLong(ticket);
+      file.ReadString(symbol);
+      
+      file.ReadInteger(itemp);
+      ordertype = (ENUM_ORDER_TYPE)itemp;
+      
+      file.ReadDouble(volume);
+      file.ReadDouble(price);
+      file.ReadDateTime(expiration);
+      
+      file.ReadInteger(id);
+      file.ReadString(comment);
+      file.ReadInteger(magic);
+      
+      file.ReadDateTime(executetime);
+      file.ReadDateTime(filltime);
+      
+      file.ReadDouble(openprice);
+      file.ReadDouble(limit_price);
+      file.ReadInteger(itemp);
+      type_time = (ENUM_ORDER_TYPE_TIME)itemp;
+      
+      file.ReadBool(price_set);
+      file.ReadBool(expiration_set);
+      file.ReadBool(typetime_set);
+      
+      Print(__FUNCTION__+" End Loading pos: "+(string)file.Tell());
+      
+      return(true);  
+   }
    
    COrderBase() {
       this.id = maxid+1;

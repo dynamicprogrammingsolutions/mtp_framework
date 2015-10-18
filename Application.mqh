@@ -138,6 +138,21 @@ public:
       return Prepare(obj);
    }
    
+   void SetDependency(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency, CAppObject* callback)
+   {
+      dependencymanager.SetDependency(caller,dependency,callback);
+   }
+   
+   CAppObject* GetDependency(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency)
+   {
+      return dependencymanager.GetDependency(caller,dependency);
+   }
+   
+   bool DependencyIsSet(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency)
+   {
+      return dependencymanager.DependencyIsSet(caller,dependency);
+   }
+   
    CAppObject* Prepare(CAppObject* obj)
    {
       if (!obj.Initalized()) {
