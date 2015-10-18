@@ -13,7 +13,6 @@
 #include "Loader.mqh"
 #include "..\libraries\objectfunctions.mqh"
 #include "..\libraries\commonfunctions.mqh"
-#include "..\libraries\file.mqh"
 
 class COrderBase : public COrderInterface
 {

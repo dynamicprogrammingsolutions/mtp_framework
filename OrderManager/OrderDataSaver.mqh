@@ -25,18 +25,20 @@ public:
       savetofile_at_terminal_close = true;
    
       loadfromfile = true;
-      datafile = "save_dps_"+(string)__DATETIME__;
+      datafile = "save_dps_"+(string)(int)__DATETIME__;
    }
 
    virtual void OnInit()
    {
       if (loadfromfile) {
-         string filename = datafile+Symbol()+".dat";
+         string filename = datafile+"_"+Symbol()+".dat";
          if (FileIsExist(filename))
          {
             Print("loading from file");
             int handle = FileOpen(filename,FILE_READ|FILE_BIN);
-      
+            if(handle==INVALID_HANDLE) {
+               Print("Operation FileOpen failed, error ",GetLastError()); 
+            }
             if (!App().ordermanager.Load(handle)) {
                Print("file load failed");
             }
@@ -48,15 +50,20 @@ public:
    
    virtual void OnDeinit()
    {
-      string filename = datafile+Symbol()+".dat";
+      Print("uninit reason: "+(string)UninitializeReason());
+      string filename = datafile+"_"+Symbol()+".dat";
       if ((savetofile_at_remove && UninitializeReason() == REASON_REMOVE) ||
       (savetofile_at_chart_change && UninitializeReason() == REASON_CHARTCHANGE) ||
       (savetofile_at_chart_close && UninitializeReason() == REASON_CHARTCLOSE) ||
       (savetofile_at_parameter_change && UninitializeReason() == REASON_PARAMETERS) ||
       (savetofile_at_template_change && UninitializeReason() == REASON_TEMPLATE) ||
       (savetofile_at_terminal_close && UninitializeReason() == REASON_CLOSE)) {
-         Print("saving to file");
+         Print("saving to file: "+filename);
+         ResetLastError(); 
          int handle = FileOpen(filename,FILE_WRITE|FILE_BIN);
+         if(handle==INVALID_HANDLE) {
+            Print("Operation FileOpen failed, error ",GetLastError()); 
+         }
          if (!App().ordermanager.Save(handle)) {
             Print("file save failed");
          }
