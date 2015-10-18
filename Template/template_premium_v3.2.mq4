@@ -25,9 +25,14 @@
 #define CUSTOM_CLASSES classSignalManager, classEntryMethod, classOrderCommandHandler, classMain,
 
 /*
+
 ToDo:
-1. Simplify the signal-entry connection
-2. Use callback for creating class instead of factory
+1. Create and use interface for OrderManager
+2. Create tests for COrder and COrderManager
+3. Remove unnecessary things from COrder and COrderBase (especially from MT5 version)
+4. Merge as much class as possible in MT4 and MT5 version, especially: AttachedOrder, AttachedOrderArray, Enums, MoneyManagement, OrderArray
+5. Remove unnecessary things from COrderManager (like order selection)
+6. Create order repository service, where the orders are stored instead of in OrderManager itself.
 
 */
 
