@@ -4,6 +4,7 @@ class COrder : public COrderBase
 {
 public:
    virtual int Type() const { return classMT5Order; }
+   TraitNewObject { return new COrder(); }
    
 protected:
    string attachedtoticket;
@@ -126,7 +127,7 @@ bool COrder::CreateAttached(ENUM_ORDER_TYPE _ordertype, double _volume, double _
 {
    CAttachedOrder *attachedorder;
    if (_price > 0 || ordertype_market(_ordertype)) {
-      attachedorder = ((CApplication*)AppBase()).attachedorderfactory.Create();
+      attachedorder = new CAttachedOrder(this.App());
       //attachedorder.ordermanager = this.ordermanager;
       attachedorder.symbol = this.symbol;
       attachedorder.ordertype = _ordertype;
@@ -270,7 +271,7 @@ int COrder::GetStopLossTicks()
 double COrder::GetStopLoss()
 {
    CAttachedOrder *attachedorder = GetStopLossOrder();
-   if (attachedorder.Isset()) return(attachedorder.Price());
+   if (attachedorder != NULL && attachedorder.Isset()) return(attachedorder.Price());
    return(0);
 }
 
@@ -282,7 +283,7 @@ CAttachedOrder* COrder::GetStopLossOrder()
       //Print("sl ticket:"+attachedorder.ticket);
       if (attachedorder.name == stoploss_name) return(attachedorder);
    }
-   return(CAttachedOrder::Null());
+   return(NULL);
 }
 int COrder::GetTakeProfitTicks()
 {
@@ -292,7 +293,7 @@ int COrder::GetTakeProfitTicks()
 double COrder::GetTakeProfit()
 {
    CAttachedOrder *attachedorder = GetTakeProfitOrder();
-   if (attachedorder.Isset()) return(attachedorder.Price());
+   if (isset(attachedorder) && attachedorder.Isset()) return(attachedorder.Price());
    return(0);
 }
 
@@ -304,7 +305,7 @@ CAttachedOrder* COrder::GetTakeProfitOrder()
       //Print("tp ticket:"+attachedorder.ticket);
       if (attachedorder.name == takeprofit_name) return(attachedorder);
    }
-   return(CAttachedOrder::Null());
+   return(NULL);
 }
 
 bool COrder::Close(double closevolume = 0, double closeprice = 0)

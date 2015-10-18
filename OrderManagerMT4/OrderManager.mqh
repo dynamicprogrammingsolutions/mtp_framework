@@ -30,8 +30,8 @@ public:
 
    bool ontick_has_run;
 
-   COrderArray orders;
-   COrderArray historyorders;
+   COrderArray* orders;
+   COrderArray* historyorders;
    CAttachedOrderArray attachedorders;
 
    COrder* selectedorder;
@@ -49,8 +49,8 @@ public:
    bool sl_virtual;
    bool tp_virtual;
    bool price_virtual;
-      
-   COrderManager()
+   
+   /*COrderManager()
    {
       trade = NULL;
       custom_order_defaults = false;
@@ -60,7 +60,31 @@ public:
       tp_virtual = false;
       price_virtual = false;
       ontick_has_run = true;
+   };*/
+   
+   CAppObject* neworder;   
+   COrderManager(CAppObject* _neworder)
+   {
+      neworder = _neworder;
+      orders = new COrderArray(neworder);
+      historyorders = new COrderArray(neworder);
+      
+      trade = NULL;
+      custom_order_defaults = false;
+      retrainhistory = 2592000;
+      move_to_history_on_update = false;
+      sl_virtual = false;
+      tp_virtual = false;
+      price_virtual = false;
+      ontick_has_run = true;
    };
+   
+   ~COrderManager()
+   {
+      delete orders;
+      delete historyorders;
+   }
+   
    
    CApplication* app;
    
@@ -144,8 +168,8 @@ public:
    double COrderManager::TotalProfit(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1);
    double COrderManager::TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1, bool _commission = true, bool swap = true);
    
-   virtual COrderInterface* NewOrderObject() { return app.orderfactory.Create(); }
-   virtual COrderInterface* NewAttachedOrderObject() { return app.attachedorderfactory.Create(); }
+   virtual COrderInterface* NewOrderObject() { return this.app.NewObject(neworder); }
+   virtual COrderInterface* NewAttachedOrderObject() { return new CAttachedOrder(this.AppBase()); }
    
    bool GetOrders(ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY, string in_symbol = "", int in_magic = -1, bool no_loop_and_reset = false)
    {

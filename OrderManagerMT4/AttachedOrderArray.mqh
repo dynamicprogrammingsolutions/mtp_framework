@@ -8,7 +8,7 @@ public:
 public:
    CAttachedOrder *AttachedOrder(int nIndex){return((CAttachedOrder*)At(nIndex));}   
    virtual bool  CreateElement(const int index) {
-      m_data[index] = ((CApplication*)this.AppBase()).attachedorderfactory.Create();      
+      m_data[index] = new CAttachedOrder(this.AppBase());      
       return(true);
    }
 };

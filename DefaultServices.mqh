@@ -9,8 +9,6 @@
 #ifdef __MQL5__
 #include "OrderManagerMT5\OrderManager.mqh"
 #endif
-#include "OrderManager\OrderFactory.mqh"
-#include "OrderManager\AttachedOrderFactory.mqh"
 
 #include "SymbolLoader\SymbolInfoVars.mqh"
 
@@ -18,8 +16,9 @@
 
 #include "Commands\Loader.mqh"
 
-#include "EntryMethod\EntryMethodBase.mqh"
-#include "Signals\SignalManagerBase.mqh"
+#include "Signals\Signal.mqh"
+#include "EntryMethod\EntryMethodSignal.mqh"
+
 #include "Commands\OrderCommandHandlerBase.mqh"
 
 #include "ScriptManager\ScriptManagerBase.mqh"
@@ -51,11 +50,7 @@ void register_services()
    global_app().RegisterService(new CSymbolLoader(),srvSymbolLoader,"symbolloader");
    
    // manages orders
-   global_app().RegisterService(new COrderManager(),srvOrderManager,"ordermanager");
-   
-   // creates order objects
-   global_app().RegisterService(new COrderFactory(),srvOrderFactory,"orderfactory");
-   global_app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
+   global_app().RegisterService(new COrderManager(new COrder),srvOrderManager,"ordermanager");
    
    // sets global vars for symbol info easy access
    global_app().RegisterService(new CSymbolInfoVars(Symbol()),srvSymbolInfoVars,"symbolinfovars");

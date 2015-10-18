@@ -1,17 +1,51 @@
 #include "..\Loader.mqh"
 
-class CEntryMethodBase : public CEntryMethodInterface
+class CEntryMethodSignal : public CServiceProvider
 {
 public:
-   virtual int Type() const { return classEntryMethodBase; }
+   virtual int Type() const { return classEntryMethodSignal; }
 
    TraitAppAccess
    TraitSendCommands
+   TraitHasEvents
+
+   static int Signal;
+
+   void GetEvents(int& events[])
+   {
+      ArrayResize(events,1);
+      events[0] = EventId(Signal);
+   }
 
    COrderManager* ordermanager;
    virtual void Initalize()
    {
       this.ordermanager = this.App().GetService(srvOrderManager);
+   }
+
+   CSignal* mainsignal;
+   int bar;
+
+   virtual void OnTick()
+   {
+      mainsignal.Run(bar);
+      
+      if (mainsignal.signal != mainsignal.lastsignal || mainsignal.closesignal != mainsignal.lastclosesignal) {
+         App().eventmanager.Send(Signal,mainsignal);
+      }
+      
+      switch (mainsignal.closesignal) {
+         case SIGNAL_BUY: OnCloseSellSignal(mainsignal.closesignal_valid); break;
+         case SIGNAL_SELL: OnCloseBuySignal(mainsignal.closesignal_valid); break;
+         case SIGNAL_BOTH: OnCloseAllSignal(mainsignal.closesignal_valid); break;
+      }
+      switch (mainsignal.signal) {
+         case SIGNAL_BUY: OnBuySignal(mainsignal.valid); break;
+         case SIGNAL_SELL: OnSellSignal(mainsignal.valid); break;
+         case SIGNAL_BOTH: OnBothSignal(mainsignal.valid); break;
+      }
+      
+      mainsignal.OnTick();
    }
    
    virtual void OnCloseSellSignal(bool valid)
@@ -53,6 +87,10 @@ public:
          CommandSend(COrderCommand::CommandOpenSell);
       }
    }
+   virtual void OnBothSignal(bool valid)
+   {
+      
+   }
    
    virtual bool CloseOpposite()
    {
@@ -70,3 +108,5 @@ public:
    }
 
 };
+
+int CEntryMethodSignal::Signal = 0;

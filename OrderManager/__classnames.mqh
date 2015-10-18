@@ -1,5 +1,3 @@
-classAttachedOrderFactory,
-classOrderFactory,
 classStopsCalc,
 classEntry,
 classStopLoss,

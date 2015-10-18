@@ -1,5 +1,5 @@
 //
-#define MTP_FRAMEWORK_VERSION 1.2
+#define MTP_FRAMEWORK_VERSION 1.3
 
 #include "Loader.mqh"
 
@@ -129,6 +129,13 @@ public:
    void SetEventListener(int id, ENUM_APPLICATION_SERVICE handlerservice)
    {
       this.eventmanager.Register(id, GetService(handlerservice));
+   }
+   
+   CObject* NewObject(CAppObject* callback)
+   {
+      CObject* obj;
+      callback.callback(0,obj);
+      return Prepare(obj);
    }
    
    CAppObject* Prepare(CAppObject* obj)

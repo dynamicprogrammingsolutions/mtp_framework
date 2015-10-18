@@ -3,15 +3,18 @@
 class COrderArray : public CAppObjectArrayObj
 {
 public:
+   TraitAppAccess
    virtual int Type() const { return classMT5OrderArray; }
 public:
-   COrderArray()
+   CAppObject* neworder;   
+   COrderArray(CAppObject* _neworder)
    {
+      neworder = _neworder;
       m_free_mode = true;
    }
    COrder* Order(int nIndex){ if (!isset(At(nIndex))) return(NULL); else return((COrder*)At(nIndex)); }   
    virtual bool  CreateElement(const int index) {
-      m_data[index] = (CObject*)(((CApplication*)AppBase()).orderfactory.Create());
+      m_data[index] = (CObject*)(App().NewObject(neworder));
       return(true);
    }
    

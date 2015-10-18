@@ -4,3 +4,4 @@
 #include "TraitHasEvents.mqh"
 #include "TraitHasCommands.mqh"
 #include "TraitSendCommands.mqh"
+#include "TraitNewObject.mqh"

@@ -24,8 +24,8 @@ private:
    string mtp_comment;
 
 public:
-   COrderArray orders;
-   COrderArray historyorders;
+   COrderArray* orders;
+   COrderArray* historyorders;
 
    COrder* selectedorder;
    COrderInfoBase* orderinfo;
@@ -41,14 +41,36 @@ public:
    
    COrderManager()
    {
-     custom_order_defaults = false;
-
-     ticket_prefix = "ticket=";
-     stoploss_comment = "stoploss"; //TODO: Remove
-     takeprofit_comment = "takeprofit";
-     mtp_comment = "mtp";
-     retrainhistory = 2592000;
+      orders = new COrderArray(neworder);
+      historyorders = new COrderArray(neworder);
+      custom_order_defaults = false;
+      ticket_prefix = "ticket=";
+      stoploss_comment = "stoploss"; //TODO: Remove
+      takeprofit_comment = "takeprofit";
+      mtp_comment = "mtp";
+      retrainhistory = 2592000;
    };
+   
+   CAppObject* neworder;
+   COrderManager(CAppObject* _neworder)
+   {
+      neworder = _neworder;
+      
+      orders = new COrderArray(neworder);
+      historyorders = new COrderArray(neworder);
+      custom_order_defaults = false;
+      ticket_prefix = "ticket=";
+      stoploss_comment = "stoploss"; //TODO: Remove
+      takeprofit_comment = "takeprofit";
+      mtp_comment = "mtp";
+      retrainhistory = 2592000;
+   }
+   
+   ~COrderManager()
+   {
+      delete orders;
+      delete historyorders;
+   }
    
    CApplication* app;
    void Initalize()
@@ -74,8 +96,8 @@ public:
       _symbol = symbolloader.LoadSymbol(__symbol);
    }
 
-   virtual COrderInterface* NewOrderObject() { return ((CApplication*)app).orderfactory.Create(); }
-   virtual COrderInterface* NewAttachedOrderObject() { return ((CApplication*)app).attachedorderfactory.Create(); }
+   virtual COrderInterface* NewOrderObject() { return app.NewObject(neworder); }
+   virtual COrderInterface* NewAttachedOrderObject() { return new CAttachedOrder(this.app); }
 
    COrder* NewOrder(string in_symbol,ENUM_ORDER_TYPE _ordertype,double _volume,double _price,double _stoploss,double _takeprofit,string _comment="",datetime _expiration=0);
    COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,double volume,CEntry* _price,
@@ -121,10 +143,6 @@ public:
    double COrderManager::TotalProfit(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1);
    double COrderManager::TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1, bool _commission = true, bool swap = true);
    
-   ~COrderManager()
-   {
-   
-   };
 };
 
 COrder* COrderManager::NewOrder(string in_symbol,ENUM_ORDER_TYPE _ordertype,double _volume,double _price,double _stoploss,double _takeprofit,string _comment="",datetime _expiration=0)

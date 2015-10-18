@@ -7,7 +7,6 @@
 #include "ServiceProviders\SymbolLoaderInterface.mqh"
 #include "ServiceProviders\FactoryInterface.mqh"
 #include "ServiceProviders\OrderManagerInterface.mqh"
-#include "ServiceProviders\EntryMethodInterface.mqh"
 #include "ServiceProviders\ScriptManagerInterface.mqh"
 #include "ServiceProviders\EventManagerInterface.mqh"
 #include "ServiceProviders\CommandManagerInterface.mqh"

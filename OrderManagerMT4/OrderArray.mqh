@@ -14,14 +14,16 @@ public:
          _symbol = App().symbolloader.LoadSymbol(__symbol);
       }
 
-      COrderArray()
+      CAppObject* neworder;   
+      COrderArray(CAppObject* _neworder)
       {
+         neworder = _neworder;
          m_free_mode = true;
       }
       COrder* Order(int nIndex){ if (!isset(At(nIndex))) return(NULL); else return((COrder*)At(nIndex)); }     
       
       virtual bool  CreateElement(const int index) {
-         m_data[index] = (CObject*)(App().orderfactory.Create());
+         m_data[index] = (CObject*)(App().NewObject(neworder));
          return(true);
       }
       

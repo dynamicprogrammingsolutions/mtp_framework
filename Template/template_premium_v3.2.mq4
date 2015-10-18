@@ -24,12 +24,18 @@
 #define CUSTOM_SERVICES srvMain,
 #define CUSTOM_CLASSES classSignalManager, classEntryMethod, classOrderCommandHandler, classMain,
 
-#include <mtp_framework_1.2\Loader.mqh>
-#include <mtp_framework_1.2\DefaultServices.mqh>   
+/*
+ToDo:
+1. Simplify the signal-entry connection
+2. Use callback for creating class instead of factory
+
+*/
+
+#include <mtp_framework_1.3\Loader.mqh>
+#include <mtp_framework_1.3\DefaultServices.mqh>   
 
 input double lotsize = 0.1;
 
-input double entrypips = 0;
 input double stoploss = 20;
 input double takeprofit = 40;
 
@@ -169,10 +175,10 @@ public:
    }   
 };
 
-class CSignalManager : public CSignalManagerBase
+class CEntryMethod : public CEntryMethodSignal
 {
 public:
-   TraitGetType { return classSignalManager; }
+   TraitGetType { return classEntryMethod; }
    
    virtual void OnInit()
    {
@@ -184,19 +190,6 @@ public:
    {
       delete mainsignal;
    }
-   
-   virtual void OnTick()
-   {
-      if (App().testmanager != NULL && App().testmanager.IsRunning()) return;
-      CSignalManagerBase::OnTick();
-   }
-   
-};
-
-class CEntryMethod : public CEntryMethodBase
-{
-public:
-   TraitGetType { return classEntryMethod; }
 
    virtual bool BuySignalFilter(bool valid)
    {
@@ -244,22 +237,9 @@ public:
       mm = new CMoneyManagementFixed(lotsize);
       sl = new CStopLossTicks(convertfract(stoploss));
       tp = new CTakeProfitTicks(convertfract(takeprofit));
-      if (entrypips == 0) {
-         entry = NULL;
-         buy_cmd = ORDER_TYPE_BUY;
-         sell_cmd = ORDER_TYPE_SELL;
-         Print("using market orders");
-      } else if (entrypips > 0) {
-         entry = new CEntryTicks(convertfract(entrypips));
-         buy_cmd = ORDER_TYPE_BUY_STOP;
-         sell_cmd = ORDER_TYPE_SELL_STOP;
-         Print("using stop orders");
-      } else if (entrypips < 0) {
-         entry = new CEntryTicks(-convertfract(entrypips));
-         buy_cmd = ORDER_TYPE_BUY_LIMIT;
-         sell_cmd = ORDER_TYPE_SELL_LIMIT;
-         Print("using limit orders");
-      }
+      entry = NULL;
+      buy_cmd = ORDER_TYPE_BUY;
+      sell_cmd = ORDER_TYPE_SELL;
    }
 
    virtual int Type() const { return classOrderCommandHandler; }
@@ -431,7 +411,8 @@ public:
          COrder::sl_virtual_default = sl_virtual;
          COrder::tp_virtual_default = tp_virtual;
          COrder::vstops_draw_line = vstops_draw_line;
-         COrder::realstops_draw_line = realstops_draw_line;   
+         COrder::realstops_draw_line = realstops_draw_line;
+         //COrderBase::use_normal_stops = false;
       
       #endif   
 
@@ -477,7 +458,6 @@ int OnInit()
       register_services();
    
       application.RegisterService(new CExpiration(),srvNone,"expiration");
-      application.RegisterService(new CSignalManager(),srvSignalManager,"signalmanager");
       application.RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
       #ifdef TRAILINGSTOP
          application.RegisterService(new CTrailingStopManager(),srvNone,"trailingstopmanager");
@@ -499,7 +479,7 @@ int OnInit()
       application.SetCommandHandler(new CScript(),new COrderScriptHandler());
       application.SetCommandHandler(new COrderCommand(),srvOrderCommandHandler);
       
-      application.SetEventListener(srvSignalManager,new CSignalEventListener());
+      application.SetEventListener(srvEntryMethod,new CSignalEventListener());
       application.SetEventListener(srvOrderCommandHandler,new COrderEventListener());
       //application.SetEventListener(COrderCommandHandlerBase::EventOpeningBuy,new COrderEventListener());
       //application.SetEventListener(COrderCommandHandlerBase::EventOpeningSell,new COrderEventListener());
