@@ -1,14 +1,26 @@
 //
 
+#include "libraries\math.mqh"
+#include "libraries\time.mqh"
+#include "libraries\arrays.mqh"
+#include "libraries\strfunctions.mqh"
+#include "libraries\commonfunctions.mqh"
+#include "libraries\comments.mqh"
+
 #include "TestManager\Loader.mqh"
 #include "EventHandler\EventHandler.mqh"
 #include "SymbolLoader\SymbolLoader.mqh"
+
+#include "OrderManager\Loader.mqh"
+
 #ifdef __MQL4__
-#include "OrderManagerMT4\OrderManager.mqh"
+#include "OrderManagerMT4\Loader.mqh"
 #endif
+
 #ifdef __MQL5__
-#include "OrderManagerMT5\OrderManager.mqh"
+#include "OrderManagerMT5\Loader.mqh"
 #endif
+
 #include "OrderManager\OrderFactory.mqh"
 #include "OrderManager\AttachedOrderFactory.mqh"
 
@@ -29,8 +41,6 @@
 
 #include "EventManager\EventManager.mqh"
 #include "CommandManager\CommandManager.mqh"
-
-#include "libraries\comments.mqh"
 
 #include "Tests\Loader.mqh"
 

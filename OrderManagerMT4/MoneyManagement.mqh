@@ -76,6 +76,22 @@ public:
   }
 };
 
+class CMoneyManagementRiskMoney : public CMoneyManagement
+{
+public:
+   double riskmoney;
+   CMoneyManagementRiskMoney(double _riskmoney)
+   {
+      riskmoney = _riskmoney;
+   }
+   virtual double GetLotsize() {
+      addaccountbalance = false;
+      addfixbalance = riskmoney;
+      moneymanagement_init(this.symbol);
+      return mmgetlot_stoploss(stoploss.GetTicks(), 100);
+  }
+};
+
 class CMoneyManagementLotPerMoney : public CMoneyManagement
 {
 public:

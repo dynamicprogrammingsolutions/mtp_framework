@@ -52,6 +52,7 @@ public:
    virtual CStopsCalcInterface* SetTicks(double _ticks)
    {
       ticks_set = true;
+      price_set = false;
       ticks = _ticks;
       return (CStopsCalcInterface*)GetPointer(this);
    }
@@ -59,6 +60,7 @@ public:
    virtual CStopsCalcInterface* SetPrice(double _price)
    {
       price_set = true;
+      ticks_set = false;
       price = _price;
       return (CStopsCalcInterface*)GetPointer(this);
    }

@@ -1,4 +1,8 @@
 //
+#include "..\Loader.mqh"
+
+#include "..\libraries\file.mqh"
+
 class COrderBase : public COrderInterface
 {
 public:
@@ -34,11 +38,11 @@ public:
    
    CTrade* trade;
 
-   ENUM_EXECUTE_STATE executestate;
+//BEGIN Need to save   
 
+   ENUM_EXECUTE_STATE executestate;
    ENUM_ORDER_STATE state;
 
-public:
    ulong ticket;
    string symbol;
    
@@ -47,27 +51,139 @@ public:
    double price;
    datetime expiration;
 
-public:
    int id;
    string comment;
    int magic; // magic is not sent to server, if "restore orders from server" is developed, it will be needed
 
-   bool selectedishistory;
-   COrderInfoBase *orderinfo;
-   COrderInfoV *orderinfov;
-   CHistoryOrderInfoV *historyorderinfov;
-   
-   uint retcode;
    datetime executetime;   
    datetime filltime;
+
+   double openprice;
+   double limit_price;
+   ENUM_ORDER_TYPE_TIME type_time;   
 
    bool price_set;
    bool expiration_set;
    bool typetime_set;
 
-   double openprice;
-   double limit_price;
-   ENUM_ORDER_TYPE_TIME type_time;   
+//BEGIN Need to save   
+   
+   uint retcode;
+      
+   bool selectedishistory;
+   COrderInfoBase *orderinfo;
+   COrderInfoV *orderinfov;
+   CHistoryOrderInfoV *historyorderinfov;
+      
+   virtual bool Save(const int handle)
+   {
+      MTPFileBin file;
+      file.Handle(handle);            
+      if (file.Invalid()) return false;
+
+      Print(__FUNCTION__+" Start Saving pos: "+file.Tell());
+      
+      /*ENUM_EXECUTE_STATE executestate;
+      ENUM_ORDER_STATE state;
+   
+      ulong ticket;
+      string symbol;
+      
+      ENUM_ORDER_TYPE ordertype;
+      double volume;
+      double price;
+      datetime expiration;
+   
+      int id;
+      string comment;
+      int magic; // magic is not sent to server, if "restore orders from server" is developed, it will be needed
+   
+      datetime executetime;   
+      datetime filltime;
+   
+      double openprice;
+      double limit_price;
+      ENUM_ORDER_TYPE_TIME type_time;   
+   
+      bool price_set;
+      bool expiration_set;
+      bool typetime_set;*/
+      
+      file.WriteInteger(executestate);
+      file.WriteInteger(state);
+      file.WriteLong(ticket);
+      file.WriteString(symbol);
+      
+      file.WriteInteger(ordertype);
+      file.WriteDouble(volume);
+      file.WriteDouble(price);
+      file.WriteDateTime(expiration);
+      
+      file.WriteInteger(id);
+      file.WriteString(comment);
+      file.WriteInteger(magic);
+      
+      file.WriteDateTime(executetime);
+      file.WriteDateTime(filltime);
+      
+      file.WriteDouble(openprice);
+      file.WriteDouble(limit_price);
+      file.WriteInteger(type_time);
+      
+      file.WriteBool(price_set);
+      file.WriteBool(expiration_set);
+      file.WriteBool(typetime_set);
+      
+      Print(__FUNCTION__+" End Saving pos: "+file.Tell());
+        
+      return(true);  
+   }
+   
+   virtual bool Load(const int handle)
+   {
+      MTPFileBin file;
+      file.Handle(handle);            
+      if (file.Invalid()) return false;
+      
+      Print(__FUNCTION__+" Start Loading pos: "+file.Tell());
+      
+      int itemp;
+      
+      file.ReadInteger(itemp);
+      executestate = itemp;
+      file.ReadInteger(itemp);
+      state = itemp;
+      
+      file.ReadLong(ticket);
+      file.ReadString(symbol);
+      
+      file.ReadInteger(itemp);
+      ordertype = itemp;
+      
+      file.ReadDouble(volume);
+      file.ReadDouble(price);
+      file.ReadDateTime(expiration);
+      
+      file.ReadInteger(id);
+      file.ReadString(comment);
+      file.ReadInteger(magic);
+      
+      file.ReadDateTime(executetime);
+      file.ReadDateTime(filltime);
+      
+      file.ReadDouble(openprice);
+      file.ReadDouble(limit_price);
+      file.ReadInteger(itemp);
+      type_time = itemp;
+      
+      file.ReadBool(price_set);
+      file.ReadBool(expiration_set);
+      file.ReadBool(typetime_set);
+      
+      Print(__FUNCTION__+" End Loading pos: "+file.Tell());
+      
+      return(true);  
+   }
 
 public:
    

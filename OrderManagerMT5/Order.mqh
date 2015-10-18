@@ -6,18 +6,18 @@ public:
    virtual int Type() const { return classMT5Order; }
    
 protected:
-   string attachedtoticket;
-   string stoploss_name;
-   string takeprofit_name;
+   static string attachedtoticket;
+   static string stoploss_name;
+   static string takeprofit_name;
    
+//BEGIN Need to save   
+
    double sl;
    double tp;
    bool sl_set;
    bool tp_set;
 
 public:
-   CAttachedOrderArray attachedorders;
-
    bool closed;
    bool close_attempted;
    
@@ -29,11 +29,80 @@ public:
    datetime lastclosetime;
    
    double lastcloseprice;
+   
+//END Need to save
+
+   CAttachedOrderArray attachedorders;
+   
+   virtual bool Save(const int handle)
+   {
+      MTPFileBin file;
+      file.Handle(handle);            
+      if (file.Invalid()) return false;
+
+      Print(__FUNCTION__+" Start Saving pos: "+file.Tell());
+      
+      file.WriteDouble(sl);
+      file.WriteDouble(tp);
+      file.WriteBool(sl_set);
+      file.WriteBool(tp_set);
+      file.WriteBool(closed);
+      file.WriteBool(close_attempted);
+      file.WriteBool(do_not_archive);
+      file.WriteBool(do_not_delete);
+      file.WriteDouble(closedvolume);
+      file.WriteDateTime(closetime);
+      file.WriteDateTime(lastclosetime);
+      file.WriteDouble(lastcloseprice);
+
+      Print(__FUNCTION__+" Start Saving AttachedOrders pos: "+file.Tell());
+
+      if (!file.WriteObject(GetPointer(attachedorders))) return file.Error("attachedorders",__FUNCTION__);
+      
+      Print(__FUNCTION__+" Start Saving OrderBase pos: "+file.Tell());
+      
+      if (!COrderBase::Save(handle)) return file.Error("COrderBase",__FUNCTION__);
+
+      Print(__FUNCTION__+" End Saving pos: "+file.Tell());
+
+      return(true);
+   }
+   
+   virtual bool Load(const int handle)
+   {
+      MTPFileBin file;
+      file.Handle(handle);            
+      if (file.Invalid()) return file.Error("invalid file",__FUNCTION__);           
+
+      Print(__FUNCTION__+" Start Loading pos: "+file.Tell());
+
+      file.ReadDouble(sl);
+      file.ReadDouble(tp);
+      file.ReadBool(sl_set);
+      file.ReadBool(tp_set);
+      file.ReadBool(closed);
+      file.ReadBool(close_attempted);
+      file.ReadBool(do_not_archive);
+      file.ReadBool(do_not_delete);
+      file.ReadDouble(closedvolume);
+      file.ReadDateTime(closetime);
+      file.ReadDateTime(lastclosetime);
+      file.ReadDouble(lastcloseprice);
+
+      Print(__FUNCTION__+" Start Loading AttachedOrders pos: "+file.Tell());
+      
+      if (!file.ReadObject(GetPointer(attachedorders))) return file.Error("attachedorders",__FUNCTION__);
+
+      Print(__FUNCTION__+" Start Loading OrderBase pos: "+file.Tell());
+      
+      if (!COrderBase::Load(handle)) return file.Error("COrderBase",__FUNCTION__);
+
+      Print(__FUNCTION__+" End Loading pos: "+file.Tell());
+
+      return(true);
+   }
 
    COrder() {
-      attachedtoticket = "attachedtoticket=";
-      stoploss_name = "stoploss";
-      takeprofit_name = "takeprofit";
       closetime = 0;
       lastclosetime = 0;
    };
@@ -94,6 +163,11 @@ public:
    
    
 };
+
+string COrder::attachedtoticket = "attachedtoticket=";
+string COrder::stoploss_name = "stoploss";
+string COrder::takeprofit_name = "takeprofit";
+
 
 bool COrder::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,
    const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0)

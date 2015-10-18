@@ -22,7 +22,7 @@ public:
       MTPFileBin file;
       file.Handle(handle);            
       if (file.Invalid()) return false;
-      if (!file.WriteString(name)) return file.Error("name",__FUNCTION__);
+      //if (!file.WriteString(name)) return file.Error("name",__FUNCTION__);
       if (!COrderBase::Save(handle)) return file.Error("COrderBase",__FUNCTION__);
       return(true);
    }
@@ -32,7 +32,7 @@ public:
       MTPFileBin file;
       file.Handle(handle);            
       if (file.Invalid()) return false;
-      if (!file.ReadString(name)) return file.Error("name",__FUNCTION__);
+      //if (!file.ReadString(name)) return file.Error("name",__FUNCTION__);
       if (!COrderBase::Load(handle)) return file.Error("COrderBase",__FUNCTION__);
       return(true);
    }
