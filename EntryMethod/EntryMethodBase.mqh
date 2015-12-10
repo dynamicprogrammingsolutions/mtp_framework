@@ -53,6 +53,10 @@ public:
          CommandSend(COrderCommand::CommandOpenSell);
       }
    }
+   virtual void OnBothSignal(bool valid)
+   {
+      
+   }
    
    virtual bool CloseOpposite()
    {

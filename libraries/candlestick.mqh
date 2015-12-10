@@ -45,12 +45,12 @@ enum ENUM_CANDLE_DIR {
    DIR_DN = 2
 };
 
-void getcandles(string symbol, int timeframe = 0, int barmin = 1, int barmax = 1)
+void getcandles(string __symbol, int __timeframe = 0, int barmin = 1, int barmax = 1)
 {
    for (int i = barmax; i > barmin; i--) {
-      getcandle(symbol, timeframe, i, false);
+      getcandle(__symbol, __timeframe, i, false);
    }
-   getcandle(symbol, timeframe, barmin, true);
+   getcandle(__symbol, __timeframe, barmin, true);
    
    /*
    for (i = barmin; i <= barmax; i++) {
@@ -72,7 +72,7 @@ void getcandles(string symbol, int timeframe = 0, int barmin = 1, int barmax = 1
    
 }
 
-void getcandle(string symbol, int timeframe = 0, int bar = 1, bool usevars = true)
+void getcandle(string __symbol, int __timeframe = 0, int bar = 1, bool usevars = true)
 {
    //initalized_alert("getcanlde: ");
 
@@ -89,15 +89,15 @@ void getcandle(string symbol, int timeframe = 0, int bar = 1, bool usevars = tru
    candle_array_incrase_int(candledir, bar+1);
    candle_array_incrase_datetime(candletime, bar+1);
    
-   bool iscurrent = (symbol == _Symbol && (timeframe == _Period || timeframe == 0));
+   bool iscurrent = (__symbol == _Symbol && (__timeframe == _Period || __timeframe == 0));
    
-   datetime time = iscurrent?Time[bar]:iTime(symbol,timeframe,bar);
+   datetime time = iscurrent?Time[bar]:iTime(__symbol,__timeframe,bar);
    
    //addcomment("time=",TimeToStr(time,TIME_MINUTES)," candletime=",TimeToStr(candletime[bar],TIME_MINUTES));
    
-   if (time != candletime[bar] || candlesymbol != symbol || bar == 0) {
+   if (time != candletime[bar] || candlesymbol != __symbol || bar == 0) {
       //addcomment(" getcandle");
-      candlesymbol = symbol;
+      candlesymbol = __symbol;
       candletime[bar] = time;
    
       if (iscurrent) {
@@ -106,10 +106,10 @@ void getcandle(string symbol, int timeframe = 0, int bar = 1, bool usevars = tru
          open[bar] = Open[bar];
          close[bar] = Close[bar];
       } else {
-         high[bar] = iHigh(candlesymbol,timeframe,bar);
-         low[bar] = iLow(candlesymbol,timeframe,bar);
-         open[bar] = iOpen(candlesymbol,timeframe,bar);
-         close[bar] = iClose(candlesymbol,timeframe,bar);
+         high[bar] = iHigh(candlesymbol,__timeframe,bar);
+         low[bar] = iLow(candlesymbol,__timeframe,bar);
+         open[bar] = iOpen(candlesymbol,__timeframe,bar);
+         close[bar] = iClose(candlesymbol,__timeframe,bar);
       }
       body[bar] = MathAbs(open[bar] - close[bar]);
       range[bar] = high[bar] - low[bar];
@@ -154,14 +154,14 @@ void getcandle(string symbol, int timeframe = 0, int bar = 1, bool usevars = tru
 }
 
 
-int getdir(string symbol, int timeframe, int bar)
+int getdir(string __symbol, int __timeframe, int bar)
 {
-   double open = iOpen(symbol,timeframe,bar);
-   double close = iClose(symbol,timeframe,bar);
+   double __open = iOpen(__symbol,__timeframe,bar);
+   double __close = iClose(__symbol,__timeframe,bar);
    
-   if (close > open)
+   if (__close > __open)
       return(DIR_UP);
-   else if (close < open)
+   else if (__close < __open)
       return(DIR_DN);
    else
       return(DIR_NONE);
@@ -179,13 +179,13 @@ void candle_array_incrase_datetime(datetime& array[], int size) {
    if (ArraySize(array) < size) ArrayResize(array,size);
 }
 
-void getcandle_mindata(string symbol, int timeframe, int bar)
+void getcandle_mindata(string __symbol, int __timeframe, int bar)
 {
-   candlesymbol = symbol;
-   candle_high = iHigh(candlesymbol,timeframe,bar);
-   candle_low = iLow(candlesymbol,timeframe,bar);
-   candle_open = iOpen(candlesymbol,timeframe,bar);
-   candle_close = iClose(candlesymbol,timeframe,bar);
+   candlesymbol = __symbol;
+   candle_high = iHigh(candlesymbol,__timeframe,bar);
+   candle_low = iLow(candlesymbol,__timeframe,bar);
+   candle_open = iOpen(candlesymbol,__timeframe,bar);
+   candle_close = iClose(candlesymbol,__timeframe,bar);
 }
 
 void getcandle_upwick()

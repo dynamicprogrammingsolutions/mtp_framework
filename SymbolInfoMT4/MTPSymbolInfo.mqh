@@ -84,7 +84,7 @@ bool CMTPSymbolInfo::IsFractional(double treshold = FRACTIONAL_TRESHOLD)
    if (Bid()/TickSize() > treshold) return(true);
    else return(false);
 }
-double CMTPSymbolInfo::LotRound(double lotreq, bool close = false)
+double CMTPSymbolInfo::LotRound(double lotreq, bool for_close = false)
 {
    double _lotstep = LotsStep()/MathPow(10,lot_extradigits);
 
@@ -99,15 +99,15 @@ double CMTPSymbolInfo::LotRound(double lotreq, bool close = false)
       lotwhole--;*/
    double lotdecimal = lotquotient-lotwhole;
    
-   if (!close && lq(lotdecimal, lotroundup))
+   if (!for_close && lq(lotdecimal, lotroundup))
       lotwhole++;
-   if (close && l(lotdecimal, lotroundup_close))
+   if (for_close && l(lotdecimal, lotroundup_close))
       lotwhole++;
 
    double lot = lotwhole*_lotstep;
    if (s(lot, LotsMin()) && lot_extradigits == 0)
    {
-      if ((!close && roundup_to_minlot) || (close && roundup_to_minlot_close))
+      if ((!for_close && roundup_to_minlot) || (for_close && roundup_to_minlot_close))
          lot = LotsMin();
       else
          lot = 0;

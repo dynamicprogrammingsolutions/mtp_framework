@@ -24,7 +24,7 @@ public:
    virtual void OnSellSignal(bool valid)
    {   
    }
-
+   
    virtual void OnBothSignal(bool valid)
    {   
    }

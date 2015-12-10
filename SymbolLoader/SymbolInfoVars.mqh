@@ -157,7 +157,7 @@ double priceround(double price)
    return(symbolinfo.PriceRound(price));
 }
 
-double lotround(double lotreq, bool close = false)
+double lotround(double lotreq, bool for_close = false)
 {
-   return(symbolinfo.LotRound(lotreq,close));
+   return(symbolinfo.LotRound(lotreq,for_close));
 }
