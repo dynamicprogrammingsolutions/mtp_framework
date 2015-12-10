@@ -1,0 +1,2581 @@
+diff --git a/Application.mqh b/Application.mqh
+index b922dfe..c7c435b 100644
+--- a/Application.mqh
++++ b/Application.mqh
+@@ -1,5 +1,5 @@
+ //
+-#define MTP_FRAMEWORK_VERSION 1.3
++#define MTP_FRAMEWORK_VERSION 1.2
+ 
+ #include "Loader.mqh"
+ 
+@@ -131,28 +131,6 @@ public:
+       this.eventmanager.Register(id, GetService(handlerservice));
+    }
+    
+-   CObject* NewObject(CAppObject* callback)
+-   {
+-      CObject* obj;
+-      callback.callback(0,obj);
+-      return Prepare(obj);
+-   }
+-   
+-   void SetDependency(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency, CAppObject* callback)
+-   {
+-      dependencymanager.SetDependency(caller,dependency,callback);
+-   }
+-   
+-   CAppObject* GetDependency(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency)
+-   {
+-      return dependencymanager.GetDependency(caller,dependency);
+-   }
+-   
+-   bool DependencyIsSet(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency)
+-   {
+-      return dependencymanager.DependencyIsSet(caller,dependency);
+-   }
+-   
+    CAppObject* Prepare(CAppObject* obj)
+    {
+       if (!obj.Initalized()) {
+diff --git a/DefaultServices.mqh b/DefaultServices.mqh
+new file mode 100644
+index 0000000..7c74eee
+--- /dev/null
++++ b/DefaultServices.mqh
+@@ -0,0 +1,73 @@
++//
++
++#include "libraries\math.mqh"
++#include "libraries\time.mqh"
++#include "libraries\arrays.mqh"
++#include "libraries\strfunctions.mqh"
++#include "libraries\commonfunctions.mqh"
++#include "libraries\comments.mqh"
++
++#include "TestManager\Loader.mqh"
++#include "EventHandler\EventHandler.mqh"
++#include "SymbolLoader\SymbolLoader.mqh"
++
++#include "OrderManager\Loader.mqh"
++
++#ifdef __MQL4__
++#include "OrderManagerMT4\Loader.mqh"
++#endif
++
++#ifdef __MQL5__
++#include "OrderManagerMT5\Loader.mqh"
++#endif
++
++#include "OrderManager\OrderFactory.mqh"
++#include "OrderManager\AttachedOrderFactory.mqh"
++
++#include "SymbolLoader\SymbolInfoVars.mqh"
++
++#include "ChartInfo\IsFirstTick.mqh"
++
++#include "Commands\Loader.mqh"
++
++#include "EntryMethod\EntryMethodBase.mqh"
++#include "Signals\SignalManagerBase.mqh"
++#include "Commands\OrderCommandHandlerBase.mqh"
++
++#include "ScriptManager\ScriptManagerBase.mqh"
++#include "ScriptManager\OrderScriptHandler.mqh"
++
++#include "TrailingStop\TrailingStop.mqh"
++
++#include "EventManager\EventManager.mqh"
++#include "CommandManager\CommandManager.mqh"
++
++#include "Tests\Loader.mqh"
++
++
++
++void register_services()
++{
++   // logs events like error and notifications
++   global_app().RegisterService(new CEventHandler(),srvEvent,"eventhandler");
++
++   // manages events, handlers are registered by SetEventHandler() method
++   global_app().RegisterService(new CEventManager(),srvEventManager,"eventmanager");
++   
++   // manages commands, handlers are registered by SetCommandHandler() method
++   global_app().RegisterService(new CCommandManager(),srvCommandManager,"commandmanager");
++   
++   // loads symbol info
++   global_app().RegisterService(new CSymbolLoader(),srvSymbolLoader,"symbolloader");
++   
++   // manages orders
++   global_app().RegisterService(new COrderManager(),srvOrderManager,"ordermanager");
++   
++   // creates order objects
++   global_app().RegisterService(new COrderFactory(),srvOrderFactory,"orderfactory");
++   global_app().RegisterService(new CAttachedOrderFactory(),srvAttachedOrderFactory,"attachedorderfactory");
++   
++   // sets global vars for symbol info easy access
++   global_app().RegisterService(new CSymbolInfoVars(Symbol()),srvSymbolInfoVars,"symbolinfovars");
++  
++}
+\ No newline at end of file
+diff --git a/DependencyManager/DependencyManager.mqh b/DependencyManager/DependencyManager.mqh
+deleted file mode 100644
+index c48da35..0000000
+--- a/DependencyManager/DependencyManager.mqh
++++ /dev/null
+@@ -1,65 +0,0 @@
+-#include "..\Loader.mqh"
+-
+-class CDependencyItem : public CArrayObj
+-{
+-public:
+-   ENUM_CLASS_NAMES caller;
+-   ENUM_CLASS_NAMES dependency;
+-   CAppObject* callback;
+-   
+-   CDependencyItem(ENUM_CLASS_NAMES _caller,
+-   ENUM_CLASS_NAMES _dependency)
+-   {
+-      caller = _caller;
+-      dependency = _dependency;
+-   }
+-};
+-
+-class CDependencyManager : CDependencyManagerInterface
+-{
+-public:
+-   TraitGetType { return classDependencyManager; }
+-
+-   int FindDependency(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency)
+-   {
+-      for (int i = 0; i < Total(); i++) {
+-         CDependencyItem* dependencyitem = At(i);
+-         if (caller == dependencyitem.caller && dependency == dependencyitem.dependency) {
+-            return i;
+-         }
+-      }
+-      return -1;
+-   }
+-
+-   virtual void SetDependency(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency, CAppObject* callback)
+-   {
+-      int idx = FindDependency(caller,dependency);
+-      if (idx < 0) {
+-         this.Add(new CDependencyItem(caller,dependency));
+-         idx = this.Total()-1;
+-      }
+-      CDependencyItem* item = At(idx);
+-      item.callback = callback;
+-   }
+-   
+-   virtual CAppObject* GetDependency(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency)
+-   {
+-      int idx = FindDependency(caller,dependency);
+-      if (idx < 0) {
+-         Print("dependency ",EnumToString(dependency)," not found for "+EnumToString(caller));
+-         return NULL;
+-      }
+-      CDependencyItem* item = At(idx);
+-      CAppObject* callback = item.callback;
+-      CAppObject* obj;
+-      callback.callback(0,obj);
+-      Prepare(obj);
+-      return obj;
+-   }
+-   
+-   virtual bool DependencyIsSet(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency)
+-   {
+-      int idx = FindDependency(caller,dependency);
+-      return idx >= 0;
+-   }
+-};
+\ No newline at end of file
+diff --git a/DependencyManager/__classnames.mqh b/DependencyManager/__classnames.mqh
+deleted file mode 100644
+index 5b92092..0000000
+--- a/DependencyManager/__classnames.mqh
++++ /dev/null
+@@ -1 +0,0 @@
+-classDependencyManager,
+\ No newline at end of file
+diff --git a/EADefaultLoader.mqh b/EADefaultLoader.mqh
+deleted file mode 100644
+index 01d3654..0000000
+--- a/EADefaultLoader.mqh
++++ /dev/null
+@@ -1,60 +0,0 @@
+-//
+-#include "libraries\math.mqh"
+-#include "libraries\time.mqh"
+-#include "libraries\arrays.mqh"
+-#include "libraries\strfunctions.mqh"
+-#include "libraries\commonfunctions.mqh"
+-#include "libraries\comments.mqh"
+-
+-#include "EventHandler\EventHandler.mqh"
+-#include "TestManager\Loader.mqh"
+-#include "EventManager\EventManager.mqh"
+-#include "CommandManager\CommandManager.mqh"
+-#include "DependencyManager\DependencyManager.mqh"
+-
+-#include "Commands\Loader.mqh"
+-#include "Tests\Loader.mqh"
+-
+-#include "SymbolLoader\SymbolLoader.mqh"
+-#include "OrderManager\Loader.mqh"
+-#ifdef __MQL4__
+-#include "OrderManagerMT4\Loader.mqh"
+-#endif
+-#ifdef __MQL5__
+-#include "OrderManagerMT5\Loader.mqh"
+-#endif
+-#include "SymbolLoader\SymbolInfoVars.mqh"
+-#include "Commands\OrderCommandHandlerBase.mqh"
+-
+-#include "Signals\Signal.mqh"
+-#include "EntryMethod\EntryMethodSignal.mqh"
+-#include "ScriptManager\ScriptManagerBase.mqh"
+-#include "ScriptManager\OrderScriptHandler.mqh"
+-
+-#include "ChartInfo\IsFirstTick.mqh"
+-#include "TrailingStop\TrailingStop.mqh"
+-
+-void register_services()
+-{
+-   // logs events like error and notifications
+-   global_app().RegisterService(new CEventHandler(),srvEvent,"eventhandler");
+-
+-   // manages events, handlers are registered by SetEventHandler() method
+-   global_app().RegisterService(new CEventManager(),srvEventManager,"eventmanager");
+-   
+-   // manages commands, handlers are registered by SetCommandHandler() method
+-   global_app().RegisterService(new CCommandManager(),srvCommandManager,"commandmanager");
+-   
+-   global_app().RegisterService(new CDependencyManager(),srvDependencyManager,"dependencymanager");
+-   
+-   // loads symbol info
+-   global_app().RegisterService(new CSymbolLoader(),srvSymbolLoader,"symbolloader");
+-   
+-   // manages orders
+-   global_app().RegisterService(new COrderManager(new COrder),srvOrderManager,"ordermanager");
+-   global_app().SetDependency(classOrder,classAttachedOrder,new CAttachedOrder());
+-   
+-   // sets global vars for symbol info easy access
+-   global_app().RegisterService(new CSymbolInfoVars(Symbol()),srvSymbolInfoVars,"symbolinfovars");
+-  
+-}
+\ No newline at end of file
+diff --git a/EntryMethod/EntryMethodBase.mqh b/EntryMethod/EntryMethodBase.mqh
+new file mode 100644
+index 0000000..daaf7c9
+--- /dev/null
++++ b/EntryMethod/EntryMethodBase.mqh
+@@ -0,0 +1,76 @@
++#include "..\Loader.mqh"
++
++class CEntryMethodBase : public CEntryMethodInterface
++{
++public:
++   virtual int Type() const { return classEntryMethodBase; }
++
++   TraitAppAccess
++   TraitSendCommands
++
++   COrderManager* ordermanager;
++   virtual void Initalize()
++   {
++      this.ordermanager = this.App().GetService(srvOrderManager);
++   }
++   
++   virtual void OnCloseSellSignal(bool valid)
++   {
++      if (valid) CommandSend(COrderCommand::CommandCloseSell);
++   }
++   
++   virtual void OnCloseBuySignal(bool valid)
++   {
++      if (valid) CommandSend(COrderCommand::CommandCloseBuy);
++   }
++   
++   virtual void OnCloseAllSignal(bool valid)
++   {
++      if (valid) CommandSend(COrderCommand::CommandCloseAll);
++   }
++   
++   virtual void OnCloseBuyOpposite(bool valid)
++   {
++      if (valid) CommandSend(COrderCommand::CommandCloseSell);
++   }
++   
++   virtual void OnCloseSellOpposite(bool valid)
++   {
++      if (valid) CommandSend(COrderCommand::CommandCloseBuy);
++   }
++   
++   virtual void OnBuySignal(bool valid)
++   {
++      if (CloseOpposite()) OnCloseBuyOpposite(valid);
++      if (BuySignalFilter(valid)) {
++         CommandSend(COrderCommand::CommandOpenBuy);
++      }
++   }
++   virtual void OnSellSignal(bool valid)
++   {   
++      if (CloseOpposite()) OnCloseSellOpposite(valid);
++      if (SellSignalFilter(valid)) {
++         CommandSend(COrderCommand::CommandOpenSell);
++      }
++   }
++   virtual void OnBothSignal(bool valid)
++   {
++      
++   }
++   
++   virtual bool CloseOpposite()
++   {
++      return false;
++   }
++   
++   virtual bool BuySignalFilter(bool valid)
++   {
++      return valid;
++   }
++   
++   virtual bool SellSignalFilter(bool valid)
++   {
++      return valid;
++   }
++
++};
+\ No newline at end of file
+diff --git a/EntryMethod/EntryMethodSignal.mqh b/EntryMethod/EntryMethodSignal.mqh
+deleted file mode 100644
+index 15388f8..0000000
+--- a/EntryMethod/EntryMethodSignal.mqh
++++ /dev/null
+@@ -1,112 +0,0 @@
+-#include "..\Loader.mqh"
+-
+-class CEntryMethodSignal : public CServiceProvider
+-{
+-public:
+-   virtual int Type() const { return classEntryMethodSignal; }
+-
+-   TraitAppAccess
+-   TraitSendCommands
+-   TraitHasEvents
+-
+-   static int Signal;
+-
+-   void GetEvents(int& events[])
+-   {
+-      ArrayResize(events,1);
+-      events[0] = EventId(Signal);
+-   }
+-
+-   COrderManager* ordermanager;
+-   virtual void Initalize()
+-   {
+-      this.ordermanager = this.App().GetService(srvOrderManager);
+-   }
+-
+-   CSignal* mainsignal;
+-   int bar;
+-
+-   virtual void OnTick()
+-   {
+-      mainsignal.Run(bar);
+-      
+-      if (mainsignal.signal != mainsignal.lastsignal || mainsignal.closesignal != mainsignal.lastclosesignal) {
+-         App().eventmanager.Send(Signal,mainsignal);
+-      }
+-      
+-      switch (mainsignal.closesignal) {
+-         case SIGNAL_BUY: OnCloseSellSignal(mainsignal.closesignal_valid); break;
+-         case SIGNAL_SELL: OnCloseBuySignal(mainsignal.closesignal_valid); break;
+-         case SIGNAL_BOTH: OnCloseAllSignal(mainsignal.closesignal_valid); break;
+-      }
+-      switch (mainsignal.signal) {
+-         case SIGNAL_BUY: OnBuySignal(mainsignal.valid); break;
+-         case SIGNAL_SELL: OnSellSignal(mainsignal.valid); break;
+-         case SIGNAL_BOTH: OnBothSignal(mainsignal.valid); break;
+-      }
+-      
+-      mainsignal.OnTick();
+-   }
+-   
+-   virtual void OnCloseSellSignal(bool valid)
+-   {
+-      if (valid) CommandSend(COrderCommand::CommandCloseSell);
+-   }
+-   
+-   virtual void OnCloseBuySignal(bool valid)
+-   {
+-      if (valid) CommandSend(COrderCommand::CommandCloseBuy);
+-   }
+-   
+-   virtual void OnCloseAllSignal(bool valid)
+-   {
+-      if (valid) CommandSend(COrderCommand::CommandCloseAll);
+-   }
+-   
+-   virtual void OnCloseBuyOpposite(bool valid)
+-   {
+-      if (valid) CommandSend(COrderCommand::CommandCloseSell);
+-   }
+-   
+-   virtual void OnCloseSellOpposite(bool valid)
+-   {
+-      if (valid) CommandSend(COrderCommand::CommandCloseBuy);
+-   }
+-   
+-   virtual void OnBuySignal(bool valid)
+-   {
+-      if (CloseOpposite()) OnCloseBuyOpposite(valid);
+-      if (BuySignalFilter(valid)) {
+-         CommandSend(COrderCommand::CommandOpenBuy);
+-      }
+-   }
+-   virtual void OnSellSignal(bool valid)
+-   {   
+-      if (CloseOpposite()) OnCloseSellOpposite(valid);
+-      if (SellSignalFilter(valid)) {
+-         CommandSend(COrderCommand::CommandOpenSell);
+-      }
+-   }
+-   virtual void OnBothSignal(bool valid)
+-   {
+-      
+-   }
+-   
+-   virtual bool CloseOpposite()
+-   {
+-      return false;
+-   }
+-   
+-   virtual bool BuySignalFilter(bool valid)
+-   {
+-      return valid;
+-   }
+-   
+-   virtual bool SellSignalFilter(bool valid)
+-   {
+-      return valid;
+-   }
+-
+-};
+-
+-int CEntryMethodSignal::Signal = 0;
+\ No newline at end of file
+diff --git a/EntryMethod/__classnames.mqh b/EntryMethod/__classnames.mqh
+index 075753c..64305ac 100644
+--- a/EntryMethod/__classnames.mqh
++++ b/EntryMethod/__classnames.mqh
+@@ -1 +1 @@
+-classEntryMethodSignal,
+\ No newline at end of file
++classEntryMethodBase,
+\ No newline at end of file
+diff --git a/Interfaces/Loader.mqh b/Interfaces/Loader.mqh
+index 638e86d..13a682c 100644
+--- a/Interfaces/Loader.mqh
++++ b/Interfaces/Loader.mqh
+@@ -7,8 +7,8 @@
+ #include "ServiceProviders\SymbolLoaderInterface.mqh"
+ #include "ServiceProviders\FactoryInterface.mqh"
+ #include "ServiceProviders\OrderManagerInterface.mqh"
++#include "ServiceProviders\EntryMethodInterface.mqh"
+ #include "ServiceProviders\ScriptManagerInterface.mqh"
+ #include "ServiceProviders\EventManagerInterface.mqh"
+ #include "ServiceProviders\CommandManagerInterface.mqh"
+ #include "ServiceProviders\TestManagerInterface.mqh"
+-#include "ServiceProviders\DependencyManagerInterface.mqh"
+\ No newline at end of file
+diff --git a/Interfaces/ServiceProviders/DependencyManagerInterface.mqh b/Interfaces/ServiceProviders/DependencyManagerInterface.mqh
+deleted file mode 100644
+index a1c0c6d..0000000
+--- a/Interfaces/ServiceProviders/DependencyManagerInterface.mqh
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "..\..\Loader.mqh"
+-
+-class CDependencyManagerInterface : public CServiceProviderArrayObj
+-{
+-
+-public:
+-
+-   virtual void SetDependency(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency, CAppObject* callback)
+-   {
+-      
+-   }
+-   
+-   virtual CAppObject* GetDependency(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency)
+-   {
+-      return NULL;
+-   }
+-   
+-   virtual bool DependencyIsSet(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency)
+-   {
+-      return false;
+-   }
+-   
+-};
+\ No newline at end of file
+diff --git a/Interfaces/ServiceProviders/EntryMethodInterface.mqh b/Interfaces/ServiceProviders/EntryMethodInterface.mqh
+new file mode 100644
+index 0000000..ba28e68
+--- /dev/null
++++ b/Interfaces/ServiceProviders/EntryMethodInterface.mqh
+@@ -0,0 +1,32 @@
++//
++#include "..\..\Loader.mqh"
++
++class CEntryMethodInterface : public CServiceProvider
++{
++public:
++
++   virtual void OnCloseSellSignal(bool valid)
++   {
++   }
++   
++   virtual void OnCloseBuySignal(bool valid)
++   {
++   }
++   
++   virtual void OnCloseAllSignal(bool valid)
++   {
++   }
++   
++   virtual void OnBuySignal(bool valid)
++   {
++   }
++   
++   virtual void OnSellSignal(bool valid)
++   {   
++   }
++   
++   virtual void OnBothSignal(bool valid)
++   {   
++   }
++
++};
+\ No newline at end of file
+diff --git a/Interfaces/__classnames.mqh b/Interfaces/__classnames.mqh
+deleted file mode 100644
+index c2cff50..0000000
+--- a/Interfaces/__classnames.mqh
++++ /dev/null
+@@ -1,4 +0,0 @@
+-classTestInterface,
+-classSymbolInfoInterface,
+-classStopsCalcInterface,
+-classOrderInterface,
+\ No newline at end of file
+diff --git a/OrderManager/AttachedOrderFactory.mqh b/OrderManager/AttachedOrderFactory.mqh
+new file mode 100644
+index 0000000..639d096
+--- /dev/null
++++ b/OrderManager/AttachedOrderFactory.mqh
+@@ -0,0 +1,8 @@
++//
++#include "..\Loader.mqh"
++class CAttachedOrderFactory : public CFactoryInterface {
++public:
++   virtual int Type() const { return classAttachedOrderFactory; }
++protected:
++   virtual CAppObject* GetNewObject() { return new CAttachedOrder(); }
++};
+\ No newline at end of file
+diff --git a/OrderManager/OrderFactory.mqh b/OrderManager/OrderFactory.mqh
+new file mode 100644
+index 0000000..8c9bf8e
+--- /dev/null
++++ b/OrderManager/OrderFactory.mqh
+@@ -0,0 +1,9 @@
++//
++#include "..\Loader.mqh"
++
++class COrderFactory : public CFactoryInterface {
++public:
++   virtual int Type() const { return classOrderFactory; }
++protected:
++   virtual CAppObject* GetNewObject() { return new COrder(); }
++};
+\ No newline at end of file
+diff --git a/OrderManager/__classnames.mqh b/OrderManager/__classnames.mqh
+index bcb6bf4..fc7aa46 100644
+--- a/OrderManager/__classnames.mqh
++++ b/OrderManager/__classnames.mqh
+@@ -1,7 +1,7 @@
++classAttachedOrderFactory,
++classOrderFactory,
+ classStopsCalc,
+ classEntry,
+ classStopLoss,
+ classTakeProfit,
+-classOrderDataSaver,
+-classAttachedOrder,
+-classOrder,
+\ No newline at end of file
++classOrderDataSaver,
+\ No newline at end of file
+diff --git a/OrderManagerMT4/AttachedOrder.mqh b/OrderManagerMT4/AttachedOrder.mqh
+index 49bb3fe..3484ad6 100644
+--- a/OrderManagerMT4/AttachedOrder.mqh
++++ b/OrderManagerMT4/AttachedOrder.mqh
+@@ -3,8 +3,7 @@
+ class CAttachedOrder : public COrderBase
+ {
+ public:
+-   TraitGetType { return classMT4AttachedOrder; }
+-   TraitNewObject { return new CAttachedOrder(); }
++   virtual int Type() const { return classMT4AttachedOrder; }
+ 
+ public:
+    string name;  
+@@ -23,7 +22,7 @@ public:
+       MTPFileBin file;
+       file.Handle(handle);            
+       if (file.Invalid()) return false;
+-      if (!file.WriteString(name)) return file.Error("name",__FUNCTION__);
++      //if (!file.WriteString(name)) return file.Error("name",__FUNCTION__);
+       if (!COrderBase::Save(handle)) return file.Error("COrderBase",__FUNCTION__);
+       return(true);
+    }
+@@ -33,7 +32,7 @@ public:
+       MTPFileBin file;
+       file.Handle(handle);            
+       if (file.Invalid()) return false;
+-      if (!file.ReadString(name)) return file.Error("name",__FUNCTION__);
++      //if (!file.ReadString(name)) return file.Error("name",__FUNCTION__);
+       if (!COrderBase::Load(handle)) return file.Error("COrderBase",__FUNCTION__);
+       return(true);
+    }
+diff --git a/OrderManagerMT4/AttachedOrderArray.mqh b/OrderManagerMT4/AttachedOrderArray.mqh
+index b781903..d924dd1 100644
+--- a/OrderManagerMT4/AttachedOrderArray.mqh
++++ b/OrderManagerMT4/AttachedOrderArray.mqh
+@@ -4,13 +4,11 @@
+ class CAttachedOrderArray : public CAppObjectArrayObj
+ {
+ public:
+-   TraitAppAccess
+-   
+    virtual int Type() const { return classMT4AttachedOrderArray; }
+ public:
+    CAttachedOrder *AttachedOrder(int nIndex){return((CAttachedOrder*)At(nIndex));}   
+    virtual bool  CreateElement(const int index) {
+-      m_data[index] = App().GetDependency(classOrder,classAttachedOrder);      
++      m_data[index] = ((CApplication*)this.AppBase()).attachedorderfactory.Create();      
+       return(true);
+    }
+ };
+\ No newline at end of file
+diff --git a/OrderManagerMT4/Order.mqh b/OrderManagerMT4/Order.mqh
+index f497cdf..31bc017 100644
+Binary files a/OrderManagerMT4/Order.mqh and b/OrderManagerMT4/Order.mqh differ
+diff --git a/OrderManagerMT4/OrderArray.mqh b/OrderManagerMT4/OrderArray.mqh
+index 66e8e95..7b5ed0f 100644
+--- a/OrderManagerMT4/OrderArray.mqh
++++ b/OrderManagerMT4/OrderArray.mqh
+@@ -14,16 +14,14 @@ public:
+          _symbol = App().symbolloader.LoadSymbol(__symbol);
+       }
+ 
+-      CAppObject* neworder;   
+-      COrderArray(CAppObject* _neworder)
++      COrderArray()
+       {
+-         neworder = _neworder;
+          m_free_mode = true;
+       }
+       COrder* Order(int nIndex){ if (!isset(At(nIndex))) return(NULL); else return((COrder*)At(nIndex)); }     
+       
+       virtual bool  CreateElement(const int index) {
+-         m_data[index] = (CObject*)(App().NewObject(neworder));
++         m_data[index] = (CObject*)(App().orderfactory.Create());
+          return(true);
+       }
+       
+diff --git a/OrderManagerMT4/OrderBase.mqh b/OrderManagerMT4/OrderBase.mqh
+index 9d1dc0d..6d0b65a 100644
+--- a/OrderManagerMT4/OrderBase.mqh
++++ b/OrderManagerMT4/OrderBase.mqh
+@@ -18,7 +18,7 @@ class COrderBase : public COrderInterface
+ {
+ public:
+    virtual int Type() const { return classMT4OrderBase; }
+-   
++
+    TraitHasEvents
+ 
+    static int EventTriggeringVirtualOrder;
+@@ -738,7 +738,7 @@ bool COrderBase::delete_mm_objects = false;
+                } else {
+                   executestate = ES_CANCELED;
+                   return false;
+-               }           
++               }        
+             }
+             return(true);
+          } else {
+diff --git a/OrderManagerMT4/OrderManager.mqh b/OrderManagerMT4/OrderManager.mqh
+index f74b027..8398b11 100644
+--- a/OrderManagerMT4/OrderManager.mqh
++++ b/OrderManagerMT4/OrderManager.mqh
+@@ -30,8 +30,8 @@ public:
+ 
+    bool ontick_has_run;
+ 
+-   COrderArray* orders;
+-   COrderArray* historyorders;
++   COrderArray orders;
++   COrderArray historyorders;
+    CAttachedOrderArray attachedorders;
+ 
+    COrder* selectedorder;
+@@ -49,26 +49,9 @@ public:
+    bool sl_virtual;
+    bool tp_virtual;
+    bool price_virtual;
+-   
+-   /*COrderManager()
+-   {
+-      trade = NULL;
+-      custom_order_defaults = false;
+-      retrainhistory = 2592000;
+-      move_to_history_on_update = false;
+-      sl_virtual = false;
+-      tp_virtual = false;
+-      price_virtual = false;
+-      ontick_has_run = true;
+-   };*/
+-   
+-   CAppObject* neworder;   
+-   COrderManager(CAppObject* _neworder)
+-   {
+-      neworder = _neworder;
+-      orders = new COrderArray(neworder);
+-      historyorders = new COrderArray(neworder);
+       
++   COrderManager()
++   {
+       trade = NULL;
+       custom_order_defaults = false;
+       retrainhistory = 2592000;
+@@ -79,13 +62,6 @@ public:
+       ontick_has_run = true;
+    };
+    
+-   ~COrderManager()
+-   {
+-      delete orders;
+-      delete historyorders;
+-   }
+-   
+-   
+    CApplication* app;
+    
+    void Initalize()
+@@ -168,14 +144,13 @@ public:
+    double COrderManager::TotalProfit(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1);
+    double COrderManager::TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1, bool _commission = true, bool swap = true);
+    
+-   virtual COrderInterface* NewOrderObject() { return this.app.NewObject(neworder); }
+-   virtual COrderInterface* NewAttachedOrderObject() { return app.GetDependency(classOrder,classAttachedOrder); }
++   virtual COrderInterface* NewOrderObject() { return app.orderfactory.Create(); }
++   virtual COrderInterface* NewAttachedOrderObject() { return app.attachedorderfactory.Create(); }
+    
+    bool GetOrders(ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY, string in_symbol = "", int in_magic = -1, bool no_loop_and_reset = false)
+    {
+       static int get_orders_i = -1;
+       int total = this.OrdersTotal();
+-      Print(total);
+       if (get_orders_i < 0) {
+          get_orders_i = 0;
+       }
+@@ -368,7 +343,7 @@ int OriginalOrdersTotal()
+       if (_stoploss != NULL) _stoploss.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price != NULL ? _price.GetPrice() : 0);
+       if (_takeprofit != NULL) _takeprofit.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price != NULL ? _price.GetPrice() : 0);
+       _mm.SetSymbol(in_symbol).SetStopLoss(_stoploss);
+-
++      
+       _order.NewOrder(
+          in_symbol,_ordertype,_mm.GetLotsize(),
+          _price == NULL ? 0 : _price.GetPrice(),
+diff --git a/OrderManagerMT5/AttachedOrder.mqh b/OrderManagerMT5/AttachedOrder.mqh
+index 5d67ad2..e2891c4 100644
+--- a/OrderManagerMT5/AttachedOrder.mqh
++++ b/OrderManagerMT5/AttachedOrder.mqh
+@@ -3,11 +3,10 @@ class CAttachedOrder : public COrderBase
+ {
+ public:
+    virtual int Type() const { return classMT5AttachedOrder; }
+-   TraitNewObject { return new CAttachedOrder(); }
+ public:
+    string name;
+    bool filling_updated;
+-   //static CAttachedOrder* Null() { return(new CAttachedOrder()); }
++   static CAttachedOrder* Null() { return(new CAttachedOrder()); }
+    
+    virtual bool Save(const int handle)
+    {
+diff --git a/OrderManagerMT5/AttachedOrderArray.mqh b/OrderManagerMT5/AttachedOrderArray.mqh
+index 6deda21..4d7f2e5 100644
+--- a/OrderManagerMT5/AttachedOrderArray.mqh
++++ b/OrderManagerMT5/AttachedOrderArray.mqh
+@@ -3,16 +3,15 @@
+ class CAttachedOrderArray : public CAppObjectArrayObj
+ {
+ public:
+-   TraitAppAccess
+    virtual int Type() const { return classMT5AttachedOrderArray; }
+ public:
++   CAttachedOrder    *AttachedOrder(int nIndex){return((CAttachedOrder*)At(nIndex));}  
+    CAttachedOrderArray()
+    {
+       m_free_mode = true;
+    }
+-   CAttachedOrder    *AttachedOrder(int nIndex){return((CAttachedOrder*)At(nIndex));}  
+    virtual bool  CreateElement(const int index) {
+-      m_data[index] = (CObject*)(App().GetDependency(classOrder,classAttachedOrder));      
++      m_data[index] = (CObject*)(((CApplication*)AppBase()).attachedorderfactory.Create());      
+       return(true);
+    } 
+ };
+diff --git a/OrderManagerMT5/Order.mqh b/OrderManagerMT5/Order.mqh
+index e745f49..8140512 100644
+--- a/OrderManagerMT5/Order.mqh
++++ b/OrderManagerMT5/Order.mqh
+@@ -4,21 +4,20 @@ class COrder : public COrderBase
+ {
+ public:
+    virtual int Type() const { return classMT5Order; }
+-   TraitNewObject { return new COrder(); }
+    
+ protected:
+-   string attachedtoticket;
+-   string stoploss_name;
+-   string takeprofit_name;
++   static string attachedtoticket;
++   static string stoploss_name;
++   static string takeprofit_name;
+    
++//BEGIN Need to save   
++
+    double sl;
+    double tp;
+    bool sl_set;
+    bool tp_set;
+ 
+ public:
+-   CAttachedOrderArray attachedorders;
+-
+    bool closed;
+    bool close_attempted;
+    
+@@ -31,13 +30,17 @@ public:
+    
+    double lastcloseprice;
+    
++//END Need to save
++
++   CAttachedOrderArray attachedorders;
++   
+    virtual bool Save(const int handle)
+    {
+       MTPFileBin file;
+       file.Handle(handle);            
+       if (file.Invalid()) return false;
+ 
+-      Print(__FUNCTION__+" Start Saving pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Start Saving pos: "+file.Tell());
+       
+       file.WriteDouble(sl);
+       file.WriteDouble(tp);
+@@ -52,15 +55,15 @@ public:
+       file.WriteDateTime(lastclosetime);
+       file.WriteDouble(lastcloseprice);
+ 
+-      Print(__FUNCTION__+" Start Saving AttachedOrders pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Start Saving AttachedOrders pos: "+file.Tell());
+ 
+       if (!file.WriteObject(GetPointer(attachedorders))) return file.Error("attachedorders",__FUNCTION__);
+       
+-      Print(__FUNCTION__+" Start Saving OrderBase pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Start Saving OrderBase pos: "+file.Tell());
+       
+       if (!COrderBase::Save(handle)) return file.Error("COrderBase",__FUNCTION__);
+ 
+-      Print(__FUNCTION__+" End Saving pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" End Saving pos: "+file.Tell());
+ 
+       return(true);
+    }
+@@ -71,7 +74,7 @@ public:
+       file.Handle(handle);            
+       if (file.Invalid()) return file.Error("invalid file",__FUNCTION__);           
+ 
+-      Print(__FUNCTION__+" Start Loading pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Start Loading pos: "+file.Tell());
+ 
+       file.ReadDouble(sl);
+       file.ReadDouble(tp);
+@@ -86,23 +89,20 @@ public:
+       file.ReadDateTime(lastclosetime);
+       file.ReadDouble(lastcloseprice);
+ 
+-      Print(__FUNCTION__+" Start Loading AttachedOrders pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Start Loading AttachedOrders pos: "+file.Tell());
+       
+       if (!file.ReadObject(GetPointer(attachedorders))) return file.Error("attachedorders",__FUNCTION__);
+ 
+-      Print(__FUNCTION__+" Start Loading OrderBase pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Start Loading OrderBase pos: "+file.Tell());
+       
+       if (!COrderBase::Load(handle)) return file.Error("COrderBase",__FUNCTION__);
+ 
+-      Print(__FUNCTION__+" End Loading pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" End Loading pos: "+file.Tell());
+ 
+       return(true);
+    }
+ 
+    COrder() {
+-      attachedtoticket = "attachedtoticket=";
+-      stoploss_name = "stoploss";
+-      takeprofit_name = "takeprofit";
+       closetime = 0;
+       lastclosetime = 0;
+    };
+@@ -164,6 +164,11 @@ public:
+    
+ };
+ 
++string COrder::attachedtoticket = "attachedtoticket=";
++string COrder::stoploss_name = "stoploss";
++string COrder::takeprofit_name = "takeprofit";
++
++
+ bool COrder::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,
+    const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0)
+ {
+@@ -195,7 +200,7 @@ bool COrder::CreateAttached(ENUM_ORDER_TYPE _ordertype, double _volume, double _
+ {
+    CAttachedOrder *attachedorder;
+    if (_price > 0 || ordertype_market(_ordertype)) {
+-      attachedorder = App().GetDependency(classOrder,classAttachedOrder);
++      attachedorder = ((CApplication*)AppBase()).attachedorderfactory.Create();
+       //attachedorder.ordermanager = this.ordermanager;
+       attachedorder.symbol = this.symbol;
+       attachedorder.ordertype = _ordertype;
+@@ -339,7 +344,7 @@ int COrder::GetStopLossTicks()
+ double COrder::GetStopLoss()
+ {
+    CAttachedOrder *attachedorder = GetStopLossOrder();
+-   if (attachedorder != NULL && attachedorder.Isset()) return(attachedorder.Price());
++   if (attachedorder.Isset()) return(attachedorder.Price());
+    return(0);
+ }
+ 
+@@ -351,7 +356,7 @@ CAttachedOrder* COrder::GetStopLossOrder()
+       //Print("sl ticket:"+attachedorder.ticket);
+       if (attachedorder.name == stoploss_name) return(attachedorder);
+    }
+-   return(NULL);
++   return(CAttachedOrder::Null());
+ }
+ int COrder::GetTakeProfitTicks()
+ {
+@@ -361,7 +366,7 @@ int COrder::GetTakeProfitTicks()
+ double COrder::GetTakeProfit()
+ {
+    CAttachedOrder *attachedorder = GetTakeProfitOrder();
+-   if (isset(attachedorder) && attachedorder.Isset()) return(attachedorder.Price());
++   if (attachedorder.Isset()) return(attachedorder.Price());
+    return(0);
+ }
+ 
+@@ -373,7 +378,7 @@ CAttachedOrder* COrder::GetTakeProfitOrder()
+       //Print("tp ticket:"+attachedorder.ticket);
+       if (attachedorder.name == takeprofit_name) return(attachedorder);
+    }
+-   return(NULL);
++   return(CAttachedOrder::Null());
+ }
+ 
+ bool COrder::Close(double closevolume = 0, double closeprice = 0)
+diff --git a/OrderManagerMT5/OrderArray.mqh b/OrderManagerMT5/OrderArray.mqh
+index 8238a7b..709ea79 100644
+--- a/OrderManagerMT5/OrderArray.mqh
++++ b/OrderManagerMT5/OrderArray.mqh
+@@ -3,18 +3,15 @@
+ class COrderArray : public CAppObjectArrayObj
+ {
+ public:
+-   TraitAppAccess
+    virtual int Type() const { return classMT5OrderArray; }
+ public:
+-   CAppObject* neworder;   
+-   COrderArray(CAppObject* _neworder)
++   COrderArray()
+    {
+-      neworder = _neworder;
+       m_free_mode = true;
+    }
+    COrder* Order(int nIndex){ if (!isset(At(nIndex))) return(NULL); else return((COrder*)At(nIndex)); }   
+    virtual bool  CreateElement(const int index) {
+-      m_data[index] = (CObject*)(App().NewObject(neworder));
++      m_data[index] = (CObject*)(((CApplication*)AppBase()).orderfactory.Create());
+       return(true);
+    }
+    
+diff --git a/OrderManagerMT5/OrderBase.mqh b/OrderManagerMT5/OrderBase.mqh
+index 41351dd..7feabab 100644
+--- a/OrderManagerMT5/OrderBase.mqh
++++ b/OrderManagerMT5/OrderBase.mqh
+@@ -1,4 +1,8 @@
+ //
++#include "..\Loader.mqh"
++
++#include "..\libraries\file.mqh"
++
+ class COrderBase : public COrderInterface
+ {
+ public:
+@@ -34,11 +38,11 @@ public:
+    
+    CTrade* trade;
+ 
+-   ENUM_EXECUTE_STATE executestate;
++//BEGIN Need to save   
+ 
++   ENUM_EXECUTE_STATE executestate;
+    ENUM_ORDER_STATE state;
+ 
+-public:
+    ulong ticket;
+    string symbol;
+    
+@@ -47,37 +51,63 @@ public:
+    double price;
+    datetime expiration;
+ 
+-public:
+    int id;
+    string comment;
+    int magic; // magic is not sent to server, if "restore orders from server" is developed, it will be needed
+ 
+-   bool selectedishistory;
+-   COrderInfoBase *orderinfo;
+-   COrderInfoV *orderinfov;
+-   CHistoryOrderInfoV *historyorderinfov;
+-   
+-   uint retcode;
+    datetime executetime;   
+    datetime filltime;
+ 
+-   bool price_set;
+-   bool expiration_set;
+-   bool typetime_set;
+-
+    double openprice;
+    double limit_price;
+    ENUM_ORDER_TYPE_TIME type_time;   
+ 
+-public:
+-  
+-  virtual bool Save(const int handle)
++   bool price_set;
++   bool expiration_set;
++   bool typetime_set;
++
++//BEGIN Need to save   
++   
++   uint retcode;
++      
++   bool selectedishistory;
++   COrderInfoBase *orderinfo;
++   COrderInfoV *orderinfov;
++   CHistoryOrderInfoV *historyorderinfov;
++      
++   virtual bool Save(const int handle)
+    {
+       MTPFileBin file;
+       file.Handle(handle);            
+       if (file.Invalid()) return false;
+ 
+-      Print(__FUNCTION__+" Start Saving pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Start Saving pos: "+file.Tell());
++      
++      /*ENUM_EXECUTE_STATE executestate;
++      ENUM_ORDER_STATE state;
++   
++      ulong ticket;
++      string symbol;
++      
++      ENUM_ORDER_TYPE ordertype;
++      double volume;
++      double price;
++      datetime expiration;
++   
++      int id;
++      string comment;
++      int magic; // magic is not sent to server, if "restore orders from server" is developed, it will be needed
++   
++      datetime executetime;   
++      datetime filltime;
++   
++      double openprice;
++      double limit_price;
++      ENUM_ORDER_TYPE_TIME type_time;   
++   
++      bool price_set;
++      bool expiration_set;
++      bool typetime_set;*/
+       
+       file.WriteInteger(executestate);
+       file.WriteInteger(state);
+@@ -104,7 +134,7 @@ public:
+       file.WriteBool(expiration_set);
+       file.WriteBool(typetime_set);
+       
+-      Print(__FUNCTION__+" End Saving pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" End Saving pos: "+file.Tell());
+         
+       return(true);  
+    }
+@@ -115,20 +145,20 @@ public:
+       file.Handle(handle);            
+       if (file.Invalid()) return false;
+       
+-      Print(__FUNCTION__+" Start Loading pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Start Loading pos: "+file.Tell());
+       
+       int itemp;
+       
+       file.ReadInteger(itemp);
+-      executestate = (ENUM_EXECUTE_STATE)itemp;
++      executestate = itemp;
+       file.ReadInteger(itemp);
+-      state = (ENUM_ORDER_STATE)itemp;
++      state = itemp;
+       
+       file.ReadLong(ticket);
+       file.ReadString(symbol);
+       
+       file.ReadInteger(itemp);
+-      ordertype = (ENUM_ORDER_TYPE)itemp;
++      ordertype = itemp;
+       
+       file.ReadDouble(volume);
+       file.ReadDouble(price);
+@@ -144,16 +174,18 @@ public:
+       file.ReadDouble(openprice);
+       file.ReadDouble(limit_price);
+       file.ReadInteger(itemp);
+-      type_time = (ENUM_ORDER_TYPE_TIME)itemp;
++      type_time = itemp;
+       
+       file.ReadBool(price_set);
+       file.ReadBool(expiration_set);
+       file.ReadBool(typetime_set);
+       
+-      Print(__FUNCTION__+" End Loading pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" End Loading pos: "+file.Tell());
+       
+       return(true);  
+    }
++
++public:
+    
+    COrderBase() {
+       this.id = maxid+1;
+diff --git a/OrderManagerMT5/OrderManager.mqh b/OrderManagerMT5/OrderManager.mqh
+index 25bbefb..239c556 100644
+--- a/OrderManagerMT5/OrderManager.mqh
++++ b/OrderManagerMT5/OrderManager.mqh
+@@ -24,8 +24,8 @@ private:
+    string mtp_comment;
+ 
+ public:
+-   COrderArray* orders;
+-   COrderArray* historyorders;
++   COrderArray orders;
++   COrderArray historyorders;
+ 
+    COrder* selectedorder;
+    COrderInfoBase* orderinfo;
+@@ -48,17 +48,17 @@ public:
+          return false;
+       }
+    
+-      Print(__FUNCTION__+" Start Saving pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Start Saving pos: "+file.Tell());
+    
+-      Print(__FUNCTION__+" Saving Orders pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Saving Orders pos: "+file.Tell());
+    
+       if (!file.WriteObject(GetPointer(orders))) return file.Error("orders",__FUNCTION__);
+    
+-      Print(__FUNCTION__+" Saving History Orders pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Saving History Orders pos: "+file.Tell());
+    
+       if (!file.WriteObject(GetPointer(historyorders))) return file.Error("historyorders",__FUNCTION__);
+    
+-      Print(__FUNCTION__+" End Saving pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" End Saving pos: "+file.Tell());
+    
+       return(true);
+    }
+@@ -73,54 +73,32 @@ public:
+          return false;
+       }                 
+    
+-      Print(__FUNCTION__+" Start Loading pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Start Loading pos: "+file.Tell());
+    
+-      Print(__FUNCTION__+" Loading Orders pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Loading Orders pos: "+file.Tell());
+    
+       if (!file.ReadObject(GetPointer(orders))) return file.Error("orders",__FUNCTION__);
+    
+-      Print(__FUNCTION__+" Loading HistoryOrders pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" Loading HistoryOrders pos: "+file.Tell());
+    
+       if (!file.ReadObject(GetPointer(historyorders))) return file.Error("historyorders",__FUNCTION__);
+    
+-      Print(__FUNCTION__+" End Loading pos: "+(string)file.Tell());
++      Print(__FUNCTION__+" End Loading pos: "+file.Tell());
+    
+       return(true);
+    }   
+-   
++      
+    COrderManager()
+    {
+-      orders = new COrderArray(neworder);
+-      historyorders = new COrderArray(neworder);
+-      custom_order_defaults = false;
+-      ticket_prefix = "ticket=";
+-      stoploss_comment = "stoploss"; //TODO: Remove
+-      takeprofit_comment = "takeprofit";
+-      mtp_comment = "mtp";
+-      retrainhistory = 2592000;
++     custom_order_defaults = false;
++
++     ticket_prefix = "ticket=";
++     stoploss_comment = "stoploss"; //TODO: Remove
++     takeprofit_comment = "takeprofit";
++     mtp_comment = "mtp";
++     retrainhistory = 2592000;
+    };
+    
+-   CAppObject* neworder;
+-   COrderManager(CAppObject* _neworder)
+-   {
+-      neworder = _neworder;
+-      
+-      orders = new COrderArray(neworder);
+-      historyorders = new COrderArray(neworder);
+-      custom_order_defaults = false;
+-      ticket_prefix = "ticket=";
+-      stoploss_comment = "stoploss"; //TODO: Remove
+-      takeprofit_comment = "takeprofit";
+-      mtp_comment = "mtp";
+-      retrainhistory = 2592000;
+-   }
+-   
+-   ~COrderManager()
+-   {
+-      delete orders;
+-      delete historyorders;
+-   }
+-   
+    CApplication* app;
+    void Initalize()
+    {
+@@ -145,8 +123,8 @@ public:
+       _symbol = symbolloader.LoadSymbol(__symbol);
+    }
+ 
+-   virtual COrderInterface* NewOrderObject() { return app.NewObject(neworder); }
+-   virtual COrderInterface* NewAttachedOrderObject() { return app.GetDependency(classOrder,classAttachedOrder); }
++   virtual COrderInterface* NewOrderObject() { return ((CApplication*)app).orderfactory.Create(); }
++   virtual COrderInterface* NewAttachedOrderObject() { return ((CApplication*)app).attachedorderfactory.Create(); }
+ 
+    COrder* NewOrder(string in_symbol,ENUM_ORDER_TYPE _ordertype,double _volume,double _price,double _stoploss,double _takeprofit,string _comment="",datetime _expiration=0);
+    COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,double volume,CEntry* _price,
+@@ -192,8 +170,14 @@ public:
+    double COrderManager::TotalProfit(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1);
+    double COrderManager::TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1, bool _commission = true, bool swap = true);
+    
++   ~COrderManager()
++   {
++   
++   };
+ };
+ 
++
++
+ COrder* COrderManager::NewOrder(string in_symbol,ENUM_ORDER_TYPE _ordertype,double _volume,double _price,double _stoploss,double _takeprofit,string _comment="",datetime _expiration=0)
+ {
+ 
+diff --git a/Signals/SignalManagerBase.mqh b/Signals/SignalManagerBase.mqh
+new file mode 100644
+index 0000000..675fd6f
+--- /dev/null
++++ b/Signals/SignalManagerBase.mqh
+@@ -0,0 +1,53 @@
++#include "..\Loader.mqh"
++#include "Signal.mqh"
++
++class CSignalManagerBase : public CServiceProvider
++{
++public:
++   virtual int Type() const { return classSignalManagerBase; }
++
++   TraitAppAccess
++   TraitHasEvents
++
++   static int Signal;
++
++   void GetEvents(int& events[])
++   {
++      ArrayResize(events,1);
++      events[0] = EventId(Signal);
++   }
++
++   CSignal* mainsignal;
++   CEntryMethodInterface* entrymethod;
++   int bar;
++   
++   virtual void Initalize()
++   {
++      entrymethod = App().GetService(srvEntryMethod);
++   }
++   
++   virtual void OnTick()
++   {
++      mainsignal.Run(bar);
++      
++      if (mainsignal.signal != mainsignal.lastsignal || mainsignal.closesignal != mainsignal.lastclosesignal) {
++         App().eventmanager.Send(Signal,mainsignal);
++      }
++      
++      switch (mainsignal.closesignal) {
++         case SIGNAL_BUY: entrymethod.OnCloseSellSignal(mainsignal.closesignal_valid); break;
++         case SIGNAL_SELL: entrymethod.OnCloseBuySignal(mainsignal.closesignal_valid); break;
++         case SIGNAL_BOTH: entrymethod.OnCloseAllSignal(mainsignal.closesignal_valid); break;
++      }
++      switch (mainsignal.signal) {
++         case SIGNAL_BUY: entrymethod.OnBuySignal(mainsignal.valid); break;
++         case SIGNAL_SELL: entrymethod.OnSellSignal(mainsignal.valid); break;
++         case SIGNAL_BOTH: entrymethod.OnBothSignal(mainsignal.valid); break;
++      }
++      
++      mainsignal.OnTick();
++   }
++   
++};
++
++int CSignalManagerBase::Signal = 0;
+\ No newline at end of file
+diff --git a/SymbolLoader/SymbolLoader.mqh b/SymbolLoader/SymbolLoader.mqh
+index 8cb5992..586400c 100644
+--- a/SymbolLoader/SymbolLoader.mqh
++++ b/SymbolLoader/SymbolLoader.mqh
+@@ -2,10 +2,8 @@
+ #include "..\Loader.mqh"
+ 
+ #ifdef __MQL4__
+-#include "..\SymbolInfoMT4\MTPSymbolInfo.mqh"
+-#endif
+-
+-#ifdef __MQL5__
++  #include "..\SymbolInfoMT4\MTPSymbolInfo.mqh"
++#else
+ #include "..\SymbolInfoMT5\MTPSymbolInfo.mqh"
+ #endif
+ 
+diff --git a/Template/template_premium_v3.1.ex4 b/Template/template_premium_v3.1.ex4
+new file mode 100644
+index 0000000..314b3a5
+Binary files /dev/null and b/Template/template_premium_v3.1.ex4 differ
+diff --git a/Template/template_premium_v3.1.mq4 b/Template/template_premium_v3.1.mq4
+new file mode 100644
+index 0000000..7396e35
+--- /dev/null
++++ b/Template/template_premium_v3.1.mq4
+@@ -0,0 +1,527 @@
++//* Copyright notice: This software and it's parts including any included files, except the anything from the "lib" directory is made by and is property of Dynamic Programming Solutions Corporation,
++//* while the strategy elements used in it is property of the customer. Any parts can be reused in later software which doesn't violate our Non-Disclosure Agreement.
++//* 
++//* Non-Disclosure Agreement:
++//* We pledge to hold your trading system in confidence.
++//* We will not resell your expert advisor that contains your trading ideas, nor will we publish your system specifications.
++//* Receipt of your system specifications or other intellectual property by us will effectively constitute a Non-Disclosure Agreement.
++//* We have no obligation with respect to such information where the information:
++//* 1) was known to us prior to receiving any of the Confidential Information from the customer;
++//* 2) has become publicly known through no wrongful act of Recipient;
++//* 3) was received by us without breach of this Agreement from a third party without restriction as to the use and disclosure of the information;
++//* 4) was independently developed by us without use of the Confidential Information 
++//* 
++//* The customer has the following rights:
++//* 1) Use the software in any instances for personal matters
++//* 2) Learn the code and change it
++//* 3) Ask any other programmer to make changes, under Non-Disclosure Agreement on the usage of the source code.
++//* 4) Resell this EA with possibility to provide the source code under Non-Disclosure Agreement.
++//* 5) Make this sofwtare available on website as a free downloadable product WITHOUT providing the source code (i.e. only the ex4 file is downloadable)
++
++#property copyright "Dynamic Programming Solutions Corp."
++#property link      "http://www.metatraderprogrammer.com"
++
++#define CUSTOM_SERVICES srvMain,
++#define CUSTOM_CLASSES classSignalManager, classEntryMethod, classOrderCommandHandler, classMain,
++
++#include <mtp_framework_1.2\Loader.mqh>
++#include <mtp_framework_1.2\DefaultServices.mqh>   
++
++input double lotsize = 0.1;
++
++input double entrypips = 0;
++input double stoploss = 20;
++input double takeprofit = 40;
++
++/*
++#define TRAILINGSTOP
++input double breakevenat = 0;
++input double breakeven_profit = 0;
++input double trailingstop_activate = 0;
++input double trailingstop = 0;
++input double trailingstop_step = 1;
++*/
++
++input int _bar = 1;
++input ENUM_TIMEFRAMES timeframe = 0;
++
++input bool reverse_strategy = false;
++input bool trade_only_at_barclose = true;
++input bool trade_only_signal_change = true;
++
++input bool long_enabled = true;
++input bool short_enabled = true;
++input bool close_opposite_order = false;
++input int maxorders = 1;
++
++#ifdef __MQL4__
++input bool sl_virtual = false;
++input bool tp_virtual = false;
++input bool vstops_draw_line = false;
++input bool realstops_draw_line = false;
++input bool orderbymarket = false;
++input color cl_buy = Blue;
++input color cl_sell = Red;
++#endif
++
++input int _magic = 1234;
++input int slippage = 3;
++
++input bool printcomment = false;
++input bool run_tests = false;
++
++ulong benchmark_sum;
++ulong benchmark_cnt;
++
++class CSignal1 : public COpenSignal { public:
++   double val1;
++   double val2;
++   virtual void CalculateValues() {
++      val1 = iClose(symbol,timeframe,bar);
++      val2 = iOpen(symbol,timeframe,bar);
++   }
++   virtual bool BuyCondition() { return (val1 > val2); }
++   virtual bool SellCondition() { return (val1 < val2); }
++   virtual void OnTick() {
++      if (comments_enabled) addcomment("Signal: "+signaltext(this.signal)+"\n");
++   }
++};
++
++class CClosesignal1 : public CCloseSignal { public:
++   double val1;
++   double val2;
++   virtual void CalculateValues() {
++      val1 = iClose(symbol,timeframe,bar);
++      val2 = iOpen(symbol,timeframe,bar);
++   }
++   virtual bool CloseSellCondition() { return (val1 > val2); }
++   virtual bool CloseBuyCondition() { return (val1 < val2); }
++   virtual void OnTick() {
++      if (comments_enabled) addcomment("Signal Close: "+signaltext_close(this.closesignal)+"\n");
++   }
++};
++
++/* INLINE SIGNAL
++class CMainSignal : public COpenAndCloseSignal
++{
++   CIsFirstTick* isfirsttick;
++   CMainSignal()
++   {
++      isfirsttick = new CIsFirstTick(symbol,timeframe);
++   }
++   OpenSignal()
++   {
++      
++   }
++   CloseSignal()
++   {
++      
++   }
++   virtual bool BeforeFilter() {
++      if (trade_only_at_barclose && !isfirsttick.isfirsttick()) return false;
++      return true;
++   }
++   
++   virtual bool AfterFilter() {
++      if (reverse_strategy) Reverse();
++      if (trade_only_signal_change && (lastsignal == SIGNAL_NONE || signal == lastsignal)) return false;
++      return true;
++   }
++   
++   virtual void OnTick() {
++      CSignalContainer::OnTick();
++      if (comments_enabled) addcomment("signal: "+signaltext(signal)+" valid:"+(string)valid+"\n");   
++   }   
++}
++*/
++
++class CMainSignal : public CSignalContainer
++{
++public:
++   CIsFirstTick* isfirsttick;
++   
++   CMainSignal()
++   {
++      isfirsttick = new CIsFirstTick(symbol,timeframe);
++      if (true) Add(new CSignal1());      
++      if (true) Add(new CClosesignal1());
++   }
++   
++   virtual bool BeforeFilter() {
++      if (trade_only_at_barclose && !isfirsttick.isfirsttick()) return false;
++      return true;
++   }
++   
++   virtual bool AfterFilter() {
++      if (reverse_strategy) Reverse();
++      if (trade_only_signal_change && (lastsignal == SIGNAL_NONE || signal == lastsignal)) return false;
++      return true;
++   }
++   
++   virtual bool AfterFilterClose() {
++      if (trade_only_signal_change && (lastclosesignal == SIGNAL_NONE || closesignal == lastclosesignal)) return false;
++      return true;
++   }
++   
++   virtual void OnTick() {
++      CSignalContainer::OnTick();
++      if (comments_enabled) addcomment("signal: "+signaltext(signal)+" valid:"+(string)valid+"\n");   
++   }   
++};
++
++class CSignalManager : public CSignalManagerBase
++{
++public:
++   TraitGetType { return classSignalManager; }
++   
++   virtual void OnInit()
++   {
++      bar = _bar;
++      mainsignal = new CMainSignal();      
++   }
++   
++   virtual void OnDeinit()
++   {
++      delete mainsignal;
++   }
++   
++   virtual void OnTick()
++   {
++      if (App().testmanager != NULL && App().testmanager.IsRunning()) return;
++      CSignalManagerBase::OnTick();
++   }
++   
++};
++
++class CEntryMethod : public CEntryMethodBase
++{
++public:
++   TraitGetType { return classEntryMethod; }
++
++   virtual bool BuySignalFilter(bool valid)
++   {
++      if (!short_enabled) return false;
++      if (ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED) >= maxorders) {
++         Print("cnt orders: "+(string)ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED));
++         return false;
++      }
++      return valid;
++   }
++   
++   virtual bool SellSignalFilter(bool valid)
++   {
++      if (!long_enabled) return false;
++      if (ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED) >= maxorders) {
++         Print("cnt orders: "+(string)ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED));
++         return false;
++      }
++      return valid;
++   }
++   virtual bool CloseOpposite()
++   {
++      return close_opposite_order;
++   }
++};
++
++class COrderCommandHandler : public COrderCommandHandlerBase
++{
++public:
++   CStopLoss* sl;
++   CTakeProfit* tp;
++   CMoneyManagement* mm;
++   CEntry* entry;
++   
++   ENUM_ORDER_TYPE buy_cmd;
++   ENUM_ORDER_TYPE sell_cmd;
++
++   virtual void Initalize()
++   {
++      COrderCommandHandlerBase::Initalize();
++   }
++   
++   virtual void OnInit()
++   {
++      mm = new CMoneyManagementFixed(lotsize);
++      sl = new CStopLossTicks(convertfract(stoploss));
++      tp = new CTakeProfitTicks(convertfract(takeprofit));
++      if (entrypips == 0) {
++         entry = NULL;
++         buy_cmd = ORDER_TYPE_BUY;
++         sell_cmd = ORDER_TYPE_SELL;
++         Print("using market orders");
++      } else if (entrypips > 0) {
++         entry = new CEntryTicks(convertfract(entrypips));
++         buy_cmd = ORDER_TYPE_BUY_STOP;
++         sell_cmd = ORDER_TYPE_SELL_STOP;
++         Print("using stop orders");
++      } else if (entrypips < 0) {
++         entry = new CEntryTicks(-convertfract(entrypips));
++         buy_cmd = ORDER_TYPE_BUY_LIMIT;
++         sell_cmd = ORDER_TYPE_SELL_LIMIT;
++         Print("using limit orders");
++      }
++   }
++
++   virtual int Type() const { return classOrderCommandHandler; }
++   
++   virtual void CloseAll()
++   {
++      ordermanager.CloseAll(ORDERSELECT_ANY,STATESELECT_ONGOING);
++   }
++
++   virtual void CloseBuy()
++   {
++      ordermanager.CloseAll(ORDERSELECT_LONG,STATESELECT_ONGOING);
++   }
++   
++   virtual void CloseSell()
++   {
++      ordermanager.CloseAll(ORDERSELECT_SHORT,STATESELECT_ONGOING);
++   }
++   
++   virtual CObject* OpenBuy()
++   {
++      return ordermanager.NewOrder(symbol,buy_cmd,mm,entry,sl,tp);
++   }
++   
++   virtual CObject* OpenSell()
++   {
++      return ordermanager.NewOrder(symbol,sell_cmd,mm,entry,sl,tp);   
++   }
++};
++
++#ifdef TRAILINGSTOP
++class CTrailingStopManager : public CServiceProvider
++{
++public:
++   CTrailingStop TrailingStop;
++
++   virtual void Initalize()
++   {
++      this.Prepare(GetPointer(TrailingStop));
++   }
++
++   virtual void OnTick()
++   {
++      TrailingStop.OnAll();
++   }
++   
++   virtual void OnInit()
++   {
++      TrailingStop.lockin = convertfract(breakevenat);
++      TrailingStop.lockinprofit = convertfract(breakeven_profit);
++      TrailingStop.activate = convertfract(trailingstop_activate);
++      TrailingStop.trailingstop = convertfract(trailingstop);
++      TrailingStop.step = convertfract(trailingstop_step);
++   }
++};
++#endif
++
++class CExpiration : public CServiceProvider
++{
++public:
++   TraitAppAccess
++   
++   int expiration_days;
++   
++   CExpiration()
++   {
++      expiration_days = 90;
++   }
++   
++   virtual void OnTick()
++   {
++      if (IsExpired()) {
++         addcomment("EA Expired\n");
++         if (this.App().ServiceIsRegistered(srvSignalManager)) application.DeregisterService(srvSignalManager);
++         if (this.App().ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvScriptManager);
++         ((COrderManager*)this.App().ordermanager).CloseAll(ORDERSELECT_ANY);
++      } else {
++         addcomment("This is a test version. EA will work until "+TimeToStr(GetExpirationTime()-1,TIME_DATE)+"\n");
++      }
++   }
++   
++   datetime GetExpirationTime()
++   {
++      return __DATE__+86400*expiration_days;
++   }
++   
++   bool IsExpired()
++   {
++      return (TimeCurrent() > GetExpirationTime());
++   }
++};
++
++class CChartComment : public CServiceProvider
++{
++public:
++   TraitAppAccess
++   
++   virtual void OnTick()
++   {
++      if (comments_enabled) {
++         writecomment_noformat();
++         if (printcomment) printcomment();
++         delcomment();
++      }
++   }
++   
++   virtual void OnInit()
++   {
++      if (IsTesting() && !IsVisualMode() && !printcomment) {    
++         comments_enabled = false;
++      }    
++   }
++};
++
++class CSignalEventListener : public CAppObject
++{
++   virtual bool callback(const int i, CObject*& o)
++   {
++      CSignal* signal = o;
++      Print("Signal changed: ",signaltext(signal.signal),", ",signaltext_close(signal.closesignal));
++      return false;
++   }
++};
++
++class COrderEventListener : public CAppObject
++{
++   virtual bool callback(const int id, CObject*& object)
++   {
++      COrder* order;
++      if (id == COrderCommandHandlerBase::EventOpeningBuy) {
++         Print("opening buy");
++      }
++      if (id == COrderCommandHandlerBase::EventOpenedBuy) {
++         order = object;
++         Print("opened buy: ",order.id);
++      }
++      if (id == COrderCommandHandlerBase::EventOpeningSell) {
++         Print("opening sell");
++      }
++      if (id == COrderCommandHandlerBase::EventOpenedSell) {
++         order = object;
++         Print("opened sell: ",order.id);
++      }
++      return true;
++   }
++};
++
++class CMain : public CServiceProvider
++{
++public:
++   TraitGetType { return classMain; }
++   TraitAppAccess
++
++   virtual void OnInit()
++   {
++      // TRADE
++      if (COrderBase::trade_default == NULL) COrderBase::trade_default = new CTrade();
++      if (IsTesting() && !IsVisualMode()) COrderBase::trade_default.LogLevel(LOG_LEVEL_ERRORS);
++      else COrderBase::trade_default.LogLevel(LOG_LEVEL_ALL);
++      COrderBase::trade_default.SetDeviationInPoints(slippage);
++         
++      #ifdef __MQL4__
++   
++         COrderBase::trade_default.SetColors(cl_buy, cl_sell);
++         COrderBase::trade_default.SetIsEcn(orderbymarket);      
++      
++         // ORDER
++         COrderBase::magic_default = _magic;
++         COrder::sl_virtual_default = sl_virtual;
++         COrder::tp_virtual_default = tp_virtual;
++         COrder::vstops_draw_line = vstops_draw_line;
++         COrder::realstops_draw_line = realstops_draw_line;   
++      
++      #endif   
++
++      if (IsTesting() && !IsVisualMode()) {      
++         application.eventhandler.SetLogLevel(E_ERROR);
++      } else {
++         application.eventhandler.SetLogLevel(E_NOTICE|E_WARNING|E_ERROR|E_INFO);
++      }
++      
++      ((COrderManager*)(application.ordermanager)).retrainhistory = 1;
++
++      #ifdef __MQL4__
++         ((COrderManager*)(application.ordermanager)).LoadOpenOrders(Symbol(),_magic);
++      #endif
++      
++   }
++   
++   virtual void OnDeinit()
++   {
++      if (benchmark_cnt > 0) Print("benchmark ("+(string)benchmark_cnt+"): "+(string)(benchmark_sum/(benchmark_cnt*1.0)));
++   }
++   
++   /*virtual void OnTimer()
++   {
++      application.OnTick();
++   }*/
++   
++};
++
++CApplication application;
++
++void OnTick()
++{
++   application.OnTick();  
++}
++
++
++int OnInit()
++{
++
++   if (!application.Initalized()) {
++   
++      register_services();
++   
++      application.RegisterService(new CExpiration(),srvNone,"expiration");
++      application.RegisterService(new CSignalManager(),srvSignalManager,"signalmanager");
++      application.RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
++      #ifdef TRAILINGSTOP
++         application.RegisterService(new CTrailingStopManager(),srvNone,"trailingstopmanager");
++      #endif
++      application.RegisterService(new COrderDataSaver(), srvNone, "orderdatasaver");
++      application.RegisterService(new CScriptManagerBase(),srvScriptManager,"scriptmanager");
++      application.RegisterService(new COrderCommandHandler(),srvOrderCommandHandler,"ordercommandhandler");
++      application.RegisterService(new CChartComment(),srvNone,"chartcomment");
++      application.RegisterService(new CMain(),srvMain,"main");
++      
++      if (run_tests) {
++         application.RegisterService(new CTestManager(), srvTestManager, "testmanager");
++         application.testmanager.AddTest(new CTestSymbolInfo(new CMTPSymbolInfo(), Symbol()));
++         application.testmanager.Start();
++      }
++
++      application.Initalize();
++      
++      application.SetCommandHandler(new CScript(),new COrderScriptHandler());
++      application.SetCommandHandler(new COrderCommand(),srvOrderCommandHandler);
++      
++      application.SetEventListener(srvSignalManager,new CSignalEventListener());
++      application.SetEventListener(srvOrderCommandHandler,new COrderEventListener());
++      //application.SetEventListener(COrderCommandHandlerBase::EventOpeningBuy,new COrderEventListener());
++      //application.SetEventListener(COrderCommandHandlerBase::EventOpeningSell,new COrderEventListener());
++      
++   }
++
++   application.OnInit();
++   
++   return(0);
++}
++
++void OnDeinit(const int reason)
++{
++   application.OnDeinit();
++}
++
++void OnChartEvent(const int id, const long& lparam, const double& dparam, const string& sparam)
++{
++   application.OnChartEvent(id, lparam, dparam, sparam);
++}
++
++void OnTimer()
++{
++   application.OnTimer();
++}
+\ No newline at end of file
+diff --git a/Template/template_premium_v3.2.ex4 b/Template/template_premium_v3.2.ex4
+deleted file mode 100644
+index 3647ccd..0000000
+Binary files a/Template/template_premium_v3.2.ex4 and /dev/null differ
+diff --git a/Template/template_premium_v3.2.mq4 b/Template/template_premium_v3.2.mq4
+deleted file mode 100644
+index 0adb5a0..0000000
+--- a/Template/template_premium_v3.2.mq4
++++ /dev/null
+@@ -1,510 +0,0 @@
+-//* Copyright notice: This software and it's parts including any included files, except the anything from the "lib" directory is made by and is property of Dynamic Programming Solutions Corporation,
+-//* while the strategy elements used in it is property of the customer. Any parts can be reused in later software which doesn't violate our Non-Disclosure Agreement.
+-//* 
+-//* Non-Disclosure Agreement:
+-//* We pledge to hold your trading system in confidence.
+-//* We will not resell your expert advisor that contains your trading ideas, nor will we publish your system specifications.
+-//* Receipt of your system specifications or other intellectual property by us will effectively constitute a Non-Disclosure Agreement.
+-//* We have no obligation with respect to such information where the information:
+-//* 1) was known to us prior to receiving any of the Confidential Information from the customer;
+-//* 2) has become publicly known through no wrongful act of Recipient;
+-//* 3) was received by us without breach of this Agreement from a third party without restriction as to the use and disclosure of the information;
+-//* 4) was independently developed by us without use of the Confidential Information 
+-//* 
+-//* The customer has the following rights:
+-//* 1) Use the software in any instances for personal matters
+-//* 2) Learn the code and change it
+-//* 3) Ask any other programmer to make changes, under Non-Disclosure Agreement on the usage of the source code.
+-//* 4) Resell this EA with possibility to provide the source code under Non-Disclosure Agreement.
+-//* 5) Make this sofwtare available on website as a free downloadable product WITHOUT providing the source code (i.e. only the ex4 file is downloadable)
+-
+-#property copyright "Dynamic Programming Solutions Corp."
+-#property link      "http://www.metatraderprogrammer.com"
+-
+-#define CUSTOM_SERVICES srvMain,
+-#define CUSTOM_CLASSES classSignalManager, classEntryMethod, classOrderCommandHandler, classMain,
+-
+-/*
+-
+-ToDo:
+-1. Create and use interface for OrderManager
+-2. Create tests for COrder and COrderManager
+-3. Remove unnecessary things from COrder and COrderBase (especially from MT5 version)
+-4. Merge as much class as possible in MT4 and MT5 version, especially: AttachedOrder, AttachedOrderArray, Enums, MoneyManagement, OrderArray
+-5. Remove unnecessary things from COrderManager (like order selection)
+-6. Create order repository service, where the orders are stored instead of in OrderManager itself.
+-
+-*/
+-
+-#include <mtp_framework_1.3\Loader.mqh>
+-#include <mtp_framework_1.3\EADefaultLoader.mqh>   
+-
+-input double lotsize = 0.1;
+-
+-input double stoploss = 20;
+-input double takeprofit = 40;
+-
+-/*
+-#define TRAILINGSTOP
+-input double breakevenat = 0;
+-input double breakeven_profit = 0;
+-input double trailingstop_activate = 0;
+-input double trailingstop = 0;
+-input double trailingstop_step = 1;
+-*/
+-
+-input int _bar = 1;
+-input ENUM_TIMEFRAMES timeframe = 0;
+-
+-input bool reverse_strategy = false;
+-input bool trade_only_at_barclose = true;
+-input bool trade_only_signal_change = true;
+-
+-input bool long_enabled = true;
+-input bool short_enabled = true;
+-input bool close_opposite_order = false;
+-input int maxorders = 1;
+-
+-#ifdef __MQL4__
+-input bool sl_virtual = false;
+-input bool tp_virtual = false;
+-input bool vstops_draw_line = false;
+-input bool realstops_draw_line = false;
+-input bool orderbymarket = false;
+-input color cl_buy = Blue;
+-input color cl_sell = Red;
+-#endif
+-
+-input int _magic = 1234;
+-input int slippage = 3;
+-
+-input bool printcomment = false;
+-input bool run_tests = false;
+-
+-ulong benchmark_sum;
+-ulong benchmark_cnt;
+-
+-class CSignal1 : public COpenSignal { public:
+-   double val1;
+-   double val2;
+-   virtual void CalculateValues() {
+-      val1 = iClose(symbol,timeframe,bar);
+-      val2 = iOpen(symbol,timeframe,bar);
+-   }
+-   virtual bool BuyCondition() { return (val1 > val2); }
+-   virtual bool SellCondition() { return (val1 < val2); }
+-   virtual void OnTick() {
+-      if (comments_enabled) addcomment("Signal: "+signaltext(this.signal)+"\n");
+-   }
+-};
+-
+-class CClosesignal1 : public CCloseSignal { public:
+-   double val1;
+-   double val2;
+-   virtual void CalculateValues() {
+-      val1 = iClose(symbol,timeframe,bar);
+-      val2 = iOpen(symbol,timeframe,bar);
+-   }
+-   virtual bool CloseSellCondition() { return (val1 > val2); }
+-   virtual bool CloseBuyCondition() { return (val1 < val2); }
+-   virtual void OnTick() {
+-      if (comments_enabled) addcomment("Signal Close: "+signaltext_close(this.closesignal)+"\n");
+-   }
+-};
+-
+-/* INLINE SIGNAL
+-class CMainSignal : public COpenAndCloseSignal
+-{
+-   CIsFirstTick* isfirsttick;
+-   CMainSignal()
+-   {
+-      isfirsttick = new CIsFirstTick(symbol,timeframe);
+-   }
+-   OpenSignal()
+-   {
+-      
+-   }
+-   CloseSignal()
+-   {
+-      
+-   }
+-   virtual bool BeforeFilter() {
+-      if (trade_only_at_barclose && !isfirsttick.isfirsttick()) return false;
+-      return true;
+-   }
+-   
+-   virtual bool AfterFilter() {
+-      if (reverse_strategy) Reverse();
+-      if (trade_only_signal_change && (lastsignal == SIGNAL_NONE || signal == lastsignal)) return false;
+-      return true;
+-   }
+-   
+-   virtual void OnTick() {
+-      CSignalContainer::OnTick();
+-      if (comments_enabled) addcomment("signal: "+signaltext(signal)+" valid:"+(string)valid+"\n");   
+-   }   
+-}
+-*/
+-
+-class CMainSignal : public CSignalContainer
+-{
+-public:
+-   CIsFirstTick* isfirsttick;
+-   
+-   CMainSignal()
+-   {
+-      isfirsttick = new CIsFirstTick(symbol,timeframe);
+-      if (true) Add(new CSignal1());      
+-      if (true) Add(new CClosesignal1());
+-   }
+-   
+-   virtual bool BeforeFilter() {
+-      if (trade_only_at_barclose && !isfirsttick.isfirsttick()) return false;
+-      return true;
+-   }
+-   
+-   virtual bool AfterFilter() {
+-      if (reverse_strategy) Reverse();
+-      if (trade_only_signal_change && (lastsignal == SIGNAL_NONE || signal == lastsignal)) return false;
+-      return true;
+-   }
+-   
+-   virtual bool AfterFilterClose() {
+-      if (trade_only_signal_change && (lastclosesignal == SIGNAL_NONE || closesignal == lastclosesignal)) return false;
+-      return true;
+-   }
+-   
+-   virtual void OnTick() {
+-      CSignalContainer::OnTick();
+-      if (comments_enabled) addcomment("signal: "+signaltext(signal)+" valid:"+(string)valid+"\n");   
+-   }   
+-};
+-
+-class CEntryMethod : public CEntryMethodSignal
+-{
+-public:
+-   TraitGetType { return classEntryMethod; }
+-   
+-   virtual void OnInit()
+-   {
+-      bar = _bar;
+-      mainsignal = new CMainSignal();      
+-   }
+-   
+-   virtual void OnDeinit()
+-   {
+-      delete mainsignal;
+-   }
+-
+-   virtual bool BuySignalFilter(bool valid)
+-   {
+-      if (!short_enabled) return false;
+-      if (ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED) >= maxorders) {
+-         return false;
+-      }
+-      return valid;
+-   }
+-   
+-   virtual bool SellSignalFilter(bool valid)
+-   {
+-      if (!long_enabled) return false;
+-      if (ordermanager.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED) >= maxorders) {
+-         return false;
+-      }
+-      return valid;
+-   }
+-   virtual bool CloseOpposite()
+-   {
+-      return close_opposite_order;
+-   }
+-};
+-
+-class COrderCommandHandler : public COrderCommandHandlerBase
+-{
+-public:
+-   CStopLoss* sl;
+-   CTakeProfit* tp;
+-   CMoneyManagement* mm;
+-   CEntry* entry;
+-   
+-   ENUM_ORDER_TYPE buy_cmd;
+-   ENUM_ORDER_TYPE sell_cmd;
+-
+-   virtual void Initalize()
+-   {
+-      COrderCommandHandlerBase::Initalize();
+-   }
+-   
+-   virtual void OnInit()
+-   {
+-      mm = new CMoneyManagementFixed(lotsize);
+-      sl = new CStopLossTicks(convertfract(stoploss));
+-      tp = new CTakeProfitTicks(convertfract(takeprofit));
+-      entry = NULL;
+-      buy_cmd = ORDER_TYPE_BUY;
+-      sell_cmd = ORDER_TYPE_SELL;
+-   }
+-
+-   virtual int Type() const { return classOrderCommandHandler; }
+-   
+-   virtual void CloseAll()
+-   {
+-      ordermanager.CloseAll(ORDERSELECT_ANY,STATESELECT_ONGOING);
+-   }
+-
+-   virtual void CloseBuy()
+-   {
+-      ordermanager.CloseAll(ORDERSELECT_LONG,STATESELECT_ONGOING);
+-   }
+-   
+-   virtual void CloseSell()
+-   {
+-      ordermanager.CloseAll(ORDERSELECT_SHORT,STATESELECT_ONGOING);
+-   }
+-   
+-   virtual CObject* OpenBuy()
+-   {
+-      return ordermanager.NewOrder(symbol,buy_cmd,mm,entry,sl,tp);
+-   }
+-   
+-   virtual CObject* OpenSell()
+-   {
+-      return ordermanager.NewOrder(symbol,sell_cmd,mm,entry,sl,tp);   
+-   }
+-};
+-
+-#ifdef TRAILINGSTOP
+-class CTrailingStopManager : public CServiceProvider
+-{
+-public:
+-   CTrailingStop TrailingStop;
+-
+-   virtual void Initalize()
+-   {
+-      this.Prepare(GetPointer(TrailingStop));
+-   }
+-
+-   virtual void OnTick()
+-   {
+-      TrailingStop.OnAll();
+-   }
+-   
+-   virtual void OnInit()
+-   {
+-      TrailingStop.lockin = convertfract(breakevenat);
+-      TrailingStop.lockinprofit = convertfract(breakeven_profit);
+-      TrailingStop.activate = convertfract(trailingstop_activate);
+-      TrailingStop.trailingstop = convertfract(trailingstop);
+-      TrailingStop.step = convertfract(trailingstop_step);
+-   }
+-};
+-#endif
+-
+-class CExpiration : public CServiceProvider
+-{
+-public:
+-   TraitAppAccess
+-   
+-   int expiration_days;
+-   
+-   CExpiration()
+-   {
+-      expiration_days = 90;
+-   }
+-   
+-   virtual void OnTick()
+-   {
+-      if (IsExpired()) {
+-         addcomment("EA Expired\n");
+-         if (this.App().ServiceIsRegistered(srvSignalManager)) application.DeregisterService(srvSignalManager);
+-         if (this.App().ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvScriptManager);
+-         ((COrderManager*)this.App().ordermanager).CloseAll(ORDERSELECT_ANY);
+-      } else {
+-         addcomment("This is a test version. EA will work until "+TimeToStr(GetExpirationTime()-1,TIME_DATE)+"\n");
+-      }
+-   }
+-   
+-   datetime GetExpirationTime()
+-   {
+-      return __DATE__+86400*expiration_days;
+-   }
+-   
+-   bool IsExpired()
+-   {
+-      return (TimeCurrent() > GetExpirationTime());
+-   }
+-};
+-
+-class CChartComment : public CServiceProvider
+-{
+-public:
+-   TraitAppAccess
+-   
+-   virtual void OnTick()
+-   {
+-      if (comments_enabled) {
+-         writecomment_noformat();
+-         if (printcomment) printcomment();
+-         delcomment();
+-      }
+-   }
+-   
+-   virtual void OnInit()
+-   {
+-      if (IsTesting() && !IsVisualMode() && !printcomment) {    
+-         comments_enabled = false;
+-      }    
+-   }
+-};
+-
+-class CSignalEventListener : public CAppObject
+-{
+-   virtual bool callback(const int i, CObject*& o)
+-   {
+-      CSignal* signal = o;
+-      Print("Signal changed: ",signaltext(signal.signal),", ",signaltext_close(signal.closesignal));
+-      return false;
+-   }
+-};
+-
+-class COrderEventListener : public CAppObject
+-{
+-   virtual bool callback(const int id, CObject*& object)
+-   {
+-      COrder* order;
+-      if (id == COrderCommandHandlerBase::EventOpeningBuy) {
+-         Print("opening buy");
+-      }
+-      if (id == COrderCommandHandlerBase::EventOpenedBuy) {
+-         order = object;
+-         Print("opened buy: ",order.id);
+-      }
+-      if (id == COrderCommandHandlerBase::EventOpeningSell) {
+-         Print("opening sell");
+-      }
+-      if (id == COrderCommandHandlerBase::EventOpenedSell) {
+-         order = object;
+-         Print("opened sell: ",order.id);
+-      }
+-      return true;
+-   }
+-};
+-
+-class CMain : public CServiceProvider
+-{
+-public:
+-   TraitGetType { return classMain; }
+-   TraitAppAccess
+-
+-   virtual void OnInit()
+-   {
+-      // TRADE
+-      if (COrderBase::trade_default == NULL) COrderBase::trade_default = new CTrade();
+-      if (IsTesting() && !IsVisualMode()) COrderBase::trade_default.LogLevel(LOG_LEVEL_ERRORS);
+-      else COrderBase::trade_default.LogLevel(LOG_LEVEL_ALL);
+-      COrderBase::trade_default.SetDeviationInPoints(slippage);
+-         
+-      #ifdef __MQL4__
+-   
+-         COrderBase::trade_default.SetColors(cl_buy, cl_sell);
+-         COrderBase::trade_default.SetIsEcn(orderbymarket);      
+-      
+-         // ORDER
+-         COrderBase::magic_default = _magic;
+-         COrder::sl_virtual_default = sl_virtual;
+-         COrder::tp_virtual_default = tp_virtual;
+-         COrder::vstops_draw_line = vstops_draw_line;
+-         COrder::realstops_draw_line = realstops_draw_line;
+-         //COrderBase::use_normal_stops = false;
+-      
+-      #endif   
+-
+-      if (IsTesting() && !IsVisualMode()) {      
+-         application.eventhandler.SetLogLevel(E_ERROR);
+-      } else {
+-         application.eventhandler.SetLogLevel(E_NOTICE|E_WARNING|E_ERROR|E_INFO);
+-      }
+-      
+-      ((COrderManager*)(application.ordermanager)).retrainhistory = 1;
+-
+-      #ifdef __MQL4__
+-         ((COrderManager*)(application.ordermanager)).LoadOpenOrders(Symbol(),_magic);
+-      #endif
+-      
+-   }
+-   
+-   virtual void OnDeinit()
+-   {
+-      if (benchmark_cnt > 0) Print("benchmark ("+(string)benchmark_cnt+"): "+(string)(benchmark_sum/(benchmark_cnt*1.0)));
+-   }
+-   
+-   /*virtual void OnTimer()
+-   {
+-      application.OnTick();
+-   }*/
+-   
+-};
+-
+-CApplication application;
+-
+-void OnTick()
+-{
+-   application.OnTick();  
+-}
+-
+-
+-int OnInit()
+-{
+-
+-   if (!application.Initalized()) {
+-   
+-      register_services();
+-   
+-      application.RegisterService(new CExpiration(),srvNone,"expiration");
+-      application.RegisterService(new CEntryMethod(),srvEntryMethod,"entrymethod");
+-      #ifdef TRAILINGSTOP
+-         application.RegisterService(new CTrailingStopManager(),srvNone,"trailingstopmanager");
+-      #endif
+-      application.RegisterService(new COrderDataSaver(), srvNone, "orderdatasaver");
+-      application.RegisterService(new CScriptManagerBase(),srvScriptManager,"scriptmanager");
+-      application.RegisterService(new COrderCommandHandler(),srvOrderCommandHandler,"ordercommandhandler");
+-      application.RegisterService(new CChartComment(),srvNone,"chartcomment");
+-      application.RegisterService(new CMain(),srvMain,"main");
+-      
+-      if (run_tests) {
+-         application.RegisterService(new CTestManager(), srvTestManager, "testmanager");
+-         application.testmanager.AddTest(new CTestSymbolInfo(new CMTPSymbolInfo(), Symbol()));
+-         application.testmanager.Start();
+-      }
+-
+-      application.Initalize();
+-      
+-      application.SetCommandHandler(new CScript(),new COrderScriptHandler());
+-      application.SetCommandHandler(new COrderCommand(),srvOrderCommandHandler);
+-      
+-      application.SetEventListener(srvEntryMethod,new CSignalEventListener());
+-      application.SetEventListener(srvOrderCommandHandler,new COrderEventListener());
+-      //application.SetEventListener(COrderCommandHandlerBase::EventOpeningBuy,new COrderEventListener());
+-      //application.SetEventListener(COrderCommandHandlerBase::EventOpeningSell,new COrderEventListener());
+-      
+-   }
+-
+-   application.OnInit();
+-   
+-   return(0);
+-}
+-
+-void OnDeinit(const int reason)
+-{
+-   application.OnDeinit();
+-}
+-
+-void OnChartEvent(const int id, const long& lparam, const double& dparam, const string& sparam)
+-{
+-   application.OnChartEvent(id, lparam, dparam, sparam);
+-}
+-
+-void OnTimer()
+-{
+-   application.OnTimer();
+-}
+\ No newline at end of file
+diff --git a/Traits/Loader.mqh b/Traits/Loader.mqh
+index 263fdfb..fba2fda 100644
+--- a/Traits/Loader.mqh
++++ b/Traits/Loader.mqh
+@@ -4,4 +4,3 @@
+ #include "TraitHasEvents.mqh"
+ #include "TraitHasCommands.mqh"
+ #include "TraitSendCommands.mqh"
+-#include "TraitNewObject.mqh"
+diff --git a/Traits/TraitNewObject.mqh b/Traits/TraitNewObject.mqh
+deleted file mode 100644
+index 0cca771..0000000
+--- a/Traits/TraitNewObject.mqh
++++ /dev/null
+@@ -1 +0,0 @@
+-#define TraitNewObject virtual bool callback(const int __id, CObject*& obj) { obj = NewObject(); return true; } virtual CObject* NewObject()
+\ No newline at end of file
+diff --git a/__classnames.mqh b/__classnames.mqh
+index 5364027..25aea75 100644
+--- a/__classnames.mqh
++++ b/__classnames.mqh
+@@ -1,4 +1,3 @@
+-#include "Interfaces\__classnames.mqh"
+ #include "Commands\__classnames.mqh"
+ #include "EventHandler\__classnames.mqh"
+ #include "OrderManager\__classnames.mqh"
+@@ -12,4 +11,3 @@
+ #include "ScriptManager\__classnames.mqh"
+ #include "EventManager\__classnames.mqh"
+ #include "CommandManager\__classnames.mqh"
+-#include "DependencyManager\__classnames.mqh"
+\ No newline at end of file
+diff --git a/__service_fastaccess_objects.mqh b/__service_fastaccess_objects.mqh
+index cd86082..4ccc05f 100644
+--- a/__service_fastaccess_objects.mqh
++++ b/__service_fastaccess_objects.mqh
+@@ -1,7 +1,8 @@
+ CEventHandlerInterface* eventhandler;
+ CSymbolLoaderInterface* symbolloader;
+ COrderManagerInterface* ordermanager;
++CFactoryInterface* orderfactory;
++CFactoryInterface* attachedorderfactory;
+ CEventManagerInterface* eventmanager;
+ CCommandManagerInterface* commandmanager;
+ CTestManagerInterface* testmanager;
+-CDependencyManagerInterface* dependencymanager;
+\ No newline at end of file
+diff --git a/__service_fastaccess_switch.mqh b/__service_fastaccess_switch.mqh
+index 8b03b25..fb29c59 100644
+--- a/__service_fastaccess_switch.mqh
++++ b/__service_fastaccess_switch.mqh
+@@ -1,7 +1,8 @@
+ case srvEvent: eventhandler = service; break;
+ case srvSymbolLoader: symbolloader = service; break;
+ case srvOrderManager: ordermanager = service; break;
++case srvOrderFactory: orderfactory = service; break;
++case srvAttachedOrderFactory: attachedorderfactory = service; break;
+ case srvEventManager: eventmanager = service; break;
+ case srvCommandManager: commandmanager = service; break;
+ case srvTestManager: testmanager = service; break;
+-case srvDependencyManager: dependencymanager = service; break;
+\ No newline at end of file
+diff --git a/__services.mqh b/__services.mqh
+index b018e23..ea53197 100644
+--- a/__services.mqh
++++ b/__services.mqh
+@@ -1,5 +1,7 @@
+ srvEvent,
+ srvSymbolLoader,
++srvOrderFactory,
++srvAttachedOrderFactory,
+ srvOrderManager,
+ srvEntryMethod,
+ srvSignalManager,
+@@ -9,4 +11,3 @@ srvScriptManager,
+ srvEventManager,
+ srvCommandManager,
+ srvTestManager,
+-srvDependencyManager,
+diff --git a/libraries/file.mqh b/libraries/file.mqh
+index 5bbd1b6..ae97add 100644
+--- a/libraries/file.mqh
++++ b/libraries/file.mqh
+@@ -430,7 +430,7 @@ int MTPFileBinBase::WriteString(const string value)
+       int size=StringLen(value);
+       //--- write
+       if(FileWriteInteger(m_handle,size)==sizeof(int))
+-         return((int)FileWriteString(m_handle,value,size));
++         return(FileWriteString(m_handle,value,size));
+      }
+ //--- failure
+    return(-1);
+@@ -442,7 +442,7 @@ int MTPFileBinBase::WriteString(const string value,const int size)
+   {
+ //--- check handle
+    if(m_handle!=INVALID_HANDLE)
+-      return((int)FileWriteString(m_handle,value,size));
++      return(FileWriteString(m_handle,value,size));
+ //--- failure
+    return(-1);
+   }
+@@ -854,7 +854,7 @@ uint MTPFileBin::WriteDateTime(datetime value)
+   {
+ //--- check handle
+    if(m_handle!=INVALID_HANDLE)
+-      return((int)FileWriteInteger(m_handle,(int)value,sizeof(int)));
++      return(FileWriteInteger(m_handle,value,sizeof(int)));
+ //--- failure
+    return(0);
+   }
+diff --git a/libraries/time.mqh b/libraries/time.mqh
+index c1bf324..c38990d 100644
+--- a/libraries/time.mqh
++++ b/libraries/time.mqh
+@@ -214,7 +214,6 @@ int TimeMonth(datetime time)
+ 
+ #endif
+ 
+-
+ int TimeSec(datetime time)
+ {
+    MqlDateTime _time;

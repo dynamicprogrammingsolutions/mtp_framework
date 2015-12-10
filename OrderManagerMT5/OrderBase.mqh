@@ -1,4 +1,8 @@
 //
+
+#include "..\Loader.mqh"
+#include "..\libraries\file.mqh"
+
 class COrderBase : public COrderInterface
 {
 public:

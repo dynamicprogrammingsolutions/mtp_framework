@@ -7,9 +7,9 @@ public:
    TraitNewObject { return new COrder(); }
    
 protected:
-   string attachedtoticket;
-   string stoploss_name;
-   string takeprofit_name;
+   static string attachedtoticket;
+   static string stoploss_name;
+   static string takeprofit_name;
    
    double sl;
    double tp;
@@ -100,9 +100,6 @@ public:
    }
 
    COrder() {
-      attachedtoticket = "attachedtoticket=";
-      stoploss_name = "stoploss";
-      takeprofit_name = "takeprofit";
       closetime = 0;
       lastclosetime = 0;
    };
@@ -163,6 +160,10 @@ public:
    
    
 };
+
+string COrder::attachedtoticket = "attachedtoticket=";
+string COrder::stoploss_name = "stoploss";
+string COrder::takeprofit_name = "takeprofit";
 
 bool COrder::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,
    const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0)
