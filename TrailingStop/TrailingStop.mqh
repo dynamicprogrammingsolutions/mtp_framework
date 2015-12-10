@@ -17,7 +17,7 @@ class CTrailingStop : CAppObject
    double activate;
    double step;
    double stoptrailing;
-   int lockinprofit;
+   double lockinprofit;
    bool trailingstop_round;
    
    TraitAppAccess
