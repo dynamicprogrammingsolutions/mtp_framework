@@ -18,6 +18,22 @@ class COrderBase : public COrderInterface
 {
 public:
    virtual int Type() const { return classMT4OrderBase; }
+   
+   TraitHasEvents
+
+   static int EventTriggeringVirtualOrder;
+   static int EventStateChange;
+   static int EventUpdate;
+
+   void GetEvents(int& events[])
+   {
+      int i = 0;
+      ArrayResize(events,3);
+      events[i++] = EventId(EventTriggeringVirtualOrder);
+      events[i++] = EventId(EventStateChange);
+      events[i++] = EventId(EventUpdate);
+   }
+   
 protected:
    CEventHandlerInterface* event;
    
@@ -71,6 +87,7 @@ public:
    ENUM_EXECUTE_STATE executestate;
    
 protected:
+   ENUM_ORDER_STATE laststate;
    ENUM_ORDER_STATE state;
 
 public:
@@ -177,11 +194,12 @@ public:
    ENUM_ORDER_STATE State()
    {
       if (this.executestate != ES_NOT_EXECUTED && this.executestate != ES_VIRTUAL && this.state != ORDER_STATE_CLOSED && this.state != ORDER_STATE_DELETED) {
-         ENUM_ORDER_STATE oldstate = state;            
          this.state = CheckOrderInfo()?this.orderinfo.State():ORDER_STATE_UNKNOWN;
-         if (oldstate != state) {
-            activity = activity | ACTIVITY_STATECHANGE;
-         }
+      }
+      if (laststate != state) {
+         laststate = state;
+         activity = activity | ACTIVITY_STATECHANGE;
+         App().eventmanager.Send(EventStateChange,GetPointer(this));
       }
       return(this.state);
    }
@@ -210,7 +228,7 @@ public:
    
    virtual double GetLots() { if (!CheckOrderInfo()) return(this.volume); else return(orderinfo.GetLots()); }
    virtual double GetClosePrice() { if (!CheckOrderInfo()) return(0); else return(orderinfo.GetClosePrice()); }
-   virtual datetime GetCloseTime() { if (!CheckOrderInfo()) return(-1); else return(orderinfo.GetCloseTime()); }
+   virtual datetime GetCloseTime() { if (!CheckOrderInfo()) return(closetime); else return(orderinfo.GetCloseTime()); }
 
    double GetInternalTP() { return(tp); }
    double GetInternalSL() { return(sl); }
@@ -351,6 +369,10 @@ public:
 
 CTrade* COrderBase::trade_default = NULL;
 
+int COrderBase::EventTriggeringVirtualOrder = 0;
+int COrderBase::EventStateChange = 0;
+int COrderBase::EventUpdate = 0;
+
 ushort COrderBase::activity = ACTIVITY_NOTHING;
 
 int COrderBase::magic_default = 0;
@@ -437,7 +459,7 @@ bool COrderBase::delete_mm_objects = false;
       
    COrderInfo* COrderBase::GetOrderInfo()
    {
-      if (!isset(this.orderinfo)) this.orderinfo = new COrderInfo();
+      if (!pointer_exists(CheckPointer(this.orderinfo))) this.orderinfo = new COrderInfo();
       if (this.orderinfo.Select(ticket,MODE_TRADES)) {
          return(orderinfo);
       }
@@ -577,6 +599,7 @@ bool COrderBase::delete_mm_objects = false;
       } else if (executestate == ES_VIRTUAL) {
          DeleteVPriceLine();
          state = ORDER_STATE_DELETED;
+         closetime = TimeCurrent();
          if (event.Info ()) event.Info ("Virtual Order Canceled",__FUNCTION__);
       } else if (executestate == ES_CANCELED) {
          if (event.Info ()) event.Info ("Order Not Executed, Execution Already Canceled",__FUNCTION__);
@@ -704,13 +727,18 @@ bool COrderBase::delete_mm_objects = false;
                this.ordertype = ordertype_convert_to_market(this.ordertype);
                executestate = ES_NOT_EXECUTED;
                price = 0;
-               if (Execute()) {
-                  //executestate = ES_EXECUTED;
-                  return(true);
+               if (App().eventmanager.Send(EventTriggeringVirtualOrder,GetPointer(this))) {
+                  if (Execute()) {
+                     //executestate = ES_EXECUTED;
+                     return(true);
+                  } else {
+                     //executestate = ES_CANCELED;
+                     return(false);
+                  }      
                } else {
-                  //executestate = ES_CANCELED;
-                  return(false);
-               }               
+                  executestate = ES_CANCELED;
+                  return false;
+               }           
             }
             return(true);
          } else {
@@ -772,6 +800,7 @@ bool COrderBase::delete_mm_objects = false;
             }
          }        
       }      
+      App().eventmanager.Send(EventUpdate,GetPointer(this));
    }
    
    void COrderBase::DeleteVPriceLine()
@@ -828,9 +857,10 @@ bool COrderBase::delete_mm_objects = false;
    
    void COrderBase::UpdateVStopLines()
    {
+      double line_sl, line_tp;
       if (vstops_draw_line) {
          if (sl_virtual && sl > 0) {
-            double line_sl = line_get(vsl_objname,this.ticket);            
+            line_sl = line_get(vsl_objname,this.ticket);            
             if (line_sl <= 0 || last_vsl != sl) {
                hline_put(vsl_objname,sl,vsl_color,this.ticket);
             } else if (line_sl > 0) {
@@ -841,7 +871,7 @@ bool COrderBase::delete_mm_objects = false;
             last_vsl = sl;            
          }         
          if (tp_virtual && tp > 0) {
-            double line_tp = line_get(vtp_objname,this.ticket);
+            line_tp = line_get(vtp_objname,this.ticket);
             if (line_tp <= 0 || last_vtp != tp)
                hline_put(vtp_objname,tp,vtp_color,this.ticket);
             else if (line_tp > 0) {

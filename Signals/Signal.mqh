@@ -190,7 +190,12 @@ public:
       if (BuyCondition()) signal = signaladd_or(signal,SIGNAL_BUY);
       if (SellCondition()) signal = signaladd_or(signal,SIGNAL_SELL);
       if (BothCondition()) signal = signaladd_or(signal,SIGNAL_BOTH);
+      if (!SignalFilter()) signal = SIGNAL_NO;
       return signal;
+   }
+   
+   virtual bool SignalFilter() {
+      return true;
    }
    
    virtual bool BuyCondition() {

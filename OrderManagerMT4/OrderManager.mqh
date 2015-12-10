@@ -122,8 +122,8 @@ public:
       const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0);   
    virtual COrder* NewOrder(COrder* _order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,
                                     const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0);
-   virtual COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume, CEntry* _price,
-                                    CStopLoss* _stoploss, CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0);
+   /*virtual COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume, CEntry* _price,
+                                    CStopLoss* _stoploss, CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0);*/
 
    virtual COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagement* mm, CEntry* _price,
                                     CStopLoss* _stoploss, CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0);
@@ -316,7 +316,7 @@ int OriginalOrdersTotal()
       return(_order);
    }
    
-   COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,CEntry* _price,
+   /*COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,CEntry* _price,
                                     CStopLoss* _stoploss,CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0)
    {
       COrder* _order = NewOrderObject();
@@ -347,7 +347,7 @@ int OriginalOrdersTotal()
       if (_takeprofit != NULL) COrderBase::DeleteIf(_takeprofit);
       
       return(_order);
-   }
+   }*/
    
    COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagement* _mm,CEntry* _price,
                                     CStopLoss* _stoploss,CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0)
@@ -389,7 +389,7 @@ int OriginalOrdersTotal()
    
    COrder* COrderManager::ExistingOrder(int ticket, bool add = true)
    {
-      COrderBase* _order = new COrderBase();
+      COrderBase* _order = this.Prepare(new COrderBase());
 
       if (custom_order_defaults) {
          _order.sl_virtual = this.sl_virtual;
@@ -612,7 +612,8 @@ int OriginalOrdersTotal()
    COrder* COrderManager::GetById(int id)
    {
       COrder* _order;
-      for (int i = 0; i < orders.Total(); i++) {
+      int i;
+      for (i = 0; i < orders.Total(); i++) {
          if (!isset(orders.At(i))) continue;
          _order = orders.At(i);         
          if (_order.id == id) return(_order);
@@ -822,7 +823,8 @@ int OriginalOrdersTotal()
    {
       double totalprofit = 0;
       COrder *_order;
-      for (int i = orders.Total()-1; i >= 0; i--) {
+      int i;
+      for (i = orders.Total()-1; i >= 0; i--) {
          _order = orders.At(i);
          if (isset(_order)) {
             if (!state_select(stateselect,_order.State())) { continue; }

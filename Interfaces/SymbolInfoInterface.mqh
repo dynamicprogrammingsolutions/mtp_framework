@@ -25,7 +25,7 @@ class CSymbolInfoInterface : public CAppObject
       virtual bool IsFractional(double treshold = 0) { AbstractFunctionWarning(__FUNCTION__); return false; }
       virtual double ConvertFractional(double pips) { AbstractFunctionWarning(__FUNCTION__); return 0; }
       virtual double PriceRound(double price) { AbstractFunctionWarning(__FUNCTION__); return(0); }
-      virtual double LotRound(double lotreq, bool close = false) { return 0; }
+      virtual double LotRound(double lotreq, bool for_close = false) { return 0; }
       virtual double LotRoundUp() { AbstractFunctionWarning(__FUNCTION__); return(0); }
       virtual void LotRoundUp(double _lotroundup, bool _roundup_to_minlot) { AbstractFunctionWarning(__FUNCTION__);  }
       virtual void LotRoundUpClose(double _lotroundup, bool _roundup_to_minlot) { AbstractFunctionWarning(__FUNCTION__);  }
