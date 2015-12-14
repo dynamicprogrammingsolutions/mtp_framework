@@ -1,7 +1,8 @@
 CEventHandlerInterface* eventhandler;
 CSymbolLoaderInterface* symbolloader;
 COrderManagerInterface* ordermanager;
-CEventManagerInterface* eventmanager;
-CCommandManagerInterface* commandmanager;
+//CEventManagerInterface* eventmanager;
+//CCommandManagerInterface* commandmanager;
 CTestManagerInterface* testmanager;
 CDependencyManagerInterface* dependencymanager;
+CTriggerManagerInterface* triggers;

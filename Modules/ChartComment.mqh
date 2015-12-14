@@ -11,6 +11,8 @@ public:
          writecomment_noformat();
          if (printcomment) printcomment();
          delcomment();
+      } else {
+         delcomment();
       }
    }
    

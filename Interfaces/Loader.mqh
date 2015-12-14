@@ -12,3 +12,4 @@
 #include "ServiceProviders\CommandManagerInterface.mqh"
 #include "ServiceProviders\TestManagerInterface.mqh"
 #include "ServiceProviders\DependencyManagerInterface.mqh"
+#include "ServiceProviders\TriggerManagerInterface.mqh"

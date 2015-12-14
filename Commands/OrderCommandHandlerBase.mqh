@@ -6,22 +6,6 @@ public:
    virtual int Type() const { return classOrderCommandHandlerBase; }
 
    TraitAppAccess
-   TraitHasEvents
-
-   static int EventOpeningBuy;
-   static int EventOpeningSell;
-   static int EventOpenedBuy;
-   static int EventOpenedSell;
-      
-   void GetEvents(int& events[])
-   {
-     int i = 0;
-     ArrayResize(events,4);
-     events[i++] = EventId(EventOpeningBuy);
-     events[i++] = EventId(EventOpeningSell);
-     events[i++] = EventId(EventOpenedBuy);
-     events[i++] = EventId(EventOpenedSell);
-   }
 
    COrderManager* ordermanager;
    
@@ -33,9 +17,9 @@ public:
    virtual bool callback(const int i, CObject*& obj)
    {
       if (i == COrderCommand::CommandOpenBuy) {
-         if (EventSend(EventOpeningBuy)) { obj = OpenBuy(); EventSend(EventOpenedBuy,obj); }
+         obj = OpenBuy();
       } else if (i == COrderCommand::CommandOpenSell) {
-         if (EventSend(EventOpeningSell)) { obj = OpenSell(); EventSend(EventOpenedSell,obj); }
+         obj = OpenSell();
       } else if (i == COrderCommand::CommandCloseBuy) CloseBuy();
       else if (i == COrderCommand::CommandCloseSell) CloseSell();
       else if (i == COrderCommand::CommandCloseAll) CloseAll();
@@ -71,8 +55,3 @@ public:
    
    
 };
-
-int COrderCommandHandlerBase::EventOpeningBuy = 0;
-int COrderCommandHandlerBase::EventOpeningSell = 0;
-int COrderCommandHandlerBase::EventOpenedBuy = 0;
-int COrderCommandHandlerBase::EventOpenedSell = 0;

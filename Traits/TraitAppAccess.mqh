@@ -1,1 +1,2 @@
-#define TraitAppAccess CApplication* App() { return (CApplication*)AppBase(); }
+#define APP ((CApplication*)AppBase())
+#define TraitAppAccess CApplication* App() { return APP; }

@@ -7,16 +7,14 @@ public:
 
    TraitAppAccess
    TraitSendCommands
-   TraitHasEvents
 
-   static int Signal;
-
-   void GetEvents(int& events[])
-   {
-      ArrayResize(events,1);
-      events[0] = EventId(Signal);
-   }
-
+//MTPCodeGen:GenerateSignals:SingalList:{NewSignal}
+//MTPCodeGen:GenerateSignals:Definitions:Begin
+   
+   static int NewSignal;
+   
+//MTPCodeGen:GenerateSignals:Definitions:End
+   
    COrderManager* ordermanager;
    virtual void Initalize()
    {
@@ -31,7 +29,7 @@ public:
       mainsignal.Run(bar);
       
       if (mainsignal.signal != mainsignal.lastsignal || mainsignal.closesignal != mainsignal.lastclosesignal) {
-         App().eventmanager.Send(Signal,mainsignal);
+         TRIGGER(NewSignal);
       }
       
       switch (mainsignal.closesignal) {
@@ -109,4 +107,8 @@ public:
 
 };
 
-int CEntryMethodSignal::Signal = 0;
+//MTPCodeGen:GenerateSignals:Resolve:Begin
+
+int CEntryMethodSignal::NewSignal = 0;
+
+//MTPCodeGen:GenerateSignals:Resolve:End

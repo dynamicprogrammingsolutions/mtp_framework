@@ -15,7 +15,7 @@ enum ENUM_SIGNAL_RELATION {
    SIGNAL_RELATION_OR
 };
 
-class CSignal : public CArrayObj {
+class CSignal : public CAppObjectArrayObj {
 
 public:
    CSignal* signalcontainer;
@@ -49,7 +49,7 @@ public:
    bool Add(CObject* element)
    {
       ((CSignal*)element).signalcontainer = GetPointer(this);
-      return CArrayObj::Add(element);      
+      return CAppObjectArrayObj::Add(element);      
    }
       
    CSignal* Subsignal(int i)
@@ -133,6 +133,7 @@ public:
    
    virtual void AddSubCloseSignal(CSignal* subsignal)
    {
+      if (!subsignal.closesignal_valid) this.closesignal_valid = false;
       closesignal = signaladd_or(closesignal,subsignal.closesignal);
    }
    

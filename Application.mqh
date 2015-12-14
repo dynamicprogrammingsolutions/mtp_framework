@@ -101,6 +101,7 @@ public:
       GetService(commandservice).CommandHandler(handlerobject);
    }
    
+   /*
    void SetEventListener(CAppObject* eventobject, CAppObject* handlerobject)
    {
       Prepare(eventobject);
@@ -130,6 +131,7 @@ public:
    {
       this.eventmanager.Register(id, GetService(handlerservice));
    }
+   */
    
    CObject* NewObject(CAppObject* callback)
    {

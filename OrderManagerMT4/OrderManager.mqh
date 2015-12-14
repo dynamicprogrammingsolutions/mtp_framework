@@ -146,6 +146,7 @@ public:
    bool CloseOrderByIdx(int idx, double closevolume = 0);
    bool CloseOrderByTicket(ulong ticket, double closevolume = 0);
    bool CloseAll(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1);
+   bool CloseAll(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect, string in_symbol, int in_magic, CAppObject*);
    int CntOrders(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1);
    bool CancelOrderByIdx(int idx) ;
    bool CancelOrderByTicket(ulong ticket);
@@ -670,6 +671,41 @@ int OriginalOrdersTotal()
             if (in_magic != -1 && _order.magic != in_magic) { continue; }
             if (!ordertype_select(orderselect,_order.GetType())) { continue; }
             if (_order.executestate == ES_EXECUTED || _order.executestate == ES_VIRTUAL) {
+               if (event.Info()) event.Info("Closing Order "+_order.ticket+" selection:"+orderselect,__FUNCTION__);
+               if (_order.State() == ORDER_STATE_FILLED) {
+                  if (_order.Close()) {
+                     ret = true;
+                  } else {
+                     //if (event.Error ()) event.Error("Failed to close order",__FUNCTION__);
+                  }
+               }
+               else if (_order.State() == ORDER_STATE_PLACED) {
+                  if (!_order.Cancel()) {
+                     if (event.Error ()) event.Error("Failed to cancel order",__FUNCTION__);
+                  }
+                  ret = true;
+               }
+            }
+         }
+      }
+      return(ret);
+   }
+   
+   bool COrderManager::CloseAll(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect, string in_symbol, int in_magic, CAppObject* callbackobj)
+   {
+      //if ( event.Debug ()) event.Debug ("Close All",__FUNCTION__);
+      bool ret = false;
+      COrder *_order;
+      for (int i = orders.Total()-1; i >= 0; i--) {
+         _order = orders.At(i);
+         //_order.Update();
+         if (isset(_order)) {
+            if (!state_select(stateselect,_order.State())) { continue; }
+            if (in_symbol != "" && _order.symbol != in_symbol) { continue; }
+            if (in_magic != -1 && _order.magic != in_magic) { continue; }
+            if (!ordertype_select(orderselect,_order.GetType())) { continue; }
+            if (_order.executestate == ES_EXECUTED || _order.executestate == ES_VIRTUAL) {
+               if (!callbackobj.callback(0,_order)) continue;
                if (event.Info()) event.Info("Closing Order "+_order.ticket+" selection:"+orderselect,__FUNCTION__);
                if (_order.State() == ORDER_STATE_FILLED) {
                   if (_order.Close()) {

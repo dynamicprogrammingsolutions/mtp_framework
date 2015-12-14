@@ -19,21 +19,10 @@ class COrderBase : public COrderInterface
 public:
    virtual int Type() const { return classMT4OrderBase; }
    
-   TraitHasEvents
-
    static int EventTriggeringVirtualOrder;
    static int EventStateChange;
    static int EventUpdate;
 
-   void GetEvents(int& events[])
-   {
-      int i = 0;
-      ArrayResize(events,3);
-      events[i++] = EventId(EventTriggeringVirtualOrder);
-      events[i++] = EventId(EventStateChange);
-      events[i++] = EventId(EventUpdate);
-   }
-   
 protected:
    CEventHandlerInterface* event;
    
@@ -199,7 +188,7 @@ public:
       if (laststate != state) {
          laststate = state;
          activity = activity | ACTIVITY_STATECHANGE;
-         App().eventmanager.Send(EventStateChange,GetPointer(this));
+         TRIGGER(EventStateChange);
       }
       return(this.state);
    }
@@ -727,7 +716,7 @@ bool COrderBase::delete_mm_objects = false;
                this.ordertype = ordertype_convert_to_market(this.ordertype);
                executestate = ES_NOT_EXECUTED;
                price = 0;
-               if (App().eventmanager.Send(EventTriggeringVirtualOrder,GetPointer(this))) {
+               if (TRIGGER(EventTriggeringVirtualOrder)) {
                   if (Execute()) {
                      //executestate = ES_EXECUTED;
                      return(true);
@@ -800,7 +789,7 @@ bool COrderBase::delete_mm_objects = false;
             }
          }        
       }      
-      App().eventmanager.Send(EventUpdate,GetPointer(this));
+      TRIGGER(EventUpdate);
    }
    
    void COrderBase::DeleteVPriceLine()
