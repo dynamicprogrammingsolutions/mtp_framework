@@ -82,57 +82,6 @@ public:
       return services.GetService(srv);
    }
 
-   void SetCommandHandler(CAppObject* commandobject, CAppObject* handlerobject)
-   {
-      Prepare(commandobject);
-      Prepare(handlerobject);
-      commandobject.CommandHandler(handlerobject);
-   }
-   
-   void SetCommandHandler(CAppObject* commandobject, ENUM_APPLICATION_SERVICE handlerservice)
-   {
-      Prepare(commandobject);
-      commandobject.CommandHandler(GetService(handlerservice));
-   }
-
-   void SetCommandHandler(ENUM_APPLICATION_SERVICE commandservice, CAppObject* handlerobject)
-   {
-      Prepare(handlerobject);
-      GetService(commandservice).CommandHandler(handlerobject);
-   }
-   
-   /*
-   void SetEventListener(CAppObject* eventobject, CAppObject* handlerobject)
-   {
-      Prepare(eventobject);
-      Prepare(handlerobject);
-      eventobject.EventListener(handlerobject);
-   }
-   
-   void SetEventListener(CAppObject* eventobject, ENUM_APPLICATION_SERVICE handlerservice)
-   {
-      Prepare(eventobject);
-      eventobject.EventListener(GetService(handlerservice));
-   }
-
-   void SetEventListener(ENUM_APPLICATION_SERVICE eventservice, CAppObject* handlerobject)
-   {
-      Prepare(handlerobject);
-      GetService(eventservice).EventListener(handlerobject);
-   }
-   
-   void SetEventListener(int& id, CAppObject* handlerobject)
-   {
-      Prepare(handlerobject);
-      this.eventmanager.Register(id, handlerobject);
-   }
-
-   void SetEventListener(int id, ENUM_APPLICATION_SERVICE handlerservice)
-   {
-      this.eventmanager.Register(id, GetService(handlerservice));
-   }
-   */
-   
    CObject* NewObject(CAppObject* callback)
    {
       CObject* obj;

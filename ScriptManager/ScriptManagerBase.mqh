@@ -10,7 +10,6 @@ class CScriptManagerBase : public CScriptManagerInterface
    
 public:
    TraitAppAccess
-   TraitSendCommands
 
    virtual int Type() const { return classScriptManagerBase; }
 
@@ -56,7 +55,7 @@ public:
    }
    virtual void HandleScript(int id, long lparam, double dparam, string sparam)
    {
-      CommandSend(CScript::Command,new CScript(id,lparam,dparam,sparam),true);
+      TRIGGERC(CScript::Command,new CScript(id,lparam,dparam,sparam));
    }
    virtual void OnTick()
    {

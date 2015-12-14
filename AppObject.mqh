@@ -59,17 +59,6 @@ public:
    
    virtual bool callback(const int id, CObject*& obj) { AbstractFunctionWarning(__FUNCTION__); return false; }
 
-   // redefined in TraitHasEvents, this is to have easy access from interfaces
-   virtual void EventListener(CAppObject* object)
-   {
-      AbstractFunctionWarning(__FUNCTION__);
-   }
-   
-   virtual void CommandHandler(CAppObject* object)
-   {
-      AbstractFunctionWarning(__FUNCTION__);
-   }
-   
 };
 
 // this is just for protection

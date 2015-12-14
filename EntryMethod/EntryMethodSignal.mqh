@@ -6,14 +6,6 @@ public:
    virtual int Type() const { return classEntryMethodSignal; }
 
    TraitAppAccess
-   TraitSendCommands
-
-//MTPCodeGen:GenerateSignals:SingalList:{NewSignal}
-//MTPCodeGen:GenerateSignals:Definitions:Begin
-   
-   static int NewSignal;
-   
-//MTPCodeGen:GenerateSignals:Definitions:End
    
    COrderManager* ordermanager;
    virtual void Initalize()
@@ -27,11 +19,7 @@ public:
    virtual void OnTick()
    {
       mainsignal.Run(bar);
-      
-      if (mainsignal.signal != mainsignal.lastsignal || mainsignal.closesignal != mainsignal.lastclosesignal) {
-         TRIGGER(NewSignal);
-      }
-      
+            
       switch (mainsignal.closesignal) {
          case SIGNAL_BUY: OnCloseSellSignal(mainsignal.closesignal_valid); break;
          case SIGNAL_SELL: OnCloseBuySignal(mainsignal.closesignal_valid); break;
@@ -48,41 +36,41 @@ public:
    
    virtual void OnCloseSellSignal(bool valid)
    {
-      if (valid) CommandSend(COrderCommand::CommandCloseSell);
+      if (valid) TRIGGER(COrderCommand::CommandCloseSell);
    }
    
    virtual void OnCloseBuySignal(bool valid)
    {
-      if (valid) CommandSend(COrderCommand::CommandCloseBuy);
+      if (valid) TRIGGER(COrderCommand::CommandCloseBuy);
    }
    
    virtual void OnCloseAllSignal(bool valid)
    {
-      if (valid) CommandSend(COrderCommand::CommandCloseAll);
+      if (valid) TRIGGER(COrderCommand::CommandCloseAll);
    }
    
    virtual void OnCloseBuyOpposite(bool valid)
    {
-      if (valid) CommandSend(COrderCommand::CommandCloseSell);
+      if (valid) TRIGGER(COrderCommand::CommandCloseSell);
    }
    
    virtual void OnCloseSellOpposite(bool valid)
    {
-      if (valid) CommandSend(COrderCommand::CommandCloseBuy);
+      if (valid) TRIGGER(COrderCommand::CommandCloseBuy);
    }
    
    virtual void OnBuySignal(bool valid)
    {
       if (CloseOpposite()) OnCloseBuyOpposite(valid);
       if (BuySignalFilter(valid)) {
-         CommandSend(COrderCommand::CommandOpenBuy);
+         TRIGGER(COrderCommand::CommandOpenBuy);
       }
    }
    virtual void OnSellSignal(bool valid)
    {   
       if (CloseOpposite()) OnCloseSellOpposite(valid);
       if (SellSignalFilter(valid)) {
-         CommandSend(COrderCommand::CommandOpenSell);
+         TRIGGER(COrderCommand::CommandOpenSell);
       }
    }
    virtual void OnBothSignal(bool valid)
@@ -106,9 +94,3 @@ public:
    }
 
 };
-
-//MTPCodeGen:GenerateSignals:Resolve:Begin
-
-int CEntryMethodSignal::NewSignal = 0;
-
-//MTPCodeGen:GenerateSignals:Resolve:End

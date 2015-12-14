@@ -24,11 +24,11 @@ public:
       CScript* script = command;
       if (script.id == GetId()) {
          Print("Script: ",script.id," ",script.sparam);
-         if (script.sparam == ActionOpenBuy()) this.App().commandmanager.Send(COrderCommand::CommandOpenBuy);
-         if (script.sparam == ActionOpenSell())  this.App().commandmanager.Send(COrderCommand::CommandOpenSell);
-         if (script.sparam == ActionCloseBuy())  this.App().commandmanager.Send(COrderCommand::CommandCloseBuy);
-         if (script.sparam == ActionCloseSell())  this.App().commandmanager.Send(COrderCommand::CommandCloseSell);
-         if (script.sparam == ActionCloseAll())  this.App().commandmanager.Send(COrderCommand::CommandCloseAll);
+         if (script.sparam == ActionOpenBuy()) TRIGGER(COrderCommand::CommandOpenBuy);
+         if (script.sparam == ActionOpenSell())  TRIGGER(COrderCommand::CommandOpenSell);
+         if (script.sparam == ActionCloseBuy())  TRIGGER(COrderCommand::CommandCloseBuy);
+         if (script.sparam == ActionCloseSell())  TRIGGER(COrderCommand::CommandCloseSell);
+         if (script.sparam == ActionCloseAll())  TRIGGER(COrderCommand::CommandCloseAll);
          return true;
       }
       return false;
@@ -40,7 +40,7 @@ public:
          CScriptManagerInterface* sm = this.App().GetService(srvScriptManager);
          sm.RegisterScript(GetId()); 
 
-         this.App().commandmanager.Register(CScript::Command,GetPointer(this));
+         LISTEN(CScript::Command,0);
       }  
    }
 };

@@ -1,8 +1,5 @@
 #include "TraitAppAccess.mqh"
 #include "TraitLoadSymbolFunction.mqh"
 #include "TraitGetType.mqh"
-//#include "TraitHasEvents.mqh"
-#include "TraitHasCommands.mqh"
-#include "TraitSendCommands.mqh"
 #include "TraitNewObject.mqh"
 #include "Triggers.mqh"

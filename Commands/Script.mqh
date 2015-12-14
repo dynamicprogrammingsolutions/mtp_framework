@@ -5,17 +5,9 @@ public:
    virtual int Type() const { return classScript; }
    
    TraitAppAccess
-   TraitHasCommands
 
    static int Command;
-     
-   void GetCommands(int& commands[])
-   {
-     ArrayResize(commands,1);
-     commands[0] = CommandId(Command);
-   }
-     
-
+   
    int id;
    long lparam;
    double dparam;
