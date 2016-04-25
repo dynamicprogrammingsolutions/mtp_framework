@@ -3,12 +3,16 @@
 
 class CMoneyManagement : public CAppObject {
 public:
+   TraitAppAccess
+   TraitLoadSymbolFunction
+
    virtual int Type() const { return classMT4MoneyManagement; }
    bool delete_after_use;
    virtual bool DeleteAfterUse() { return delete_after_use; }
 public:
    string symbol;
    CStopLoss* stoploss;
+   ENUM_ORDER_TYPE ordertype;
    virtual CMoneyManagement* SetSymbol(string __symbol)
    {
       this.symbol = __symbol;
@@ -17,6 +21,11 @@ public:
    virtual CMoneyManagement* SetStopLoss(CStopLoss* _stoploss)
    {
       stoploss = _stoploss;
+      return GetPointer(this);
+   }
+   virtual CMoneyManagement* SetOrderType(ENUM_ORDER_TYPE _ordertype)
+   {
+      ordertype = _ordertype;
       return GetPointer(this);
    }
    virtual double GetLotsize() { return 0; }
@@ -39,9 +48,12 @@ class CMoneyManagementExponential : public CMoneyManagement
 public:   
    double lotsize;
    CMoneyManagement* mm;
-   double level;
+   int level;
    double multiplier;
    double maximum_lotsize;
+   CMoneyManagementExponential()
+   {
+   }
    CMoneyManagementExponential(CMoneyManagement* _mm, double _multiplier) {
       mm = _mm;
       multiplier = _multiplier;
@@ -50,9 +62,13 @@ public:
       lotsize = _lotsize;
       multiplier = _multiplier;
    }
-   virtual void SetLevel(double _level)
+   virtual void SetLevel(int _level)
    {
       this.level = _level;
+   }
+   void IncLevel()
+   {
+      this.level++;
    }
    virtual double GetLotsize() {
       if (mm != NULL && (lotsize == 0 || level == 0)) lotsize = mm.SetStopLoss(this.stoploss).SetSymbol(this.symbol).GetLotsize();
@@ -65,6 +81,7 @@ class CMoneyManagementRiskPercent : public CMoneyManagement
 public:
    bool use_equity;
    double riskpercent;
+   CMoneyManagementRiskPercent() {}
    CMoneyManagementRiskPercent(double _riskpercent)
    {
       riskpercent = _riskpercent;

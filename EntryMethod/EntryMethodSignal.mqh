@@ -19,7 +19,7 @@ public:
    virtual void OnTick()
    {
       mainsignal.Run(bar);
-            
+      
       switch (mainsignal.closesignal) {
          case SIGNAL_BUY: OnCloseSellSignal(mainsignal.closesignal_valid); break;
          case SIGNAL_SELL: OnCloseBuySignal(mainsignal.closesignal_valid); break;

@@ -146,6 +146,7 @@ void CTrade::CTrade()
    m_ticket = -1;
    m_log_level   =LOG_LEVEL_ERRORS;
    m_errcode = 0;
+   get_new_price_for_retry = true;
 //--- check programm mode
    if(IsOptimization()) m_log_level=LOG_LEVEL_NO;
    if(IsTesting())      m_log_level=LOG_LEVEL_ALL;

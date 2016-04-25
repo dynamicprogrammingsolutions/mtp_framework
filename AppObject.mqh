@@ -49,6 +49,30 @@ public:
       //AbstractFunctionWarning(__FUNCTION__);
    }
    
+   //Reference Counting:
+   
+   virtual bool ReferenceCountActive()
+   {
+      return false;
+   }
+   
+   virtual CAppObject* RefAdd()
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return GetPointer(this);
+   }
+
+   virtual CAppObject* RefDel()
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return GetPointer(this);
+   }
+   
+   virtual void RefClean()
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+   }
+   
    // callback for command:
    //    object parameter is used for return.
    //    if true is returned it means, the command is handled, and other handlers will not be called.
@@ -60,6 +84,24 @@ public:
    virtual bool callback(const int id, CObject*& obj) { AbstractFunctionWarning(__FUNCTION__); return false; }
 
 };
+
+void ref_clean(CAppObject* obj)
+{
+   if (obj.ReferenceCountActive()) obj.RefClean();
+}
+
+CAppObject* ref_del(CAppObject* obj)
+{
+   if (obj.ReferenceCountActive()) return obj.RefDel();
+   return obj;
+}
+
+CAppObject* ref_add(CAppObject* obj)
+{
+   if (obj.ReferenceCountActive()) return obj.RefAdd();
+   else return obj;
+}
+
 
 // this is just for protection
 CObject* global_application_object;

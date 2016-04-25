@@ -154,9 +154,9 @@ double std(string str)
 
 string substr_fromto(string str, int from, int to)
 {
-   if (from >= 0 && to >= 0 && to >= from)
+   if (from >= 0 && to >= 0 && to >= from) {
       return(StringSubstr(str,from,to-from+1));
-   else Alert("sunstr_fromto error");
+   }
    return("");
 }
 

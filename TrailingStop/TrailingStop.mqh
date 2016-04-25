@@ -7,6 +7,7 @@
 #property link      "http://www.mql5.com"
 
 #include "..\Loader.mqh"
+#include "..\libraries\math.mqh"
 
 class CTrailingStop : CAppObject
 {
@@ -19,6 +20,7 @@ class CTrailingStop : CAppObject
    double stoptrailing;
    double lockinprofit;
    bool trailingstop_round;
+   bool trail_if_no_sl;
    
    TraitAppAccess
    TraitLoadSymbolFunction
@@ -34,6 +36,7 @@ class CTrailingStop : CAppObject
       stoptrailing = 0;
       lockinprofit = 0;
       trailingstop_round = false;
+      trail_if_no_sl = true;
    }
    
    virtual void Initalize()
@@ -53,11 +56,13 @@ class CTrailingStop : CAppObject
    
    double Calc(double orderprofit, const double ordersl)
    {
+      if (ordersl == EMPTY_VALUE && trail_if_no_sl) return ordersl;
+   
       double ret = ordersl;
    
       double _sl = ordersl;
       double newsl = _sl;
-   
+      
       if ((lockin > 0) && (orderprofit >= lockin) && (newsl > -lockinprofit)) {
          newsl = -lockinprofit;
       }
@@ -254,6 +259,22 @@ class CTrailingStop : CAppObject
       return(ret);
    }
    
+   bool OnOrderArray(COrderArray* orderarray, ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY)
+   {
+      if (trailingstop == 0 && lockin == 0) return(false);
+      
+      //if (event.Debug ()) event.Debug ("Trailing Stop",__FUNCTION__);
+      bool ret = false;
+      for (int i=0; i < orderarray.Total(); i++)
+      {
+         COrder* _order = orderarray.At(i);
+         if (!ordertype_select(type,_order.GetType())) continue;
+         if (!state_select(state,_order.State())) continue;
+         OnOrder(_order);
+      }
+      return(ret);
+   }
+   
    bool TrailingTPOnAll(ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY)
    {
       if (trailingstop == 0 && lockin == 0) return(false);
@@ -289,6 +310,36 @@ class CTrailingStop : CAppObject
                change = (_order.GetStopLoss() == 0 || _order.GetStopLoss() > newsl);               
             }
             if (change) {               
+               _order.SetStopLoss(newsl);
+               _order.SetTakeProfit(_order.GetTakeProfit());
+               _order.Modify();
+               ret = true;
+            }
+         }
+      }
+      return(ret);
+   }
+   
+   bool OnAllByIndicatorUpDn(double buysl, double sellsl)
+   {
+      bool ret = false;
+      for (int i=0; i < om.OrdersTotal(); i++)
+      {
+         COrder* _order = om.GetOrderByIdx(i);
+         _order.Select();
+         if (_order.State() == ORDER_STATE_FILLED) {
+            loadsymbol(_order.symbol);
+            bool change = false;
+            double newsl = 0;
+            if (_order.GetType() == OP_BUY) {
+               newsl = _symbol.PriceRound(buysl);
+               change = (_order.GetStopLoss() == 0 || !q(_order.GetStopLoss(),newsl));
+            } else {
+               newsl = _symbol.PriceRound(sellsl);
+               change = (_order.GetStopLoss() == 0 || !q(_order.GetStopLoss(),newsl));               
+            }
+            if (change) {   
+               Print("modify sl from "+ _order.GetStopLoss() + " to "+newsl);       
                _order.SetStopLoss(newsl);
                _order.SetTakeProfit(_order.GetTakeProfit());
                _order.Modify();

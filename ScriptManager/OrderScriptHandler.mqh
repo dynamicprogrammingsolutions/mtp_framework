@@ -16,7 +16,8 @@ public:
    
    bool callback(const int i, CObject*& o)
    {
-      return HandleCommand(o);
+      if (i == 0) return HandleCommand(o);
+      return false;
    }
    
    virtual bool HandleCommand(CObject* command)

@@ -27,6 +27,7 @@ double testline_price[];
 string testline_description[];
 
 int obj_window = 0;
+bool obj_load_remove = false;
 
 bool objectsallowed()
 {
@@ -387,9 +388,12 @@ double obj_getdesc_double(string name, int ticket = -1)
       return(StrToDouble(str));
 }
 
+
+
 void obj_loadstring(string name, string& var, int ticket = -1)
 {
    string str = obj_getdesc(name,ticket);
+   if (obj_load_remove) objdel(name,ticket);
    if (str != NULL)
       var = str;
    return;
@@ -398,6 +402,7 @@ void obj_loadstring(string name, string& var, int ticket = -1)
 void obj_loaddouble(string name, double& var, int ticket = -1)
 {
    string str = obj_getdesc(name,ticket);
+   if (obj_load_remove) objdel(name,ticket);
    if (str != NULL)
       var = StrToDouble(str);
    return;
@@ -406,15 +411,27 @@ void obj_loaddouble(string name, double& var, int ticket = -1)
 void obj_loadint(string name, int& var, int ticket = -1)
 {
    string str = obj_getdesc(name,ticket);
+   if (obj_load_remove) objdel(name,ticket);
    if (str != NULL) {
       var = (int)MathRound(StrToDouble(str));
    }
    return;
 }
 
+int obj_loadenum(string name, int var, int ticket = -1)
+{
+   string str = obj_getdesc(name,ticket);
+   if (obj_load_remove) objdel(name,ticket);
+   if (str != NULL) {
+      return (int)MathRound(StrToDouble(str));
+   }
+   return var;
+}
+
 void obj_loaddatetime(string name, datetime& var, int ticket = -1)
 {
    string str = obj_getdesc(name,ticket);
+   if (obj_load_remove) objdel(name,ticket);
    if (str != NULL)
       var = (datetime)MathRound(StrToDouble(str));
    return;
@@ -423,6 +440,7 @@ void obj_loaddatetime(string name, datetime& var, int ticket = -1)
 void obj_loadtime(string name, datetime& var, int ticket = -1)
 {
    string str = obj_getdesc(name,ticket);
+   if (obj_load_remove) objdel(name,ticket);
    if (str != NULL)
       var = (datetime)MathRound(StrToDouble(str));
    return;
@@ -431,6 +449,7 @@ void obj_loadtime(string name, datetime& var, int ticket = -1)
 void obj_loadbool(string name, bool& var, int ticket = -1)
 {
    string str = obj_getdesc(name,ticket);
+   if (obj_load_remove) objdel(name,ticket);
    if (str != NULL)
       var = MathRound(StrToDouble(str));
    return;

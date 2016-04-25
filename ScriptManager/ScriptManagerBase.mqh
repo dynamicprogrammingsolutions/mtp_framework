@@ -55,7 +55,7 @@ public:
    }
    virtual void HandleScript(int id, long lparam, double dparam, string sparam)
    {
-      TRIGGERC(CScript::Command,new CScript(id,lparam,dparam,sparam));
+      TRIGGERCR(CScript::Command,new CScript(id,lparam,dparam,sparam));
    }
    virtual void OnTick()
    {

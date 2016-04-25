@@ -3,3 +3,4 @@
 #include "TraitGetType.mqh"
 #include "TraitNewObject.mqh"
 #include "Triggers.mqh"
+#include "TraitRefCount.mqh"

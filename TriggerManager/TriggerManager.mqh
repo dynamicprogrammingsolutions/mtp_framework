@@ -7,7 +7,7 @@ class CTriggerCallback : public CObject
 public:
    CAppObject* callbackobj;
    int handler_id;
-   bool Callback(CObject* obj)
+   bool Callback(CObject*& obj)
    {
       return callbackobj.callback(handler_id,obj);
    }
@@ -41,7 +41,22 @@ public:
       return container.At(id-1);
    }
       
-   virtual bool Send(const int id, CObject* o = NULL, const bool deleteobject = false)
+   virtual bool Send(const int id)
+   {
+      CObject* o = NULL;
+      bool ret = true;
+      if (id > 0) {
+         CArrayObj* callbacks = GetCallBacks(id);
+         int total = callbacks.Total();
+         for (int i = 0; i < callbacks.Total(); i++) {
+            CTriggerCallback* callback = callbacks.At(i);
+            ret &= callback.Callback(o);
+         }
+      }
+      return ret;
+   }   
+      
+   virtual bool Send(const int id, CObject*& o, const bool deleteobject = false)
    {
       CObject* originalobj;
       bool ret = true;
@@ -51,8 +66,26 @@ public:
          int total = callbacks.Total();
          for (int i = 0; i < callbacks.Total(); i++) {
             CTriggerCallback* callback = callbacks.At(i);
-            ret &= callback.Callback(o);
             o = originalobj;
+            ret &= callback.Callback(o);
+         }
+      }
+      if (deleteobject) delete o;
+      return ret;
+   }
+   
+   virtual bool SendR(const int id, CObject* o, const bool deleteobject = false)
+   {
+      CObject* originalobj;
+      bool ret = true;
+      if (id > 0) {
+         CArrayObj* callbacks = GetCallBacks(id);
+         originalobj = o;
+         int total = callbacks.Total();
+         for (int i = 0; i < callbacks.Total(); i++) {
+            CTriggerCallback* callback = callbacks.At(i);
+            o = originalobj;
+            ret &= callback.Callback(o);
          }
       }
       if (deleteobject) delete o;

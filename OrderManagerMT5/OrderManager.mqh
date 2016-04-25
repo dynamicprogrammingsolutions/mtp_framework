@@ -644,7 +644,7 @@ double COrderManager::TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STATES
             if (in_symbol != "" && _order.symbol != in_symbol) { continue; }
             if (in_magic != -1 && _order.magic != in_magic) { continue; }
             if (_order.Select())
-               totalprofit += OrderProfit()+(_commission?OrderCommission():0)-(swap?OrderSwap():0);
+               totalprofit += OrderProfit()+(_commission?OrderCommission():0)+(swap?OrderSwap():0);
          }
       }
    }*/

@@ -11,49 +11,45 @@ public:
    
    virtual void Initalize()
    {
-      this.ordermanager = this.App().GetService(srvOrderManager);      
-      LISTEN(COrderCommand::CommandOpenBuy,0);
-      LISTEN(COrderCommand::CommandOpenSell,1);
-      LISTEN(COrderCommand::CommandCloseBuy,2);
-      LISTEN(COrderCommand::CommandCloseSell,3);
-      LISTEN(COrderCommand::CommandCloseAll,4);
+      this.ordermanager = this.App().GetService(srvOrderManager);   
+      LISTEN(COrderCommand::CommandOpenBuy,1);
+      LISTEN(COrderCommand::CommandOpenSell,2);
+      LISTEN(COrderCommand::CommandCloseBuy,3);
+      LISTEN(COrderCommand::CommandCloseSell,4);
+      LISTEN(COrderCommand::CommandCloseAll,5);
    }
    
-   virtual bool callback(const int i, CObject*& obj)
+   CALLBACK(
+      CBFUNC(1,CommandOpenBuy)
+      CBFUNC(2,CommandOpenSell)
+      CBFUNC(3,CommandCloseBuy)
+      CBFUNC(4,CommandCloseSell)
+      CBFUNC(5,CommandCloseAll)
+   )
+   
+   virtual bool CommandCloseAll(CObject*& obj)
    {
-      switch(i) {
-         case 0: obj = OpenBuy(); break;
-         case 1: obj = OpenSell(); break;
-         case 2: CloseBuy(); break;
-         case 3: CloseSell(); break;
-         case 4: CloseAll(); break;
-      }
       return true;
    }
 
-   virtual void CloseAll()
+   virtual bool CommandCloseBuy(CObject*& obj)
    {
-
-   }
-
-   virtual void CloseBuy()
-   {
-
+      return true;
    }
    
-   virtual void CloseSell()
+   virtual bool CommandCloseSell(CObject*& obj)
    {
-
+      return true;
    }
    
-   virtual CObject* OpenBuy()
+   virtual bool CommandOpenBuy(CObject*& obj)
    {
-      return NULL;
+      return true;
    }
    
-   virtual CObject* OpenSell()
+   virtual bool CommandOpenSell(CObject*& obj)
    {
-      return NULL;
+      return true;
    }
    
    

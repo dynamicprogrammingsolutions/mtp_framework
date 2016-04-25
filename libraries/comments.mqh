@@ -21,7 +21,7 @@ string lastcommentstring[];
 bool comments_enabled = true;
 bool comment_formatting = false;
 string objname_comment = "comment_textbox";
-int comment_corner = 0;
+ENUM_BASE_CORNER comment_corner = CORNER_LEFT_UPPER;
 int comment_fontsize = 7;
 string comment_font = "Tahoma";
 color comment_color = White;
@@ -29,6 +29,7 @@ int comment_x = 10;
 int comment_y = 15;
 int comment_lineheight = 11;
 int comment_window = 0;
+bool comment_reverse_lines = false;
 
 
 void addcomment_(int id, const string c1)
@@ -43,6 +44,11 @@ void addcomment(const string c1)
    if (!comments_enabled) return;
    if (ArraySize(commentstring) == 0) ArrayResize(commentstring,1);
    commentstring[0] = commentstring[0]+c1;
+}
+
+void commentln(const string c1)
+{
+   addcomment(c1+"\n");
 }
 
 void clear0(string& str)
@@ -89,6 +95,20 @@ void writecomment_(int id/*, bool comment_formatting, string objname_comment, in
    int yextra = 0;
       
    if (comment_formatting) {
+      if (comment_reverse_lines) {
+         string temp_a[];   
+         string temp_a1[];
+         str_explode_string(commentstring[id],temp_a,"\n");
+         int arraysize = ArraySize(temp_a);
+         ArrayResize(temp_a1,arraysize);
+         for (int i = 0; i < arraysize; i++) {
+            temp_a1[arraysize-i-1] = temp_a[i];
+            //Print((arraysize-i-1),"=",temp_a1[arraysize-i-1]);
+         }
+         string temp_s;
+         str_implode_string(temp_s,temp_a1,"\n");
+         commentstring[id] = temp_s;
+      }
       while (pos < StringLen(commentstring[id])) {
          lineend = StringFind(commentstring[id],"\n",pos);
          if (lineend < 0) lineend = StringLen(commentstring[id]);

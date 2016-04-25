@@ -120,6 +120,7 @@ public:
    COrderBase() {
       this.id = maxid+1;
       maxid = this.id;
+      //Print("new orderbase id: "+this.id);
       
       if (trade_default == NULL) trade_default = new CTrade;
       
@@ -177,6 +178,7 @@ public:
    virtual string GetSymbol() { return(this.symbol); }
    virtual string GetComment() { return(this.comment); }
    
+   CStopLoss* PrepareSLForModify(CStopLoss* _sl) { return _sl.SetEntryPrice(this.GetOpenPrice()).SetSymbol(this.symbol).SetOrderType(this.GetType()); }   
    
    bool Select() { if (this.executestate != ES_NOT_EXECUTED) return(GetOrderInfoB()); else return(false); } 
      
@@ -246,7 +248,7 @@ public:
    virtual void SetStopLoss(const double value) { sl_set = true; if (executestate != ES_CANCELED) sl = value; else Print("Cannot change canceled order data (sl)"); }
    virtual void SetTakeProfit(const double value) { tp_set = true; if (executestate != ES_CANCELED) tp = value; else Print("Cannot change canceled order data (tp)"); }
    
-   bool SetStopLoss(CStopLoss* _sl, bool check = false);
+   bool SetStopLoss(CStopLoss* _sl, bool checkchange = false, bool checkhigher = false);
    bool SetTakeProfit(CTakeProfit* _tp, bool check = false);
    
    static void DeleteIf(CStopLoss* obj) {
@@ -480,17 +482,17 @@ bool COrderBase::delete_mm_objects = false;
          /*if (ordermanager != NULL && ordermanager.simulation_enabled) {         
             return(this.UpdateSimulation());
          } else {*/
-            if ( event.Info ()) event.Info ("Execute Order: type="+ordertype+" price="+price+" tp="+tp+" sl="+sl+" expiration="+expiration+" magic="+this.magic,__FUNCTION__);
+            if ( event.Info ()) event.Info ("Execute Order: type="+ordertype+" volume="+volume+" price="+price+" tp="+tp+" sl="+sl+" expiration="+expiration+" magic="+this.magic+" comment="+comment,__FUNCTION__);
             bool success;
             bool isvirtual = false;
             string virtual_error = "";
             double real_sl = 0, real_tp = 0;                   
             if (ordertype_market(ordertype)) {
                loadsymbol(symbol);
-               if (price == 0) {                  
+               /*if (price == 0) {                  
                   if (ordertype == ORDER_TYPE_SELL) { price = _symbol.Bid(); }
                   else if (ordertype == ORDER_TYPE_BUY) { price = _symbol.Ask(); }
-               }              
+               }*/         
                if (!sl_virtual) real_sl = sl;
                if (!tp_virtual) real_tp = tp;
                trade.SetExpertMagicNumber(this.magic);
@@ -904,41 +906,38 @@ bool COrderBase::delete_mm_objects = false;
          }
       }
    }
-
    
-   bool COrderBase::SetStopLoss(CStopLoss* _sl, bool check = false) {
-      if (!check) {
-         SetStopLoss(_sl.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice()).GetPrice());
+   bool COrderBase::SetStopLoss(CStopLoss* _sl, bool checkchange = false, bool checkhigher = false) {
+      loadsymbol(this.symbol);
+      _sl.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice());
+      _sl.Reset();
+      double thissl = _symbol.PriceRound(_sl.GetPrice());
+      double thisslticks = _sl.GetTicks();
+      if (
+         (checkchange && thissl == _symbol.PriceRound(this.GetStopLoss())) ||
+         (checkhigher && thisslticks >= this.GetStopLossTicks())
+      ) {
          DeleteIf(_sl);
-         return true;
-      } else {
-         loadsymbol(this.symbol);
-         double thissl = _symbol.PriceRound(_sl.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice()).GetPrice());
-         if (thissl != _symbol.PriceRound(this.GetStopLoss())) {
-            SetStopLoss(thissl);
-            DeleteIf(_sl);
-            return true;
-         } else {
-            DeleteIf(_sl);
-            return false;
-         }
+         return false;
       }
+      SetStopLoss(thissl);
+      return true;
    }
    
    bool COrderBase::SetTakeProfit(CTakeProfit* _tp, bool check = false) {
       if (!check) {
          SetTakeProfit(_tp.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice()).GetPrice());
-         if (delete_takeprofit_objects) delete _tp;
+         DeleteIf(_tp);
          return true;
       } else {
          loadsymbol(this.symbol);
          double thistp = _symbol.PriceRound(_tp.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice()).GetPrice());
          if (thistp != _symbol.PriceRound(this.GetTakeProfit())) {
             SetTakeProfit(thistp);
-            if (delete_takeprofit_objects) delete _tp;
+            DeleteIf(_tp);
             return true;
          } else {
-            if (delete_takeprofit_objects) delete _tp;
+            DeleteIf(_tp);
             return false;
          }
       }

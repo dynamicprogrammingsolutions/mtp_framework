@@ -123,10 +123,12 @@ bool ordertype_pendingshort(int in_ordertype) {
 
 ENUM_ORDER_TYPE ordertype_convert_to_market(ENUM_ORDER_TYPE in_ordertype) {
    switch (in_ordertype) {
+      case ORDER_TYPE_SELL:
       case ORDER_TYPE_SELL_LIMIT:
       case ORDER_TYPE_SELL_STOP:
          return(ORDER_TYPE_SELL);
          break;
+      case ORDER_TYPE_BUY:
       case ORDER_TYPE_BUY_LIMIT:
       case ORDER_TYPE_BUY_STOP:
          return(ORDER_TYPE_BUY);

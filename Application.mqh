@@ -30,13 +30,14 @@ public:
       service.name = servicename;
       
       if (service.srv != srvNone && services.IsRegistered(service.srv)) {
-         CServiceProvider* oldservice = DeregisterService(service.srv);
-         if (CheckPointer(oldservice) == POINTER_DYNAMIC) delete oldservice;
+         service.AppBase(GetPointer(this));
+         services.ReRegister(service);
+      } else {
+         Print("Registering Service type:",EnumToString(service.srv)," name:'",service.name,"' class:",EnumToString((ENUM_CLASS_NAMES)service.Type()));
+               
+         service.AppBase(GetPointer(this));
+         services.Add(service);
       }
-      Print("Registering Service type:",EnumToString(service.srv)," name:'",service.name,"' class:",EnumToString((ENUM_CLASS_NAMES)service.Type()));
-            
-      service.AppBase(GetPointer(this));
-      services.Add(service);
 
       switch(service.srv) {
 
@@ -129,6 +130,11 @@ public:
    void OnDeinit()
    {
       services.OnDeinit();
+   }
+   
+   void OnDeinit(const int reason)
+   {
+      services.OnDeinit(reason);
    }
    
    void OnChartEvent(int id, long lparam, double dparam, string sparam)

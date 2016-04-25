@@ -236,6 +236,16 @@ public:
       }
    }
    
+   virtual void OnInit()
+   {
+      
+   }
+   
+   virtual void OnDeinit(const int reason)
+   {
+      
+   }
+   
 };
 
 class COpenSignal : public CSignal {

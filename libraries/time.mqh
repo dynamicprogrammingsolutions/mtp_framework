@@ -150,6 +150,19 @@ bool AtTime(datetime& lasttime, int hour, int min = 0, int sec = 0, int dow = -1
    return(time >= at && time-at < maxdelay);
 }   
 
+bool AtTimeGMT(datetime& lasttime, int hour, int min = 0, int sec = 0, int dow = -1, int maxdelay = 1800)
+{
+   datetime time = TimeGMT();
+   if (lasttime == 0) {
+      lasttime = time;
+      return(false);
+   }
+   datetime at = NextGivenTime(lasttime+1,hour,min,sec,dow);      
+   lasttime = time;
+   return(time >= at && time-at < maxdelay);
+}   
+
+
 bool AtTime(datetime& lasttime, int hour, int min, int sec, int dow, int maxdelay, datetime& at)
 {
    datetime time = TimeCurrent();
@@ -255,8 +268,8 @@ datetime ConvertFromGMT(datetime time, bool custom_gmt_shift = false, int gmtshi
 bool istradinghours(int _starthour, int _endhour, int _startminute=0, int _endminute=0, int startseconds=0, int endseconds=0, int shift = 0)
 {
    datetime now = TimeCurrent()+shift*3600;
-   datetime starttime = LastGivenTime(now,_starthour,_startminute);
-   datetime endtime = NextGivenTime(starttime+1,_endhour,_endminute);
+   datetime starttime = LastGivenTime(now,_starthour,_startminute,startseconds);
+   datetime endtime = NextGivenTime(starttime+1,_endhour,_endminute,endseconds);
    return(now >= starttime && now <= endtime);
    return(true);
 }
@@ -264,8 +277,8 @@ bool istradinghours(int _starthour, int _endhour, int _startminute=0, int _endmi
 bool istradingdays(int _startday, int _endday, int _starthour = 0, int _endhour = 0, int _startminute=0, int _endminute=0, int startseconds=0, int endseconds=0, int shift = 0)
 {
    datetime now = TimeCurrent()+shift*3600;
-   datetime starttime = LastGivenTime(now,_starthour,_startminute,0,_startday);
-   datetime endtime = NextGivenTime(starttime+1,_endhour,_endminute,0,_endday);
+   datetime starttime = LastGivenTime(now,_starthour,_startminute,startseconds,_startday);
+   datetime endtime = NextGivenTime(starttime+1,_endhour,_endminute,endseconds,_endday);
    return(now >= starttime && now <= endtime);
    return(true);
 }

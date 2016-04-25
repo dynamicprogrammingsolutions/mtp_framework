@@ -66,6 +66,21 @@ public:
       return false;
    }
    
+   bool ReRegister(CServiceProvider* newservice)
+   {
+      if (newservice.srv == srvNone) return false;
+      int count = Total();
+      for (int i = 0; i < count; i++) {
+         CServiceProvider* service = ServiceProvider(i);
+         if (service.srv == newservice.srv) {
+            delete service;
+            this.m_data[i] = newservice;
+            return true;
+         }
+      }
+      return false;
+   }
+   
    bool IsRegistered(string servicename)
    {
       int count = Total();
@@ -85,6 +100,7 @@ public:
             Print("Initalizing Service ",EnumToString(service.srv)," '",service.name,"': ",EnumToString((ENUM_CLASS_NAMES)service.Type()));
             service.SetInitalized();
             service.Initalize();
+            CObject* obj = NULL;
          } else {
             Print("Service Alread Initalized: ",EnumToString((ENUM_CLASS_NAMES)service.Type()));
          }
@@ -117,6 +133,15 @@ public:
       for (int i = 0; i < Total(); i++) {
          CServiceProvider* service = ServiceProvider(i);
          if (service.use_ondeinit) service.OnDeinit();
+      }
+   }
+   
+   void OnDeinit(const int reason)
+   {
+      //int count = Total();
+      for (int i = 0; i < Total(); i++) {
+         CServiceProvider* service = ServiceProvider(i);
+         if (service.use_ondeinit) service.OnDeinit(reason);
       }
    }
    

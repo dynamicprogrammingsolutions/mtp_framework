@@ -15,6 +15,62 @@ public:
    bool closed;
    bool has_open;
    bool has_closed;
+   
+   virtual bool Save(const int handle)
+   {
+      MTPFileBin file;
+      file.Handle(handle);            
+      if (file.Invalid()) return false;
+
+      file.WriteInteger(id);
+      file.WriteInteger(highest_id);
+      file.WriteBool(closed);
+      file.WriteBool(has_open);
+      file.WriteBool(has_closed);
+
+      file.WriteInteger(this.Total());
+      for (int i = 0; i < Total(); i++) {
+         if (!isset(this.At(i))) {
+            file.WriteInteger(-1);
+            continue;
+         }
+         COrder* order = this.At(i);
+         Print("saving order id: "+order.id);
+         file.WriteInteger(order.id);
+      }
+
+      return true;      
+   }
+   
+   virtual bool Load(const int handle)
+   {
+      MTPFileBin file;
+      file.Handle(handle);            
+      if (file.Invalid()) return false;
+
+      file.ReadInteger(id);
+      file.ReadInteger(highest_id);
+      file.ReadBool(closed);
+      file.ReadBool(has_open);
+      file.ReadBool(has_closed);
+      
+      int total;
+      file.ReadInteger(total);
+      COrderManager* om = APP.GetService(srvOrderManager);
+      for (int i = 0; i < total; i++) {
+         int _id;
+         file.ReadInteger(_id);
+         Print("finding order id "+_id);
+         COrder* order = om.GetById(_id);
+         if (isset(order)) {
+            Print("adding order "+order.ticket);
+            this.Add(order);
+         }
+      }
+      
+      return true;
+   }
+   
    COrderSet()
    {
       id = highest_id+1;
@@ -53,9 +109,9 @@ public:
       AfterUpdate();
    }
    
-   virtual bool CreateElement(const int index) {
+   /*virtual bool CreateElement(const int index) {
       return(false);
-   }
+   }*/
    
    virtual void UpdateOrder(COrder* _order)
    {

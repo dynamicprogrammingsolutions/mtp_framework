@@ -719,8 +719,9 @@ bool CAppObjectArrayObj::Load(const int file_handle)
       for(i=0;i<num;i++)
         {
          //--- create new element
-         if(!CreateElement(i))
+         if(!CreateElement(i)) {
             break;
+         }
          if(m_data[i].Load(file_handle)!=true)
             break;
          m_data_total++;

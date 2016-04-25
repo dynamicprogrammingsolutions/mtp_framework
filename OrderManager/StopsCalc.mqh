@@ -28,12 +28,15 @@ protected:
    bool ticks_set;
    bool price_set;
    virtual void CalcTicks() {}
-   virtual void CalcPrice() {}   
+   virtual void CalcPrice() {}
+   
      
 public:
 
    bool delete_after_use;
    virtual bool DeleteAfterUse() { return delete_after_use; }
+
+   virtual void Reset() {}
 
    virtual CStopsCalcInterface* SetOrderType(ENUM_ORDER_TYPE _ordertype)
    {
@@ -77,8 +80,11 @@ public:
       return (CStopsCalcInterface*)GetPointer(this);
    }
    
+   virtual void Calculate() { }
+   
    virtual double GetTicks()
    {
+      if (!ticks_set && !price_set) Calculate();
       if (ticks_set) return ticks;
       if (price_set){
          this.CalcTicks();
@@ -89,6 +95,7 @@ public:
    
    virtual double GetPrice()
    {
+      if (!ticks_set && !price_set) Calculate();
       if (price_set) return price;
       if (ticks_set){
          this.CalcPrice();
@@ -117,6 +124,7 @@ protected:
 class CStopLoss : public CStopsCalc {
 public:
    virtual int Type() const { return classStopLoss; }
+   CStopsCalc* tp;
 
 protected:
    bool zero_is_nosl;
@@ -136,6 +144,7 @@ protected:
 class CTakeProfit : public CStopsCalc {
 public:
    virtual int Type() const { return classTakeProfit; }
+   CStopsCalc* sl;
 
 protected:
    virtual void CalcTicks()
@@ -186,6 +195,10 @@ public:
 class CStopLossPrice : public CStopLoss {
 public:
    bool addspread;
+   CStopLossPrice()
+   {
+      
+   }
    CStopLossPrice(double _price, bool _addspread = false) {
       addspread = _addspread;
       this.SetPrice(_price);
@@ -201,6 +214,18 @@ public:
    }
 };
 
+class CStopLossCalculate : public CStopLossPrice {
+public:
+   CStopLossCalculate()
+   {
+      addspread = true;
+   }
+   virtual void Reset()
+   {
+      price_set = false;
+   } 
+};
+
 class CTakeProfitTicks : public CTakeProfit {
 public:
    CTakeProfitTicks(double _ticks) {
@@ -212,6 +237,10 @@ public:
 class CTakeProfitPrice : public CTakeProfit {
 public:
    bool addspread;
+   CTakeProfitPrice()
+   {
+   
+   }
    CTakeProfitPrice(double _price, bool _addspread = false) {
       addspread = _addspread;
       this.SetPrice(_price);
@@ -227,6 +256,17 @@ public:
    }
 };
 
+class CTakeProfitCalculate : public CTakeProfitPrice {
+public:
+   CTakeProfitCalculate()
+   {
+      addspread = true;
+   }
+   virtual void Reset()
+   {
+      price_set = false;
+   } 
+};
 
 double getstoplossprice(string in_symbol, int in_ordertype, int in_stoploss, double price=0, bool formodify = false)
 {

@@ -3,6 +3,7 @@
 
 #include "..\Loader.mqh"
 #include "..\libraries\commonfunctions.mqh"
+#include "..\ChartInfo\IsFirstTick.mqh"
 
 //CAccountInfo accountinfo;
 
@@ -20,6 +21,7 @@ double minlot, lotstep, maxlot;
 int stoplevel_inticks;
 double ticksize_inpoints;
 double lotvalue;
+bool firsttick;
 
 datetime ticktime;
 double bid, ask;
@@ -27,6 +29,8 @@ double force_bid=0, force_ask=0;
 int spread;
 int spread_inticks;
 int minsl, mintp;
+
+bool convertfract_enabled = true;
 
 string initerror = "variables.mqh has not been initalized!";
 string priceiniterror = "variables.mqh has not been initalized at actual tick!";
@@ -41,10 +45,14 @@ class CSymbolInfoVars : public CServiceProvider
    CEventHandlerInterface* event;
    CSymbolLoaderInterface* symbolloader;
    CMTPSymbolInfo *m_symbolinfo;
+   CIsFirstTick* isfirsttick;
    
-   CSymbolInfoVars(string _symbol)
+   ENUM_TIMEFRAMES tf;
+   
+   CSymbolInfoVars(string _symbol, ENUM_TIMEFRAMES _tf = PERIOD_CURRENT)
    {
       symbol = _symbol;
+      tf = _tf;
    }
    virtual void Initalize()
    {
@@ -55,10 +63,12 @@ class CSymbolInfoVars : public CServiceProvider
    virtual void OnInit()
    {
       InitVars(symbol);
+      isfirsttick = new CIsFirstTick(symbol,tf);
    }
    virtual void OnTick()
    {
       InitVarsTick();
+      firsttick = isfirsttick.isfirsttick();
    }
    
    bool InitVars(string symbol);
@@ -149,7 +159,7 @@ double inticksd(double price)
 
 double convertfract(double pips)
 {
-   return symbolinfo.ConvertFractional(pips);
+   return convertfract_enabled?symbolinfo.ConvertFractional(pips):pips;
 }
 
 double priceround(double price)

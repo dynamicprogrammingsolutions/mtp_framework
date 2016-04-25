@@ -8,6 +8,7 @@ public:
    bool use_oninit;
    bool use_ontick;
    bool use_ondeinit;
+   bool use_ondeinit_reason;
    bool use_onchartevent;
    bool use_ontimer;
    
@@ -16,7 +17,9 @@ public:
       use_oninit = true;
       use_ontick = true;
       use_ondeinit = true;
+      use_ondeinit_reason = true;
       use_onchartevent = true;
+      use_ontimer = true;
    }
    
    virtual void OnInit() {
@@ -31,6 +34,11 @@ public:
    
    virtual void OnDeinit() {
       use_ondeinit = false;
+      //Print("Disable OnDeinit on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
+   }
+
+   virtual void OnDeinit(const int reason) {
+      use_ondeinit_reason = false;
       //Print("Disable OnDeinit on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
    }
    

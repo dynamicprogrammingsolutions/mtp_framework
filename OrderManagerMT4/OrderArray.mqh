@@ -1,7 +1,7 @@
 //
 #include "Loader.mqh"
 
-class COrderArray : public CAppObjectArrayObj
+class COrderArray : public CAppObjectArrayObjManaged
 {
 public:
    virtual int Type() const { return classMT4OrderArray; }
@@ -13,6 +13,16 @@ public:
       {
          _symbol = App().symbolloader.LoadSymbol(__symbol);
       }
+      
+      COrderArray()
+      {
+         neworder = new COrder();
+      }
+      
+      ~COrderArray()
+      {
+         delete neworder;
+      }
 
       CAppObject* neworder;   
       COrderArray(CAppObject* _neworder)
@@ -23,6 +33,7 @@ public:
       COrder* Order(int nIndex){ if (!isset(At(nIndex))) return(NULL); else return((COrder*)At(nIndex)); }     
       
       virtual bool  CreateElement(const int index) {
+         Print("create element");
          m_data[index] = (CObject*)(App().NewObject(neworder));
          return(true);
       }
@@ -62,6 +73,8 @@ public:
                if (in_symbol != "" && _order.symbol != in_symbol) { continue; }
                if (in_magic != -1 && _order.magic != in_magic) { continue; }
                
+               loadsymbol(_order.symbol);
+
                if (ordertype_select(ORDERSELECT_LONG,_order.GetType())) {
                   sum_lots_buy += _order.GetLots();
                   sum_price_buy += _order.GetOpenPrice()*_order.GetLots();
@@ -77,8 +90,6 @@ public:
          
          double avg_price = 0;
          
-         if (in_symbol != "") loadsymbol(in_symbol);
-         
          if (sum_lots_buy > 0) avg_price_buy = sum_price_buy/sum_lots_buy;
          if (sum_lots_sell > 0) avg_price_sell = sum_price_sell/sum_lots_sell;
       
@@ -93,6 +104,26 @@ public:
          
          return 0;
       }
+      
+      double TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1, bool _commission = true, bool swap = true)
+      {
+         double totalprofit = 0;
+         COrder *_order;
+         int i;
+         for (i = this.Total()-1; i >= 0; i--) {
+            _order = this.At(i);
+            if (isset(_order)) {
+               if (!state_select(stateselect,_order.State())) { continue; }
+               if (!ordertype_select(orderselect,_order.GetType())) { continue; }
+               if (in_symbol != "" && _order.symbol != in_symbol) { continue; }
+               if (in_magic != -1 && _order.magic != in_magic) { continue; }
+               if (_order.Select()) {
+                  totalprofit += OrderProfit()+(_commission?OrderCommission():0)+(swap?OrderSwap():0);
+               }
+            }
+         }
+         return totalprofit;
+      }   
       
       double AvgPrice(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1)
       {

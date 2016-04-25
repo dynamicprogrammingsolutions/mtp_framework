@@ -12,7 +12,19 @@ public:
       AbstractFunctionWarning(__FUNCTION__);
    }
    
-   virtual bool Send(const int id, CObject* o = NULL, const bool deleteobject = false)
+   virtual bool Send(const int id)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return false;
+   }
+   
+   virtual bool SendR(const int id, CObject* o, const bool deleteobject = false)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return false;
+   }
+   
+   virtual bool Send(const int id, CObject*& o, const bool deleteobject = false)
    {
       AbstractFunctionWarning(__FUNCTION__);
       return false;

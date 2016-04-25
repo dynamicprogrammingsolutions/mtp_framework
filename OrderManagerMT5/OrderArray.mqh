@@ -1,6 +1,6 @@
 //
 
-class COrderArray : public CAppObjectArrayObj
+class COrderArray : public CAppObjectArrayObjManaged
 {
 public:
    TraitAppAccess

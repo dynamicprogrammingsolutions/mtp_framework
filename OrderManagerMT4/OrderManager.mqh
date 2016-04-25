@@ -83,6 +83,7 @@ public:
    {
       delete orders;
       delete historyorders;
+      delete neworder;
    }
    
    
@@ -126,6 +127,8 @@ public:
                                     CStopLoss* _stoploss, CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0);*/
 
    virtual COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagement* mm, CEntry* _price,
+                                    CStopLoss* _stoploss, CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0);
+   virtual COrder* NewOrder(COrder* _order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagement* mm, CEntry* _price,
                                     CStopLoss* _stoploss, CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0);
   
    COrder* ExistingOrder(int ticket, bool add = true);
@@ -176,7 +179,6 @@ public:
    {
       static int get_orders_i = -1;
       int total = this.OrdersTotal();
-      Print(total);
       if (get_orders_i < 0) {
          get_orders_i = 0;
       }
@@ -204,10 +206,15 @@ public:
       int cnt = 0;
       for (int i = OriginalOrdersTotal()-1; i >= 0; i--) {
          if (OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) {
+
+            if (OrderSymbol() != __symbol) continue;
+            if (OrderMagicNumber() != __magic) continue;
+            if (GetIdxByTicket(OrderTicket()) >= 0) continue;
+
             COrder* exord;
             exord = ExistingOrder(OrderTicket());
             if (exord != NULL) {
-               Print("new order found: ticket "+exord.GetTicket());
+               Print("new order found: ticket "+exord.GetTicket()+" type: "+EnumToString((ENUM_CLASS_NAMES)exord.Type()));
                if (exord.symbol != __symbol || exord.magic != __magic) {         
                   int idx = GetIdxByTicket(exord.GetTicket());
                   if (idx >= 0)
@@ -350,13 +357,11 @@ int OriginalOrdersTotal()
       return(_order);
    }*/
    
-   COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagement* _mm,CEntry* _price,
+   COrder* COrderManager::NewOrder(COrder* _order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagement* _mm,CEntry* _price,
                                     CStopLoss* _stoploss,CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0)
    {
       app.symbolloader.LoadSymbol(in_symbol).RefreshRates();
 
-      COrder* _order = NewOrderObject();
-      
       if (custom_order_defaults) {
          _order.sl_virtual = this.sl_virtual;
          _order.tp_virtual = this.tp_virtual;
@@ -364,11 +369,24 @@ int OriginalOrdersTotal()
          _order.magic = this.magic;
          if (isset(trade)) _order.trade = trade;
       }
-
-      if (_price != NULL) _price.SetOrderType(_ordertype).SetSymbol(in_symbol);
-      if (_stoploss != NULL) _stoploss.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price != NULL ? _price.GetPrice() : 0);
-      if (_takeprofit != NULL) _takeprofit.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price != NULL ? _price.GetPrice() : 0);
-      _mm.SetSymbol(in_symbol).SetStopLoss(_stoploss);
+      
+      if (_price != NULL) {
+         _price.SetOrderType(_ordertype).SetSymbol(in_symbol);
+         _price.Reset();
+      }
+      
+      if (_stoploss != NULL) {
+         _stoploss.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price != NULL ? _price.GetPrice() : 0);
+         _stoploss.Reset();
+         _stoploss.tp = _takeprofit;
+      }
+      if (_takeprofit != NULL) {
+         _takeprofit.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price != NULL ? _price.GetPrice() : 0);
+         _takeprofit.Reset();
+         _takeprofit.sl = _stoploss;
+      }
+      
+      _mm.SetSymbol(in_symbol).SetStopLoss(_stoploss).SetOrderType(_ordertype);
 
       _order.NewOrder(
          in_symbol,_ordertype,_mm.GetLotsize(),
@@ -385,6 +403,16 @@ int OriginalOrdersTotal()
       
       COrderBase::DeleteIf(_mm);
 
+      return(_order);
+   }
+   
+   
+   COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagement* _mm,CEntry* _price,
+                                    CStopLoss* _stoploss,CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0)
+   {
+      app.symbolloader.LoadSymbol(in_symbol).RefreshRates();
+      COrder* _order = NewOrderObject();
+      NewOrder(_order, in_symbol, _ordertype,_mm,_price,_stoploss,_takeprofit,_comment,_expiration);
       return(_order);
    }
    
@@ -500,8 +528,8 @@ int OriginalOrdersTotal()
       
       //addcomment("total:",(string)orders.Total());
       for (int i = 0; i < orders.Total(); i++) {
+         if (!isset(orders.At(i))) continue;
          _order = orders.At(i);
-         if (!isset(_order)) continue;
          //addcomment("main order ",(string)i," ticket=",(string)_order.ticket," ",(string)_order.placed," ",(string)_order.executed," ",(string)_order.canceled," ",(string)_order.closed,"\n");
          _order.OnTick();
          
@@ -823,6 +851,8 @@ int OriginalOrdersTotal()
             if (in_symbol != "" && _order.symbol != in_symbol) { continue; }
             if (in_magic != -1 && _order.magic != in_magic) { continue; }
             
+            if (in_symbol == "") in_symbol = _order.symbol;
+            
             if (ordertype_select(ORDERSELECT_LONG,_order.GetType())) {
                sum_lots_buy += _order.GetLots();
                sum_price_buy += _order.GetOpenPrice()*_order.GetLots();
@@ -839,6 +869,7 @@ int OriginalOrdersTotal()
       double avg_price = 0;
       
       if (in_symbol != "") loadsymbol(in_symbol,__FUNCTION__);
+      else loadsymbol(Symbol(),__FUNCTION__);
       
       if (sum_lots_buy > 0) avg_price_buy = sum_price_buy/sum_lots_buy;
       if (sum_lots_sell > 0) avg_price_sell = sum_price_sell/sum_lots_sell;
@@ -868,7 +899,7 @@ int OriginalOrdersTotal()
             if (in_symbol != "" && _order.symbol != in_symbol) { continue; }
             if (in_magic != -1 && _order.magic != in_magic) { continue; }
             if (_order.Select()) {
-               totalprofit += OrderProfit()+(_commission?OrderCommission():0)-(swap?OrderSwap():0);
+               totalprofit += OrderProfit()+(_commission?OrderCommission():0)+(swap?OrderSwap():0);
             }
          }
       }
