@@ -438,7 +438,7 @@ bool COrderBase::delete_mm_objects = false;
       
    COrderInfo* COrderBase::GetOrderInfo()
    {
-      if (!isset(this.orderinfo)) this.orderinfo = new COrderInfo();
+      if (!pointer_exists(CheckPointer(this.orderinfo))) this.orderinfo = new COrderInfo();
       if (this.orderinfo.Select(ticket,MODE_TRADES)) {
          return(orderinfo);
       }

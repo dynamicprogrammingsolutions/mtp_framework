@@ -19,7 +19,7 @@ public:
    void Add(ENUM_CLASS_NAMES handled_class, CObject* handler)
    {
       CHandlerContainerItem* handleritem = FindHandler(handled_class);
-      if (handleritem == NULL) this.Add(new CHandlerContainerItem(handled_class,handler));
+      if (handleritem == NULL) this.Add((CObject*)new CHandlerContainerItem(handled_class,handler));
       else handleritem.handler = handler;
    }
    CObject* GetHandler(ENUM_CLASS_NAMES handled_class)

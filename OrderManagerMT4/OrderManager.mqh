@@ -173,8 +173,39 @@ public:
       get_orders_i = -1;
       return gotorder;
    }
+   
+   int LoadOpenOrders(string __symbol, int __magic = -1)
+   {
+      int cnt = 0;
+      for (int i = OriginalOrdersTotal()-1; i >= 0; i--) {
+         if (OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) {
+
+            if (OrderSymbol() != __symbol) continue;
+            if (__magic >= 0 && OrderMagicNumber() != __magic) continue;
+            if (GetIdxByTicket(OrderTicket()) >= 0) continue;
+
+            COrder* exord;
+            exord = ExistingOrder(OrderTicket());
+            if (exord != NULL) {
+               Print("new order found: ticket "+exord.GetTicket()+" type: "+EnumToString((ENUM_CLASS_NAMES)exord.Type()));
+               cnt++;
+            } else {
+               //Print("Order Adding Failed");
+            }
+         }
+      }
+      AssignAttachedOrders();
+      return cnt;
+   }
+
 
 };
+
+int OriginalOrdersTotal()
+{
+   return OrdersTotal();
+}
+
 
 //COrderManager* om;
 
