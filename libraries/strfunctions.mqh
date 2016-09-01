@@ -62,8 +62,9 @@ void str_explode_double_fixed(string list_string, double& explode_array[], strin
    }
 } 
 
-void str_explode_string(string list_string, string& explode_array[], string delimiter=",", int maxitems = 100)
+void str_explode_string(string list_string, string& explode_array[], string delimiter=",", int minitems = 0, int maxitems = 100)
 {
+   ArrayResize(explode_array,minitems);
    for (int i = 0; i < maxitems; i++) {
       if (list_string == "") { break; }
       array_increase_string(explode_array, i+1);

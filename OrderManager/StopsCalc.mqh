@@ -35,6 +35,7 @@ public:
 
    bool delete_after_use;
    virtual bool DeleteAfterUse() { return delete_after_use; }
+   CStopsCalc* UseOnce() { this.delete_after_use = true; return GetPointer(this); }
 
    virtual void Reset() {}
 
@@ -126,9 +127,21 @@ public:
    virtual int Type() const { return classStopLoss; }
    CStopsCalc* tp;
 
+   CStopLoss()
+   {
+   }
+   
+   CStopLoss(double _ticks) {
+      zero_is_nosl = true;
+      if (_ticks == 0) this.SetPrice(0);
+      else this.SetTicks(_ticks);
+      delete_after_use = true;
+   }
+
 protected:
    bool zero_is_nosl;
-
+   
+   
    virtual void CalcTicks()
    {
       ticks = getstoplossticks(this.symbol,this.ordertype,this.price,this.entryprice);
@@ -145,6 +158,16 @@ class CTakeProfit : public CStopsCalc {
 public:
    virtual int Type() const { return classTakeProfit; }
    CStopsCalc* sl;
+
+   CTakeProfit()
+   {
+   }
+   
+   CTakeProfit(double _ticks) {
+      if (_ticks == 0) this.SetPrice(0);
+      else this.SetTicks(_ticks);
+      delete_after_use = true;
+   }
 
 protected:
    virtual void CalcTicks()

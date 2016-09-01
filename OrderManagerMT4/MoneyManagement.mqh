@@ -9,6 +9,8 @@ public:
    virtual int Type() const { return classMT4MoneyManagement; }
    bool delete_after_use;
    virtual bool DeleteAfterUse() { return delete_after_use; }
+   CMoneyManagement* UseOnce() { this.delete_after_use = true; return GetPointer(this); }
+
 public:
    string symbol;
    CStopLoss* stoploss;
@@ -31,6 +33,19 @@ public:
    virtual double GetLotsize() { return 0; }
 };
 
+class CLotsize : public CMoneyManagement
+{
+public:
+   double lotsize;
+   CLotsize(double _lotsize) {
+      lotsize = _lotsize;
+      delete_after_use = true;
+   }
+   virtual double GetLotsize() {
+      return lotsize;
+   }
+};
+
 class CMoneyManagementFixed : public CMoneyManagement
 {
 public:
@@ -43,16 +58,35 @@ public:
    }
 };
 
-class CMoneyManagementExponential : public CMoneyManagement
+class CMoneyManagementLevel : public CMoneyManagement
+{
+public:
+   int level;
+   virtual void SetLevel(int _level)
+   {
+      this.level = _level;
+   }
+   virtual void IncLevel()
+   {
+      this.level++;
+   }
+   virtual void DecLevel()
+   {
+      this.level--;
+   }
+};
+
+
+class CMoneyManagementExponential : public CMoneyManagementLevel
 {
 public:   
    double lotsize;
    CMoneyManagement* mm;
-   int level;
    double multiplier;
    double maximum_lotsize;
    CMoneyManagementExponential()
    {
+      
    }
    CMoneyManagementExponential(CMoneyManagement* _mm, double _multiplier) {
       mm = _mm;
@@ -62,17 +96,37 @@ public:
       lotsize = _lotsize;
       multiplier = _multiplier;
    }
-   virtual void SetLevel(int _level)
-   {
-      this.level = _level;
-   }
-   void IncLevel()
-   {
-      this.level++;
-   }
    virtual double GetLotsize() {
       if (mm != NULL && (lotsize == 0 || level == 0)) lotsize = mm.SetStopLoss(this.stoploss).SetSymbol(this.symbol).GetLotsize();
       return maximum_lotsize > 0?MathMin(lotsize*MathPow(multiplier,level),maximum_lotsize):lotsize*MathPow(multiplier,level);
+   }
+};
+
+class CMoneyManagementLotList : public CMoneyManagementLevel
+{
+public:
+   double lotlist[];
+   CMoneyManagementLotList()
+   {
+      
+   }
+   CMoneyManagementLotList(string mm_lotlist)
+   {
+      str_explode_double(mm_lotlist,lotlist,",");
+   }
+   void IncLevel()
+   {
+      level++;
+      level = MathMin(level,ArraySize(lotlist)-1);
+   }
+   void DecLevel()
+   {
+      level--;
+      level = MathMax(level,0);
+   }
+   virtual double GetLotsize() {
+      
+      return lotlist[level];
    }
 };
 

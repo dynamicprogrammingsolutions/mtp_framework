@@ -3,7 +3,7 @@
 #include "..\mql4to5\timeseries.mqh"
 #endif
 
-class CIsFirstTick
+class CIsFirstTick : CObject
 {
    protected:
       datetime lasttick;

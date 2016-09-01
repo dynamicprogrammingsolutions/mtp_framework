@@ -48,6 +48,7 @@ public:
    static int CTrade::MaxRetryIfTooMuch;
    static int CTrade::MaxRetryIfBrokerError;
    static int CTrade::MaxRetryIfPriceError;
+   static int CTrade::MaxRetryIfMarketClosed;
    
    bool get_new_price_for_retry;
 
@@ -73,6 +74,8 @@ public:
    color cl_cancelbuy;
    color cl_cancelsell;   
 
+   int newticket;
+
                      CTrade();
    //--- methods of access to protected data
    void              LogLevel(ENUM_LOG_LEVELS log_level)     { m_log_level=log_level;               }
@@ -97,6 +100,7 @@ public:
    bool              OrderDelete(ulong ticket, COrderInfo* orderinfo = NULL);   
    bool              OrderClose(ulong ticket, double lots = 0, double price = 0, COrderInfo* orderinfo = NULL);
    int               OrderClosePartial(ulong ticket, double lots = 0, double price = 0, COrderInfo* orderinfo = NULL);
+   int               FindNewTicket(datetime orderopentime, double orderopenprice, string ordersymbol);
    int               CloseBy(ulong ticket1, ulong ticket2, COrderInfo* orderinfo = NULL);
 
    bool              CheckRetry(int errcode, ENUM_TRADE_ACTION action, int& retrycnt);
@@ -403,8 +407,27 @@ bool CTrade::OrderClose(ulong ticket, double lots = 0, double price = 0, COrderI
    if (lots == 0.0) {
       lots = orderinfo.GetLots();
    }
+   
+   bool partial = false;
 
-   int retrycnt = 0;
+   if (lots < orderinfo.GetLots()) {
+      partial = true;
+   }
+   
+      
+   datetime orderopentime;
+   double orderopenprice;  
+   string ordersymbol;
+   
+   if (partial) {
+      orderopentime = orderinfo.GetOpenTime();
+      orderopenprice = orderinfo.GetOpenPrice();  
+      ordersymbol = orderinfo.GetSymbol();
+   }
+   
+   newticket = -1;
+   
+   int retrycnt = 0;  
    while (true) {
       
       if(price==0.0)
@@ -426,6 +449,7 @@ bool CTrade::OrderClose(ulong ticket, double lots = 0, double price = 0, COrderI
       if (OrderClose(ticket,lots,price,m_deviation_close,getcolor(orderinfo.GetType(),true))) {
          if(m_log_level>LOG_LEVEL_ERRORS)
             Print("Order Closed: (",ticket,",",lots,",",price,")");
+         if (partial) newticket = FindNewTicket(orderopentime,orderopenprice,ordersymbol);
          return(true);   
       } else {
          int code = GetLastError();
@@ -492,6 +516,21 @@ int CTrade::OrderClosePartial(ulong ticket, double lots = 0, double price = 0, C
    return(false);
 }
 
+int CTrade::FindNewTicket(datetime orderopentime, double orderopenprice, string ordersymbol)
+{
+   COrderInfo orderinfo;
+   for (int i = OrdersTotal()-1; i >= 0; i--) {
+      if (orderinfo.SelectByIndex(i,MODE_TRADES)) {
+         if (orderinfo.GetSymbol() == ordersymbol && orderinfo.GetOpenTime() == orderopentime && orderinfo.GetOpenPrice() == orderopenprice) {
+            if(m_log_level>LOG_LEVEL_ERRORS) Print("New ticket found:",orderinfo.Ticket());
+            return(orderinfo.Ticket());
+         }
+      }         
+   }
+   if(m_log_level>LOG_LEVEL_NO) Print("New ticket not found :(");
+   return(-1);
+}
+
 int CTrade::CloseBy(ulong ticket1, ulong ticket2, COrderInfo* orderinfo = NULL)
 {
 //--- check stopped
@@ -514,7 +553,8 @@ int CTrade::CloseBy(ulong ticket1, ulong ticket2, COrderInfo* orderinfo = NULL)
    while (true) {
       
       if (OrderCloseBy(ticket1,ticket2,getcolor(orderinfo.GetType(),true))) {
-         if(m_log_level>LOG_LEVEL_ERRORS) Print("Order CloseBy Succeed, finding new ticket");
+         FindNewTicket(orderopentime,orderopenprice,ordersymbol);
+         /*if(m_log_level>LOG_LEVEL_ERRORS) Print("Order CloseBy Succeed, finding new ticket");
          for (int i = OrdersTotal()-1; i >= 0; i--) {
             if (orderinfo.SelectByIndex(i,MODE_TRADES)) {
                if (orderinfo.GetSymbol() == ordersymbol && orderinfo.GetOpenTime() == orderopentime && orderinfo.GetOpenPrice() == orderopenprice) {
@@ -524,7 +564,7 @@ int CTrade::CloseBy(ulong ticket1, ulong ticket2, COrderInfo* orderinfo = NULL)
             }         
          }
          if(m_log_level>LOG_LEVEL_NO) Print("New ticket not found :(");
-         return(-1);
+         return(-1);*/
       } else {
          int code = GetLastError();
          m_errcode = code;
@@ -560,6 +600,7 @@ int CTrade::MaxRetryIfBusy = 19;
 int CTrade::MaxRetryIfTooMuch = 4;
 int CTrade::MaxRetryIfBrokerError = 2;
 int CTrade::MaxRetryIfPriceError = 2;
+int CTrade::MaxRetryIfMarketClosed = 0;
   
 bool CTrade::CheckRetry(int errcode, ENUM_TRADE_ACTION action, int& retrycnt)
 {
@@ -576,7 +617,12 @@ bool CTrade::CheckRetry(int errcode, ENUM_TRADE_ACTION action, int& retrycnt)
          sleep = CTrade::SleepIfBusy;
          maxretry = CTrade::MaxRetryIfBusy;
          break;
-
+         
+      case ERR_MARKET_CLOSED:
+         sleep = CTrade::SleepIfBusy;
+         maxretry = CTrade::MaxRetryIfMarketClosed;
+         break;
+         
       case ERR_TOO_FREQUENT_REQUESTS:
       case ERR_TOO_MANY_REQUESTS:
          sleep = CTrade::SleepIfTooMuch;

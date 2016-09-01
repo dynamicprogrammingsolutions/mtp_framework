@@ -3,7 +3,7 @@
 int get_fractal_up(int from, int idx, string __symbol = NULL, ENUM_TIMEFRAMES _timeframe=0)
 {
    int cnt = 0;
-   for (int i = from; i <= Bars; i++) {
+   for (int i = from; i <= iBars(__symbol,_timeframe); i++) {
       double fractal_up = iFractals(__symbol,_timeframe,MODE_UPPER,i);
       if (fractal_up != 0) {
          if (cnt >= idx) {
@@ -19,7 +19,7 @@ int get_fractal_up(int from, int idx, string __symbol = NULL, ENUM_TIMEFRAMES _t
 int get_fractal_dn(int from, int idx, string __symbol = NULL, ENUM_TIMEFRAMES _timeframe=0)
 {
    int cnt = 0;
-   for (int i = from; i <= Bars; i++) {
+   for (int i = from; i <= iBars(__symbol,_timeframe); i++) {
       double fractal_up = iFractals(__symbol,_timeframe,MODE_LOWER,i);
       if (fractal_up != 0) {
          if (cnt >= idx) {
@@ -36,7 +36,7 @@ int get_fractal_dn(int from, int idx, string __symbol = NULL, ENUM_TIMEFRAMES _t
 int get_fractal_up(int from, int idx, double& fractal_up, string __symbol = NULL, ENUM_TIMEFRAMES _timeframe=0)
 {
    int cnt = 0;
-   for (int i = from; i <= Bars; i++) {
+   for (int i = from; i <= iBars(__symbol,_timeframe); i++) {
       fractal_up = iFractals(__symbol,_timeframe,MODE_UPPER,i);
       if (fractal_up != 0) {
          if (cnt >= idx) {
@@ -52,7 +52,7 @@ int get_fractal_up(int from, int idx, double& fractal_up, string __symbol = NULL
 int get_fractal_dn(int from, int idx, double& fractal_dn, string __symbol = NULL, ENUM_TIMEFRAMES _timeframe=0)
 {
    int cnt = 0;
-   for (int i = from; i <= Bars; i++) {
+   for (int i = from; i <= iBars(__symbol,_timeframe); i++) {
       fractal_dn = iFractals(__symbol,_timeframe,MODE_LOWER,i);
       if (fractal_dn != 0) {
          if (cnt >= idx) {

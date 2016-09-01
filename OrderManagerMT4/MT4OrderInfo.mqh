@@ -196,7 +196,7 @@ bool COrderInfo::Select(ulong ticket, int pool = MODE_TRADES)
       m_stoploss = EMPTY_VALUE;
       m_takeprofit = EMPTY_VALUE;
       m_expiration = -1;
-      
+
       m_laststate = m_state;      
       m_state = 0;      
       State();
@@ -204,6 +204,10 @@ bool COrderInfo::Select(ulong ticket, int pool = MODE_TRADES)
       if (m_state != m_laststate) {
          m_opentime = -1;
          m_lots = 0;
+
+         m_comment = "";
+         no_comment = false;
+
       }            
       
       return(true);
@@ -244,8 +248,13 @@ bool COrderInfo::SelectByIndex(int index, int pool = MODE_TRADES)
          State();
       
          if (m_state != m_laststate) {
+         
             m_opentime = -1;
             m_lots = 0;
+
+            m_comment = "";
+            no_comment = false;
+
          }
       }
             
@@ -260,7 +269,7 @@ bool COrderInfo::SelectByIndex(int index, int pool = MODE_TRADES)
       m_stoploss = EMPTY_VALUE;
       m_takeprofit = EMPTY_VALUE;
       m_expiration = -1;
-      
+
       return(true);
    }
    

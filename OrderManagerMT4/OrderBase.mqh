@@ -19,7 +19,9 @@ class COrderBase : public COrderInterface
 public:
    virtual int Type() const { return classMT4OrderBase; }
    
-   static int EventTriggeringVirtualOrder;
+   static int EventTriggeringVirtualOrderOverride;
+   static int EventTriggeringVirtualOrderEnabled;
+   static int EventTriggeringVirtualOrderEnabledOrCancel;
    static int EventStateChange;
    static int EventUpdate;
 
@@ -165,6 +167,7 @@ public:
    bool CheckForSimulation(double currentprice);
    virtual bool Update();
    virtual void OnTick();
+   virtual void BeforeTicketChange();
 
    void DeleteVPriceLine();
    void UpdateVPriceLine();
@@ -176,7 +179,7 @@ public:
    virtual long GetTicket() { return((long)this.ticket); }
    virtual int GetMagicNumber() { return(this.magic); }
    virtual string GetSymbol() { return(this.symbol); }
-   virtual string GetComment() { return(this.comment); }
+   virtual string GetComment() { if (!CheckOrderInfo()) return(this.comment); else return(orderinfo.GetComment()); }
    
    CStopLoss* PrepareSLForModify(CStopLoss* _sl) { return _sl.SetEntryPrice(this.GetOpenPrice()).SetSymbol(this.symbol).SetOrderType(this.GetType()); }   
    
@@ -360,7 +363,9 @@ public:
 
 CTrade* COrderBase::trade_default = NULL;
 
-int COrderBase::EventTriggeringVirtualOrder = 0;
+int COrderBase::EventTriggeringVirtualOrderOverride = 0;
+int COrderBase::EventTriggeringVirtualOrderEnabled = 0;
+int COrderBase::EventTriggeringVirtualOrderEnabledOrCancel = 0;
 int COrderBase::EventStateChange = 0;
 int COrderBase::EventUpdate = 0;
 
@@ -419,9 +424,9 @@ bool COrderBase::delete_mm_objects = false;
    
       target.closetime = closetime;
    
-      target.sl_virtual = sl_virtual;
-      target.tp_virtual = tp_virtual;
-      target.price_virtual = price_virtual;
+      //target.sl_virtual = sl_virtual;
+      //target.tp_virtual = tp_virtual;
+      //target.price_virtual = price_virtual;
       
       target.retcode = retcode;
       
@@ -508,6 +513,7 @@ bool COrderBase::delete_mm_objects = false;
                         executetime = TimeCurrent();
                         success = true;
                      } else {
+                        loadsymbol(symbol);
                         virtual_error = "Invalid Price: "+this.price+" bid/ask:"+_symbol.Bid()+"/"+_symbol.Ask();
                      }
                   } else {
@@ -642,6 +648,14 @@ bool COrderBase::delete_mm_objects = false;
       
       if (trade.OrderClose(this.ticket,closevolume,closeprice,orderinfo)) {
          if (event.Info ()) event.Info ("order closed",__FUNCTION__);
+         if (trade.newticket >= 0) {
+
+            BeforeTicketChange();
+            
+            this.ticket = trade.newticket;
+            this.Update();
+            
+         }
          this.OnTick();
          //this.DeleteVStopLines(); 
          return(true);
@@ -652,8 +666,12 @@ bool COrderBase::delete_mm_objects = false;
       return(false);
    }
    
+   void COrderBase::BeforeTicketChange()
+   {
+      DeleteVStopLines();
+      DeleteVPriceLine();
+   }
    
-
    bool COrderBase::Modify()
    {      
       activity = activity | ACTIVITY_MODIFY;
@@ -666,10 +684,10 @@ bool COrderBase::delete_mm_objects = false;
          if (!price_set) price = orderinfo.GetOpenPrice();
          if (!expiration_set) expiration = orderinfo.GetExpiration();
 	 
-	 price_set = false;
-	 sl_set = false;
-	 tp_set = false;
-	 expiration_set = false;
+      	 price_set = false;
+      	 sl_set = false;
+      	 tp_set = false;
+      	 expiration_set = false;
 	 
          if (GetOrderInfoB()) {
             if (real_sl != orderinfo.GetStopLoss() || real_tp != orderinfo.GetTakeProfit() || (ordertype_pending(orderinfo.GetType()) && (price != orderinfo.GetOpenPrice() || expiration != orderinfo.GetExpiration()))) {
@@ -713,12 +731,13 @@ bool COrderBase::delete_mm_objects = false;
          if (state == ORDER_STATE_PLACED) {
             // Checking virtual price
             UpdateVPriceLine();
-            if (getentrypriceticks(this.symbol,this.ordertype,this.price) <= 0) {               
+            if ((getentrypriceticks(this.symbol,this.ordertype,this.price) <= 0 && TRIGGER(EventTriggeringVirtualOrderEnabled)) || TRIGGER(EventTriggeringVirtualOrderOverride)) {               
                DeleteVPriceLine();
                this.ordertype = ordertype_convert_to_market(this.ordertype);
                executestate = ES_NOT_EXECUTED;
                price = 0;
-               if (TRIGGER(EventTriggeringVirtualOrder)) {
+               if (TRIGGER(EventTriggeringVirtualOrderEnabledOrCancel)) {
+                  BeforeTicketChange();
                   if (Execute()) {
                      //executestate = ES_EXECUTED;
                      return(true);
@@ -729,7 +748,7 @@ bool COrderBase::delete_mm_objects = false;
                } else {
                   executestate = ES_CANCELED;
                   return false;
-               }           
+               }  
             }
             return(true);
          } else {
@@ -767,6 +786,7 @@ bool COrderBase::delete_mm_objects = false;
          } else {
             if (this.state == ORDER_STATE_PLACED && (price_virtual || realprice_draw_line)) {           
                UpdateRealPriceLine();
+               if (realstops_draw_line) UpdateVStopLines();
             }
             if (this.state == ORDER_STATE_FILLED && realprice_draw_line) DeleteVPriceLine();
             if (this.state == ORDER_STATE_FILLED && (sl_virtual || tp_virtual || realstops_draw_line)) { 
@@ -875,34 +895,34 @@ bool COrderBase::delete_mm_objects = false;
       }
       if (realstops_draw_line) {
          if (!sl_virtual && GetStopLoss() > 0) {
-            line_sl = line_get(vsl_objname,this.ticket);            
+            line_sl = line_get(vsl_objname,this.ticket);  
             if (line_sl <= 0 || last_vsl != GetStopLoss()) {
                hline_put(vsl_objname,GetStopLoss(),vsl_color,this.ticket);
             } else if (line_sl > 0) {
-               if (!line_beingdragged(vsl_objname,this.ticket)) {
+               //if (!line_beingdragged(vsl_objname,this.ticket)) {
                   if (GetStopLoss() != line_sl) {
                      SetStopLoss(line_sl);
                      Modify();
                      hline_put(vsl_objname,GetStopLoss(),vsl_color,this.ticket);
                   }
-               }
+               //}
             }
-            last_vsl = sl;            
+            last_vsl = GetStopLoss();            
          }
          if (!tp_virtual && GetTakeProfit() > 0) {
             line_tp = line_get(vtp_objname,this.ticket);
             if (line_tp <= 0 || last_vtp != GetTakeProfit())
                hline_put(vtp_objname,GetTakeProfit(),vtp_color,this.ticket);
             else if (line_tp > 0) {
-               if (!line_beingdragged(vtp_objname,this.ticket)) {
+               //if (!line_beingdragged(vtp_objname,this.ticket)) {
                   if (GetTakeProfit() != line_tp) {
                      SetTakeProfit(line_tp);
                      Modify();
                      hline_put(vtp_objname,GetTakeProfit(),vtp_color,this.ticket);
                   }
-               }
+               //}
             }
-            last_vtp = tp;
+            last_vtp = GetTakeProfit();
          }
       }
    }

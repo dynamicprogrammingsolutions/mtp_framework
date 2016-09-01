@@ -8,6 +8,25 @@
 
 #include "constants.mqh"
 
+/*int iBarShiftMQL4(string symbol,
+                  int tf,
+                  datetime time,
+                  bool exact=false)
+  {
+   if(time<0) return(-1);
+   ENUM_TIMEFRAMES timeframe=TFMigrate(tf);
+   datetime Arr[],time1;
+   CopyTime(symbol,timeframe,0,1,Arr);
+   time1=Arr[0];
+   if(CopyTime(symbol,timeframe,time,time1,Arr)>0)
+     {
+      if(ArraySize(Arr)>2) return(ArraySize(Arr)-1);
+      if(time<time1) return(1);
+      else return(0);
+     }
+   else return(-1);
+  }*/
+
 int iBarShift(string in_symbol,
                   ENUM_TIMEFRAMES __timeframe,
                   datetime time)
@@ -15,6 +34,7 @@ int iBarShift(string in_symbol,
    if (in_symbol == NULL) in_symbol = _Symbol;
    if(time<0) return(-1);
    datetime Arr[],time1;
+   ArrayResize(Arr,2);
    CopyTime(in_symbol,__timeframe,0,1,Arr);
    time1=Arr[0];
    if(CopyTime(in_symbol,__timeframe,time,time1,Arr)>0)
