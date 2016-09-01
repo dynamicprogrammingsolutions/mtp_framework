@@ -178,6 +178,11 @@ public:
       int cnt = 0;
       for (int i = OriginalOrdersTotal()-1; i >= 0; i--) {
          if (OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) {
+
+            if (OrderSymbol() != __symbol) continue;
+            if (OrderMagicNumber() != __magic) continue;
+            if (GetIdxByTicket(OrderTicket()) >= 0) continue;
+
             COrder* exord;
             exord = ExistingOrder(OrderTicket());
             if (exord != NULL) {

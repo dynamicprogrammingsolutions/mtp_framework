@@ -176,6 +176,10 @@ public:
 
 class CStopLossTicks : public CStopLoss {
 public:
+   CStopLossTicks()
+   {
+      zero_is_nosl = true;
+   }
    CStopLossTicks(double _ticks, bool _zero_is_nosl = true) {
       zero_is_nosl = _zero_is_nosl;
       if (zero_is_nosl && _ticks == 0) this.SetPrice(0);
@@ -203,6 +207,10 @@ public:
 
 class CTakeProfitTicks : public CTakeProfit {
 public:
+   CTakeProfitTicks()
+   {
+   
+   }
    CTakeProfitTicks(double _ticks) {
       if (_ticks == 0) this.SetPrice(0);
       else this.SetTicks(_ticks);

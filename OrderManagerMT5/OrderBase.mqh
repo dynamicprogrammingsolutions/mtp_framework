@@ -331,14 +331,14 @@ double COrderBase::CurrentPrice()
 
 COrderInfoBase* COrderBase::GetOrderInfo()
 {
-   if (!isset(this.orderinfov)) this.orderinfov = new COrderInfoV();
+   if (!pointer_exists(CheckPointer(this.orderinfov))) this.orderinfov = new COrderInfoV();
    if (this.orderinfov.Select(ticket)) {
       selectedishistory = false;
       orderinfo = (COrderInfoBase*)(this.orderinfov);
       return(orderinfo);
    }
 
-   if (!isset(this.historyorderinfov)) this.historyorderinfov = new CHistoryOrderInfoV();
+   if (!pointer_exists(CheckPointer(this.historyorderinfov))) this.historyorderinfov = new CHistoryOrderInfoV();
    if (this.historyorderinfov.Ticket(ticket)) {         
       selectedishistory = true;
       orderinfo = (COrderInfoBase*)(this.historyorderinfov);

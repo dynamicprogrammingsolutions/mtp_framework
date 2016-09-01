@@ -31,6 +31,8 @@ int minsl, mintp;
 string initerror = "variables.mqh has not been initalized!";
 string priceiniterror = "variables.mqh has not been initalized at actual tick!";
 
+bool fractional_conversion_enabled = true;
+
 class CSymbolInfoVars : public CServiceProvider
 {
    public:
@@ -149,7 +151,7 @@ double inticksd(double price)
 
 double convertfract(double pips)
 {
-   return symbolinfo.ConvertFractional(pips);
+   return fractional_conversion_enabled?symbolinfo.ConvertFractional(pips):pips;
 }
 
 double priceround(double price)

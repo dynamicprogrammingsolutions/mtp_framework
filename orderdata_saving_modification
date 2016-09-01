@@ -1,0 +1,1026 @@
+diff --git a/DefaultServices.mqh b/DefaultServices.mqh
+index 268369a..7c74eee 100644
+--- a/DefaultServices.mqh
++++ b/DefaultServices.mqh
+@@ -1,14 +1,26 @@
+ //
+ 
++#include "libraries\math.mqh"
++#include "libraries\time.mqh"
++#include "libraries\arrays.mqh"
++#include "libraries\strfunctions.mqh"
++#include "libraries\commonfunctions.mqh"
++#include "libraries\comments.mqh"
++
+ #include "TestManager\Loader.mqh"
+ #include "EventHandler\EventHandler.mqh"
+ #include "SymbolLoader\SymbolLoader.mqh"
++
++#include "OrderManager\Loader.mqh"
++
+ #ifdef __MQL4__
+-#include "OrderManagerMT4\OrderManager.mqh"
++#include "OrderManagerMT4\Loader.mqh"
+ #endif
++
+ #ifdef __MQL5__
+-#include "OrderManagerMT5\OrderManager.mqh"
++#include "OrderManagerMT5\Loader.mqh"
+ #endif
++
+ #include "OrderManager\OrderFactory.mqh"
+ #include "OrderManager\AttachedOrderFactory.mqh"
+ 
+@@ -30,8 +42,6 @@
+ #include "EventManager\EventManager.mqh"
+ #include "CommandManager\CommandManager.mqh"
+ 
+-#include "libraries\comments.mqh"
+-
+ #include "Tests\Loader.mqh"
+ 
+ 
+diff --git a/Interfaces/Loader.mqh b/Interfaces/Loader.mqh
+index fd16b33..13a682c 100644
+--- a/Interfaces/Loader.mqh
++++ b/Interfaces/Loader.mqh
+@@ -11,4 +11,4 @@
+ #include "ServiceProviders\ScriptManagerInterface.mqh"
+ #include "ServiceProviders\EventManagerInterface.mqh"
+ #include "ServiceProviders\CommandManagerInterface.mqh"
+-#include "ServiceProviders\TestManagerInterface.mqh"
+\ No newline at end of file
++#include "ServiceProviders\TestManagerInterface.mqh"
+diff --git a/OrderManager/Loader.mqh b/OrderManager/Loader.mqh
+index 42399fc..05e526a 100644
+--- a/OrderManager/Loader.mqh
++++ b/OrderManager/Loader.mqh
+@@ -1,4 +1,5 @@
+ //
++#include "..\libraries\file.mqh"
+ #include "EnumOrderselect.mqh"
+ #include "EnumStateselect.mqh"
+ #include "HelperOrderselect.mqh"
+diff --git a/OrderManager/OrderDataSaver.mqh b/OrderManager/OrderDataSaver.mqh
+index 557d321..b0789f4 100644
+--- a/OrderManager/OrderDataSaver.mqh
++++ b/OrderManager/OrderDataSaver.mqh
+@@ -25,18 +25,20 @@ public:
+       savetofile_at_terminal_close = true;
+    
+       loadfromfile = true;
+-      datafile = "save_dps_"+(string)__DATETIME__;
++      datafile = "save_dps_"+(string)(int)__DATETIME__;
+    }
+ 
+    virtual void OnInit()
+    {
+       if (loadfromfile) {
+-         string filename = datafile+Symbol()+".dat";
++         string filename = datafile+"_"+Symbol()+".dat";
+          if (FileIsExist(filename))
+          {
+             Print("loading from file");
+             int handle = FileOpen(filename,FILE_READ|FILE_BIN);
+-      
++            if(handle==INVALID_HANDLE) {
++               Print("Operation FileOpen failed, error ",GetLastError()); 
++            }
+             if (!App().ordermanager.Load(handle)) {
+                Print("file load failed");
+             }
+@@ -48,15 +50,20 @@ public:
+    
+    virtual void OnDeinit()
+    {
+-      string filename = datafile+Symbol()+".dat";
++      Print("uninit reason: "+(string)UninitializeReason());
++      string filename = datafile+"_"+Symbol()+".dat";
+       if ((savetofile_at_remove && UninitializeReason() == REASON_REMOVE) ||
+       (savetofile_at_chart_change && UninitializeReason() == REASON_CHARTCHANGE) ||
+       (savetofile_at_chart_close && UninitializeReason() == REASON_CHARTCLOSE) ||
+       (savetofile_at_parameter_change && UninitializeReason() == REASON_PARAMETERS) ||
+       (savetofile_at_template_change && UninitializeReason() == REASON_TEMPLATE) ||
+       (savetofile_at_terminal_close && UninitializeReason() == REASON_CLOSE)) {
+-         Print("saving to file");
++         Print("saving to file: "+filename);
++         ResetLastError(); 
+          int handle = FileOpen(filename,FILE_WRITE|FILE_BIN);
++         if(handle==INVALID_HANDLE) {
++            Print("Operation FileOpen failed, error ",GetLastError()); 
++         }
+          if (!App().ordermanager.Save(handle)) {
+             Print("file save failed");
+          }
+diff --git a/OrderManager/StopsCalc.mqh b/OrderManager/StopsCalc.mqh
+index d6f8836..54d6ecc 100644
+--- a/OrderManager/StopsCalc.mqh
++++ b/OrderManager/StopsCalc.mqh
+@@ -52,6 +52,7 @@ public:
+    virtual CStopsCalcInterface* SetTicks(double _ticks)
+    {
+       ticks_set = true;
++      price_set = false;
+       ticks = _ticks;
+       return (CStopsCalcInterface*)GetPointer(this);
+    }
+@@ -59,6 +60,7 @@ public:
+    virtual CStopsCalcInterface* SetPrice(double _price)
+    {
+       price_set = true;
++      ticks_set = false;
+       price = _price;
+       return (CStopsCalcInterface*)GetPointer(this);
+    }
+diff --git a/OrderManagerMT4/AttachedOrder.mqh b/OrderManagerMT4/AttachedOrder.mqh
+index 941011e..3484ad6 100644
+--- a/OrderManagerMT4/AttachedOrder.mqh
++++ b/OrderManagerMT4/AttachedOrder.mqh
+@@ -22,7 +22,7 @@ public:
+       MTPFileBin file;
+       file.Handle(handle);            
+       if (file.Invalid()) return false;
+-      if (!file.WriteString(name)) return file.Error("name",__FUNCTION__);
++      //if (!file.WriteString(name)) return file.Error("name",__FUNCTION__);
+       if (!COrderBase::Save(handle)) return file.Error("COrderBase",__FUNCTION__);
+       return(true);
+    }
+@@ -32,7 +32,7 @@ public:
+       MTPFileBin file;
+       file.Handle(handle);            
+       if (file.Invalid()) return false;
+-      if (!file.ReadString(name)) return file.Error("name",__FUNCTION__);
++      //if (!file.ReadString(name)) return file.Error("name",__FUNCTION__);
+       if (!COrderBase::Load(handle)) return file.Error("COrderBase",__FUNCTION__);
+       return(true);
+    }
+diff --git a/OrderManagerMT4/MoneyManagement.mqh b/OrderManagerMT4/MoneyManagement.mqh
+index 1b4d9b5..4b278b6 100644
+--- a/OrderManagerMT4/MoneyManagement.mqh
++++ b/OrderManagerMT4/MoneyManagement.mqh
+@@ -76,6 +76,22 @@ public:
+   }
+ };
+ 
++class CMoneyManagementRiskMoney : public CMoneyManagement
++{
++public:
++   double riskmoney;
++   CMoneyManagementRiskMoney(double _riskmoney)
++   {
++      riskmoney = _riskmoney;
++   }
++   virtual double GetLotsize() {
++      addaccountbalance = false;
++      addfixbalance = riskmoney;
++      moneymanagement_init(this.symbol);
++      return mmgetlot_stoploss(stoploss.GetTicks(), 100);
++  }
++};
++
+ class CMoneyManagementLotPerMoney : public CMoneyManagement
+ {
+ public:
+diff --git a/OrderManagerMT4/OrderBase.mqh b/OrderManagerMT4/OrderBase.mqh
+index b52c6d1..29cc5c3 100644
+--- a/OrderManagerMT4/OrderBase.mqh
++++ b/OrderManagerMT4/OrderBase.mqh
+@@ -13,7 +13,6 @@
+ #include "Loader.mqh"
+ #include "..\libraries\objectfunctions.mqh"
+ #include "..\libraries\commonfunctions.mqh"
+-#include "..\libraries\file.mqh"
+ 
+ class COrderBase : public COrderInterface
+ {
+diff --git a/OrderManagerMT4/OrderManager.mqh b/OrderManagerMT4/OrderManager.mqh
+index 4f1a255..3917713 100644
+--- a/OrderManagerMT4/OrderManager.mqh
++++ b/OrderManagerMT4/OrderManager.mqh
+@@ -174,27 +174,37 @@ public:
+       return gotorder;
+    }
+    
+-   void LoadOpenOrders(string __symbol, int __magic)
++   int LoadOpenOrders(string __symbol, int __magic)
+    {
+-      for (int i = OrdersTotal()-1; i >= 0; i--) {
++      int cnt = 0;
++      for (int i = OriginalOrdersTotal()-1; i >= 0; i--) {
+          if (OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) {
+             COrder* exord;
+             exord = ExistingOrder(OrderTicket());
+-            if (exord != NULL) {  
++            if (exord != NULL) {
++               Print("new order found: ticket "+exord.GetTicket());
+                if (exord.symbol != __symbol || exord.magic != __magic) {         
+                   int idx = GetIdxByTicket(exord.GetTicket());
+                   if (idx >= 0)
+                      orders.Delete(idx);
+-               }                     
++               } else {
++                  cnt++;
++               }                 
+             } else {
+                //Print("Order Adding Failed");
+             }
+          }
+       }
+       AssignAttachedOrders();
++      return cnt;
+    }
+ 
+ };
++   
++int OriginalOrdersTotal()
++{
++   return OrdersTotal();
++}
+ 
+ //COrderManager* om;
+ 
+diff --git a/OrderManagerMT5/AttachedOrder.mqh b/OrderManagerMT5/AttachedOrder.mqh
+index e1b29f7..e2891c4 100644
+--- a/OrderManagerMT5/AttachedOrder.mqh
++++ b/OrderManagerMT5/AttachedOrder.mqh
+@@ -7,4 +7,27 @@ public:
+    string name;
+    bool filling_updated;
+    static CAttachedOrder* Null() { return(new CAttachedOrder()); }
++   
++   virtual bool Save(const int handle)
++   {
++      MTPFileBin file;
++      file.Handle(handle);            
++      if (file.Invalid()) return false;
++      if (!file.WriteString(name)) return file.Error("name",__FUNCTION__);
++      if (!file.WriteBool(filling_updated)) return file.Error("filling_updated",__FUNCTION__);
++      if (!COrderBase::Save(handle)) return file.Error("COrderBase",__FUNCTION__);
++      return(true);
++   }
++   
++   virtual bool Load(const int handle)
++   {
++      MTPFileBin file;
++      file.Handle(handle);            
++      if (file.Invalid()) return false;
++      if (!file.ReadString(name)) return file.Error("name",__FUNCTION__);
++      if (!file.ReadBool(filling_updated)) return file.Error("filling_updated",__FUNCTION__);
++      if (!COrderBase::Load(handle)) return file.Error("COrderBase",__FUNCTION__);
++      return(true);
++   }
++   
+ };
+diff --git a/OrderManagerMT5/AttachedOrderArray.mqh b/OrderManagerMT5/AttachedOrderArray.mqh
+index 7112c97..4d7f2e5 100644
+--- a/OrderManagerMT5/AttachedOrderArray.mqh
++++ b/OrderManagerMT5/AttachedOrderArray.mqh
+@@ -6,6 +6,10 @@ public:
+    virtual int Type() const { return classMT5AttachedOrderArray; }
+ public:
+    CAttachedOrder    *AttachedOrder(int nIndex){return((CAttachedOrder*)At(nIndex));}  
++   CAttachedOrderArray()
++   {
++      m_free_mode = true;
++   }
+    virtual bool  CreateElement(const int index) {
+       m_data[index] = (CObject*)(((CApplication*)AppBase()).attachedorderfactory.Create());      
+       return(true);
+diff --git a/OrderManagerMT5/Order.mqh b/OrderManagerMT5/Order.mqh
+index cfdc332..8140512 100644
+--- a/OrderManagerMT5/Order.mqh
++++ b/OrderManagerMT5/Order.mqh
+@@ -6,18 +6,18 @@ public:
+    virtual int Type() const { return classMT5Order; }
+    
+ protected:
+-   string attachedtoticket;
+-   string stoploss_name;
+-   string takeprofit_name;
++   static string attachedtoticket;
++   static string stoploss_name;
++   static string takeprofit_name;
+    
++//BEGIN Need to save   
++
+    double sl;
+    double tp;
+    bool sl_set;
+    bool tp_set;
+ 
+ public:
+-   CAttachedOrderArray attachedorders;
+-
+    bool closed;
+    bool close_attempted;
+    
+@@ -29,11 +29,80 @@ public:
+    datetime lastclosetime;
+    
+    double lastcloseprice;
++   
++//END Need to save
++
++   CAttachedOrderArray attachedorders;
++   
++   virtual bool Save(const int handle)
++   {
++      MTPFileBin file;
++      file.Handle(handle);            
++      if (file.Invalid()) return false;
++
++      Print(__FUNCTION__+" Start Saving pos: "+file.Tell());
++      
++      file.WriteDouble(sl);
++      file.WriteDouble(tp);
++      file.WriteBool(sl_set);
++      file.WriteBool(tp_set);
++      file.WriteBool(closed);
++      file.WriteBool(close_attempted);
++      file.WriteBool(do_not_archive);
++      file.WriteBool(do_not_delete);
++      file.WriteDouble(closedvolume);
++      file.WriteDateTime(closetime);
++      file.WriteDateTime(lastclosetime);
++      file.WriteDouble(lastcloseprice);
++
++      Print(__FUNCTION__+" Start Saving AttachedOrders pos: "+file.Tell());
++
++      if (!file.WriteObject(GetPointer(attachedorders))) return file.Error("attachedorders",__FUNCTION__);
++      
++      Print(__FUNCTION__+" Start Saving OrderBase pos: "+file.Tell());
++      
++      if (!COrderBase::Save(handle)) return file.Error("COrderBase",__FUNCTION__);
++
++      Print(__FUNCTION__+" End Saving pos: "+file.Tell());
++
++      return(true);
++   }
++   
++   virtual bool Load(const int handle)
++   {
++      MTPFileBin file;
++      file.Handle(handle);            
++      if (file.Invalid()) return file.Error("invalid file",__FUNCTION__);           
++
++      Print(__FUNCTION__+" Start Loading pos: "+file.Tell());
++
++      file.ReadDouble(sl);
++      file.ReadDouble(tp);
++      file.ReadBool(sl_set);
++      file.ReadBool(tp_set);
++      file.ReadBool(closed);
++      file.ReadBool(close_attempted);
++      file.ReadBool(do_not_archive);
++      file.ReadBool(do_not_delete);
++      file.ReadDouble(closedvolume);
++      file.ReadDateTime(closetime);
++      file.ReadDateTime(lastclosetime);
++      file.ReadDouble(lastcloseprice);
++
++      Print(__FUNCTION__+" Start Loading AttachedOrders pos: "+file.Tell());
++      
++      if (!file.ReadObject(GetPointer(attachedorders))) return file.Error("attachedorders",__FUNCTION__);
++
++      Print(__FUNCTION__+" Start Loading OrderBase pos: "+file.Tell());
++      
++      if (!COrderBase::Load(handle)) return file.Error("COrderBase",__FUNCTION__);
++
++      Print(__FUNCTION__+" End Loading pos: "+file.Tell());
++
++      return(true);
++   }
+ 
+    COrder() {
+-      attachedtoticket = "attachedtoticket=";
+-      stoploss_name = "stoploss";
+-      takeprofit_name = "takeprofit";
+       closetime = 0;
+       lastclosetime = 0;
+    };
+@@ -95,6 +164,11 @@ public:
+    
+ };
+ 
++string COrder::attachedtoticket = "attachedtoticket=";
++string COrder::stoploss_name = "stoploss";
++string COrder::takeprofit_name = "takeprofit";
++
++
+ bool COrder::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,
+    const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0)
+ {
+diff --git a/OrderManagerMT5/OrderBase.mqh b/OrderManagerMT5/OrderBase.mqh
+index cf447db..7feabab 100644
+--- a/OrderManagerMT5/OrderBase.mqh
++++ b/OrderManagerMT5/OrderBase.mqh
+@@ -1,4 +1,8 @@
+ //
++#include "..\Loader.mqh"
++
++#include "..\libraries\file.mqh"
++
+ class COrderBase : public COrderInterface
+ {
+ public:
+@@ -34,11 +38,11 @@ public:
+    
+    CTrade* trade;
+ 
+-   ENUM_EXECUTE_STATE executestate;
++//BEGIN Need to save   
+ 
++   ENUM_EXECUTE_STATE executestate;
+    ENUM_ORDER_STATE state;
+ 
+-public:
+    ulong ticket;
+    string symbol;
+    
+@@ -47,27 +51,139 @@ public:
+    double price;
+    datetime expiration;
+ 
+-public:
+    int id;
+    string comment;
+    int magic; // magic is not sent to server, if "restore orders from server" is developed, it will be needed
+ 
+-   bool selectedishistory;
+-   COrderInfoBase *orderinfo;
+-   COrderInfoV *orderinfov;
+-   CHistoryOrderInfoV *historyorderinfov;
+-   
+-   uint retcode;
+    datetime executetime;   
+    datetime filltime;
+ 
++   double openprice;
++   double limit_price;
++   ENUM_ORDER_TYPE_TIME type_time;   
++
+    bool price_set;
+    bool expiration_set;
+    bool typetime_set;
+ 
+-   double openprice;
+-   double limit_price;
+-   ENUM_ORDER_TYPE_TIME type_time;   
++//BEGIN Need to save   
++   
++   uint retcode;
++      
++   bool selectedishistory;
++   COrderInfoBase *orderinfo;
++   COrderInfoV *orderinfov;
++   CHistoryOrderInfoV *historyorderinfov;
++      
++   virtual bool Save(const int handle)
++   {
++      MTPFileBin file;
++      file.Handle(handle);            
++      if (file.Invalid()) return false;
++
++      Print(__FUNCTION__+" Start Saving pos: "+file.Tell());
++      
++      /*ENUM_EXECUTE_STATE executestate;
++      ENUM_ORDER_STATE state;
++   
++      ulong ticket;
++      string symbol;
++      
++      ENUM_ORDER_TYPE ordertype;
++      double volume;
++      double price;
++      datetime expiration;
++   
++      int id;
++      string comment;
++      int magic; // magic is not sent to server, if "restore orders from server" is developed, it will be needed
++   
++      datetime executetime;   
++      datetime filltime;
++   
++      double openprice;
++      double limit_price;
++      ENUM_ORDER_TYPE_TIME type_time;   
++   
++      bool price_set;
++      bool expiration_set;
++      bool typetime_set;*/
++      
++      file.WriteInteger(executestate);
++      file.WriteInteger(state);
++      file.WriteLong(ticket);
++      file.WriteString(symbol);
++      
++      file.WriteInteger(ordertype);
++      file.WriteDouble(volume);
++      file.WriteDouble(price);
++      file.WriteDateTime(expiration);
++      
++      file.WriteInteger(id);
++      file.WriteString(comment);
++      file.WriteInteger(magic);
++      
++      file.WriteDateTime(executetime);
++      file.WriteDateTime(filltime);
++      
++      file.WriteDouble(openprice);
++      file.WriteDouble(limit_price);
++      file.WriteInteger(type_time);
++      
++      file.WriteBool(price_set);
++      file.WriteBool(expiration_set);
++      file.WriteBool(typetime_set);
++      
++      Print(__FUNCTION__+" End Saving pos: "+file.Tell());
++        
++      return(true);  
++   }
++   
++   virtual bool Load(const int handle)
++   {
++      MTPFileBin file;
++      file.Handle(handle);            
++      if (file.Invalid()) return false;
++      
++      Print(__FUNCTION__+" Start Loading pos: "+file.Tell());
++      
++      int itemp;
++      
++      file.ReadInteger(itemp);
++      executestate = itemp;
++      file.ReadInteger(itemp);
++      state = itemp;
++      
++      file.ReadLong(ticket);
++      file.ReadString(symbol);
++      
++      file.ReadInteger(itemp);
++      ordertype = itemp;
++      
++      file.ReadDouble(volume);
++      file.ReadDouble(price);
++      file.ReadDateTime(expiration);
++      
++      file.ReadInteger(id);
++      file.ReadString(comment);
++      file.ReadInteger(magic);
++      
++      file.ReadDateTime(executetime);
++      file.ReadDateTime(filltime);
++      
++      file.ReadDouble(openprice);
++      file.ReadDouble(limit_price);
++      file.ReadInteger(itemp);
++      type_time = itemp;
++      
++      file.ReadBool(price_set);
++      file.ReadBool(expiration_set);
++      file.ReadBool(typetime_set);
++      
++      Print(__FUNCTION__+" End Loading pos: "+file.Tell());
++      
++      return(true);  
++   }
+ 
+ public:
+    
+diff --git a/OrderManagerMT5/OrderManager.mqh b/OrderManagerMT5/OrderManager.mqh
+index 7af25bb..239c556 100644
+--- a/OrderManagerMT5/OrderManager.mqh
++++ b/OrderManagerMT5/OrderManager.mqh
+@@ -39,6 +39,55 @@ public:
+    
+    int retrainhistory;
+    
++   bool COrderManager::Save(const int handle)
++   {
++      MTPFileBin file;
++      file.Handle(handle);            
++      if (file.Invalid()) {
++         Print("Invalid Handle");
++         return false;
++      }
++   
++      Print(__FUNCTION__+" Start Saving pos: "+file.Tell());
++   
++      Print(__FUNCTION__+" Saving Orders pos: "+file.Tell());
++   
++      if (!file.WriteObject(GetPointer(orders))) return file.Error("orders",__FUNCTION__);
++   
++      Print(__FUNCTION__+" Saving History Orders pos: "+file.Tell());
++   
++      if (!file.WriteObject(GetPointer(historyorders))) return file.Error("historyorders",__FUNCTION__);
++   
++      Print(__FUNCTION__+" End Saving pos: "+file.Tell());
++   
++      return(true);
++   }
++   
++   bool COrderManager::Load(const int handle)
++   {      
++      MTPFileBin file;
++      file.Handle(handle);    
++              
++      if (file.Invalid()) {
++         Print("Invalid Handle");
++         return false;
++      }                 
++   
++      Print(__FUNCTION__+" Start Loading pos: "+file.Tell());
++   
++      Print(__FUNCTION__+" Loading Orders pos: "+file.Tell());
++   
++      if (!file.ReadObject(GetPointer(orders))) return file.Error("orders",__FUNCTION__);
++   
++      Print(__FUNCTION__+" Loading HistoryOrders pos: "+file.Tell());
++   
++      if (!file.ReadObject(GetPointer(historyorders))) return file.Error("historyorders",__FUNCTION__);
++   
++      Print(__FUNCTION__+" End Loading pos: "+file.Tell());
++   
++      return(true);
++   }   
++      
+    COrderManager()
+    {
+      custom_order_defaults = false;
+@@ -127,6 +176,8 @@ public:
+    };
+ };
+ 
++
++
+ COrder* COrderManager::NewOrder(string in_symbol,ENUM_ORDER_TYPE _ordertype,double _volume,double _price,double _stoploss,double _takeprofit,string _comment="",datetime _expiration=0)
+ {
+ 
+diff --git a/Template/template_premium_v3.1.ex4 b/Template/template_premium_v3.1.ex4
+new file mode 100644
+index 0000000..314b3a5
+Binary files /dev/null and b/Template/template_premium_v3.1.ex4 differ
+diff --git a/__classnames.mqh b/__classnames.mqh
+index 8597d8b..25aea75 100644
+--- a/__classnames.mqh
++++ b/__classnames.mqh
+@@ -10,4 +10,4 @@
+ #include "EntryMethod\__classnames.mqh"
+ #include "ScriptManager\__classnames.mqh"
+ #include "EventManager\__classnames.mqh"
+-#include "CommandManager\__classnames.mqh"
+\ No newline at end of file
++#include "CommandManager\__classnames.mqh"
+diff --git a/__service_fastaccess_switch.mqh b/__service_fastaccess_switch.mqh
+index 1d4c1c3..fb29c59 100644
+--- a/__service_fastaccess_switch.mqh
++++ b/__service_fastaccess_switch.mqh
+@@ -5,4 +5,4 @@ case srvOrderFactory: orderfactory = service; break;
+ case srvAttachedOrderFactory: attachedorderfactory = service; break;
+ case srvEventManager: eventmanager = service; break;
+ case srvCommandManager: commandmanager = service; break;
+-case srvTestManager: testmanager = service; break;
+\ No newline at end of file
++case srvTestManager: testmanager = service; break;
+diff --git a/libraries/candlestick.mqh b/libraries/candlestick.mqh
+new file mode 100644
+index 0000000..86c6400
+--- /dev/null
++++ b/libraries/candlestick.mqh
+@@ -0,0 +1,278 @@
++//+------------------------------------------------------------------+
++//|                                                  candlestick.mq4 |
++//|                                            Zoltan Laszlo Ferenci |
++//|                              http://www.metatraderprogrammer.com |
++//+------------------------------------------------------------------+
++#property copyright "Zoltan Laszlo Ferenci"
++#property link      "http://www.metatraderprogrammer.com"
++
++//#include <variables.mqh>
++
++string candle_symbol = "";
++datetime candle_time = 0;
++int candle_dir, candle_bar;
++double
++candle_high,
++candle_low,
++candle_open,
++candle_close,
++candle_body,
++candle_range,
++candle_bodyhigh,
++candle_bodylow,
++candle_upwick,
++candle_dnwick;
++
++double
++high[],
++low[],
++open[],
++close[],
++body[],
++range[],
++bodyhigh[],
++bodylow[],
++upwick[],
++dnwick[];
++
++int candledir[];
++datetime candletime[];
++string candlesymbol = "";
++
++enum ENUM_CANDLE_DIR {
++   DIR_NONE = 0,
++   DIR_UP = 1,
++   DIR_DN = 2
++};
++
++void getcandles(string symbol, int timeframe = 0, int barmin = 1, int barmax = 1)
++{
++   for (int i = barmax; i > barmin; i--) {
++      getcandle(symbol, timeframe, i, false);
++   }
++   getcandle(symbol, timeframe, barmin, true);
++   
++   /*
++   for (i = barmin; i <= barmax; i++) {
++      addcomment("high[",i,"]=",high[i]);
++      addcomment(" low[",i,"]=",low[i]);
++      addcomment(" open[",i,"]=",open[i]);
++      addcomment(" close[",i,"]=",close[i]);
++      addcomment(" body[",i,"]=",body[i]);
++      addcomment(" range[",i,"]=",range[i]);
++      addcomment(" bodyhigh[",i,"]=",bodyhigh[i]);
++      addcomment(" bodylow[",i,"]=",bodylow[i]);
++      addcomment(" upwick[",i,"]=",upwick[i]);
++      addcomment(" dnwick[",i,"]=",dnwick[i]);
++      addcomment(" candledir[",i,"]=",candledir[i]);
++      addcomment(" candletime[",i,"]=",TimeToStr(candletime[i],TIME_MINUTES));
++      addcomment("\n");
++   }  
++   */
++   
++}
++
++void getcandle(string symbol, int timeframe = 0, int bar = 1, bool usevars = true)
++{
++   //initalized_alert("getcanlde: ");
++
++   candle_array_incrase_double(high, bar+1);
++   candle_array_incrase_double(low, bar+1);
++   candle_array_incrase_double(open, bar+1);
++   candle_array_incrase_double(close, bar+1);
++   candle_array_incrase_double(body, bar+1);
++   candle_array_incrase_double(range, bar+1);
++   candle_array_incrase_double(bodyhigh, bar+1);
++   candle_array_incrase_double(bodylow, bar+1);
++   candle_array_incrase_double(upwick, bar+1);   
++   candle_array_incrase_double(dnwick, bar+1);
++   candle_array_incrase_int(candledir, bar+1);
++   candle_array_incrase_datetime(candletime, bar+1);
++   
++   bool iscurrent = (symbol == _Symbol && (timeframe == _Period || timeframe == 0));
++   
++   datetime time = iscurrent?Time[bar]:iTime(symbol,timeframe,bar);
++   
++   //addcomment("time=",TimeToStr(time,TIME_MINUTES)," candletime=",TimeToStr(candletime[bar],TIME_MINUTES));
++   
++   if (time != candletime[bar] || candlesymbol != symbol || bar == 0) {
++      //addcomment(" getcandle");
++      candlesymbol = symbol;
++      candletime[bar] = time;
++   
++      if (iscurrent) {
++         high[bar] = High[bar];
++         low[bar] = Low[bar];
++         open[bar] = Open[bar];
++         close[bar] = Close[bar];
++      } else {
++         high[bar] = iHigh(candlesymbol,timeframe,bar);
++         low[bar] = iLow(candlesymbol,timeframe,bar);
++         open[bar] = iOpen(candlesymbol,timeframe,bar);
++         close[bar] = iClose(candlesymbol,timeframe,bar);
++      }
++      body[bar] = MathAbs(open[bar] - close[bar]);
++      range[bar] = high[bar] - low[bar];
++      if (close[bar] > open[bar])
++         candledir[bar] = DIR_UP;
++      else if (close[bar] < open[bar])
++         candledir[bar] = DIR_DN;
++      else if (close[bar] == open[bar])
++         candledir[bar] = DIR_NONE;
++   
++      if ((candledir[bar] == DIR_UP) || (candledir[bar] == DIR_NONE))
++      {
++         bodyhigh[bar] = close[bar];
++         bodylow[bar] = open[bar];
++      }
++      else if (candledir[bar] == DIR_DN)
++      {
++         bodyhigh[bar] = open[bar];
++         bodylow[bar] = close[bar];
++      }
++   
++      upwick[bar] = high[bar] - bodyhigh[bar];
++      dnwick[bar] = bodylow[bar] -  low[bar];
++   }
++   if (usevars && (candle_bar != bar || candle_time != candletime[bar] || bar == 0)) {
++      //addcomment(" getvars");
++      candle_bar = bar;
++      candle_time = candletime[bar];
++      candle_high = high[bar];
++      candle_low = low[bar];
++      candle_open = open[bar];
++      candle_close = close[bar];
++      candle_body = body[bar];
++      candle_range = range[bar];
++      candle_bodyhigh = bodyhigh[bar];
++      candle_bodylow = bodylow[bar];
++      candle_upwick = upwick[bar];
++      candle_dnwick = dnwick[bar];
++      candle_dir = candledir[bar];
++   }
++   //addcomment("\n");
++}
++
++
++int getdir(string symbol, int timeframe, int bar)
++{
++   double open = iOpen(symbol,timeframe,bar);
++   double close = iClose(symbol,timeframe,bar);
++   
++   if (close > open)
++      return(DIR_UP);
++   else if (close < open)
++      return(DIR_DN);
++   else
++      return(DIR_NONE);
++}
++
++void candle_array_incrase_double(double& array[], int size) {
++   if (ArraySize(array) < size) ArrayResize(array,size);
++}
++
++void candle_array_incrase_int(int& array[], int size) {
++   if (ArraySize(array) < size) ArrayResize(array,size);
++}
++
++void candle_array_incrase_datetime(datetime& array[], int size) {
++   if (ArraySize(array) < size) ArrayResize(array,size);
++}
++
++void getcandle_mindata(string symbol, int timeframe, int bar)
++{
++   candlesymbol = symbol;
++   candle_high = iHigh(candlesymbol,timeframe,bar);
++   candle_low = iLow(candlesymbol,timeframe,bar);
++   candle_open = iOpen(candlesymbol,timeframe,bar);
++   candle_close = iClose(candlesymbol,timeframe,bar);
++}
++
++void getcandle_upwick()
++{
++   candle_upwick = candle_high-MathMax(candle_open,candle_close);
++}
++
++void getcandle_dnwick()
++{
++   candle_dnwick = MathMin(candle_open,candle_close)-candle_low;
++}
++
++void getcandle_body()
++{
++   candle_body = MathAbs(candle_open-candle_close);
++}
++
++double candle_bodytorange(int bar = -1)
++{
++   if (bar < 0) bar = candle_bar;
++   if (range[bar] == 0)
++      return(100);
++   else   
++      return((body[bar]/range[bar])*100);
++}
++
++double candle_upwicktobody(int bar = -1)
++{
++   if (bar < 0) bar = candle_bar;
++   if (body[bar] == 0)
++   {
++      if (upwick[bar] == 0)
++         return(0);
++      else
++         return(100);
++   }
++   else
++   {
++      return((upwick[bar]/body[bar])*100);
++   }
++}
++
++double candle_dnwicktobody(int bar = -1)
++{
++   if (bar < 0) bar = candle_bar;
++   if (body[bar] == 0)
++   {
++      if (dnwick[bar] == 0)
++         return(0);
++      else
++         return(100);
++   }
++   else
++   {
++      return((dnwick[bar]/body[bar])*100);
++   }
++}
++
++
++double candle_upwicktorange(int bar = -1)
++{
++   if (bar < 0) bar = candle_bar;
++   if (range[bar] == 0)
++   {
++      if (upwick[bar] == 0)
++         return(0);
++      else
++         return(100);
++   }
++   else
++   {
++      return((upwick[bar]/range[bar])*100);
++   }
++}
++
++double candle_dnwicktorange(int bar = -1)
++{
++   if (bar < 0) bar = candle_bar;
++   if (range[bar] == 0)
++   {
++      if (dnwick[bar] == 0)
++         return(0);
++      else
++         return(100);
++   }
++   else
++   {
++      return((dnwick[bar]/range[bar])*100);
++   }
++}
+\ No newline at end of file
+diff --git a/libraries/time.mqh b/libraries/time.mqh
+index 55cb859..c38990d 100644
+--- a/libraries/time.mqh
++++ b/libraries/time.mqh
+@@ -176,7 +176,43 @@ bool AtTimeDt(datetime& lasttime, datetime at, int maxdelay = 1800)
+    return(ret);
+ }   
+ 
++#ifdef __MQL5__
++int TimeHour(datetime time)
++{
++   MqlDateTime _time;
++   TimeToStruct(time,_time);
++   return(_time.hour);
++}
++
++int TimeDayOfWeek(datetime time)
++{
++   MqlDateTime _time;
++   TimeToStruct(time,_time);
++   return(_time.day_of_week);
++}
++
++int TimeDay(datetime time)
++{
++   MqlDateTime _time;
++   TimeToStruct(time,_time);
++   return(_time.day);
++}
++
++int TimeYear(datetime time)
++{
++   MqlDateTime _time;
++   TimeToStruct(time,_time);
++   return(_time.year);
++}
++
++int TimeMonth(datetime time)
++{
++   MqlDateTime _time;
++   TimeToStruct(time,_time);
++   return(_time.mon);
++}
+ 
++#endif
+ 
+ int TimeSec(datetime time)
+ {
+@@ -194,7 +230,7 @@ int TimeMin(datetime time)
+ 
+ int AutoGMTShift()
+ {
+-   return(MathRound((TimeGMT()-TimeCurrent())/3600.0));
++   return((int)MathRound((TimeGMT()-TimeCurrent())/3600.0));
+ }
+ 
+ int GetGMTShift(bool custom_gmt_shift = false, int gmtshift = 0)

@@ -39,9 +39,13 @@ class CMoneyManagementExponential : public CMoneyManagement
 public:   
    double lotsize;
    CMoneyManagement* mm;
-   double level;
+   int level;
    double multiplier;
    double maximum_lotsize;
+   CMoneyManagementExponential()
+   {
+   
+   }
    CMoneyManagementExponential(CMoneyManagement* _mm, double _multiplier) {
       mm = _mm;
       multiplier = _multiplier;
