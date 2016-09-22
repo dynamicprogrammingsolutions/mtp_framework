@@ -21,7 +21,7 @@ public:
 class CTriggerManager : public CTriggerManagerInterface
 {
 public:
-   TraitGetType { return classTriggerManager; }
+   TraitGetType(classTriggerManager)
    
 public:
    CArrayObj container;

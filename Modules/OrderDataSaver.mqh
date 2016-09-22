@@ -2,7 +2,7 @@
 class COrderDataSaver : public CServiceProvider
 {
 public:
-   TraitGetType { return classOrderDataSaver; }
+   TraitGetType(classOrderDataSaver)
    TraitAppAccess
    
    bool savetofile_at_remove;

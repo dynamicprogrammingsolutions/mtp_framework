@@ -1,11 +1,13 @@
 #include "SymbolInfoInterface.mqh"
 #include "StopsCalcInterface.mqh"
+#include "MoneyManagementInterface.mqh"
 #include "OrderInterface.mqh"
 #include "TestInterface.mqh"
 
 #include "ServiceProviders\EventHandlerInterface.mqh"
 #include "ServiceProviders\SymbolLoaderInterface.mqh"
 #include "ServiceProviders\OrderManagerInterface.mqh"
+#include "ServiceProviders\OrderRepositoryInterface.mqh"
 #include "ServiceProviders\ScriptManagerInterface.mqh"
 #include "ServiceProviders\TestManagerInterface.mqh"
 #include "ServiceProviders\DependencyManagerInterface.mqh"

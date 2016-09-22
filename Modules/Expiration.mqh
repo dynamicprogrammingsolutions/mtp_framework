@@ -23,7 +23,7 @@ public:
          if (this.App().ServiceIsRegistered(srvSignalManager)) application.DeregisterService(srvSignalManager);
          if (this.App().ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvScriptManager);
          if (this.App().ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvMain);
-         ((COrderManager*)this.App().ordermanager).CloseAll(ORDERSELECT_ANY);
+         this.App().orderrepository.CloseAll(ORDERSELECT_ANY);
       } else {
          if (comment_enabled) addcomment("This is a test version. EA will work until "+TimeToStr(GetExpirationTime()-1,TIME_DATE)+"\n");
       }

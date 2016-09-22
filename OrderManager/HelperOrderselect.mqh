@@ -1,5 +1,4 @@
 //
-#include "EnumOrderselect.mqh"
 
 int ordertype_opposite(int in_ordertype) {
    switch (in_ordertype) {

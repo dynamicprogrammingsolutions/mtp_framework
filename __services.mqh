@@ -1,6 +1,7 @@
 srvEvent,
 srvSymbolLoader,
 srvOrderManager,
+srvOrderRepository,
 srvEntryMethod,
 srvSignalManager,
 srvOrderCommandHandler,

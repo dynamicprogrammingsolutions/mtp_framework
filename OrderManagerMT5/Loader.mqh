@@ -12,7 +12,6 @@
 #include "Trade\HistoryOrderInfoV.mqh"
 #include "MoneyManagement.mqh"
 
-#include "EnumExecuteState.mqh"
 #include "EnumActivity.mqh"
 
 #include "OrderBase.mqh"

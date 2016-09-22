@@ -16,6 +16,7 @@ public:
    CApplication()
    {
       global_application_object = GetPointer(this);
+      app = GetPointer(this);
    }
 
 #include "__service_fastaccess_objects.mqh"
@@ -153,3 +154,14 @@ CApplication* global_app()
 {
    return (CApplication*)global_application_object;
 }
+
+
+#ifdef GLOBAL_APPLICATION_OBJECT
+CApplication* App()
+{
+   return (CApplication*)global_application_object;
+}
+
+CApplication* app;
+#endif
+

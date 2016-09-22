@@ -11,7 +11,9 @@
 
 class CTrailingStop : CAppObject
 {
-   public:
+public:
+   TraitAppAccess
+   TraitLoadSymbolFunction
       
    double lockin;
    double trailingstop;
@@ -22,10 +24,7 @@ class CTrailingStop : CAppObject
    bool trailingstop_round;
    bool trail_if_no_sl;
    
-   TraitAppAccess
-   TraitLoadSymbolFunction
-
-   COrderManager* om;
+   
    
    CTrailingStop()
    {
@@ -41,7 +40,7 @@ class CTrailingStop : CAppObject
    
    virtual void Initalize()
    {
-      om = this.App().GetService(srvOrderManager); 
+
    }
    
    void Fract()
@@ -114,7 +113,7 @@ class CTrailingStop : CAppObject
    
    bool OnOrder(ulong ticket)
    {
-      COrder* _order = om.GetOrderByTicket(ticket);
+      COrder* _order = App().orderrepository.GetByTicket(ticket);
       if (_order == NULL) return(false);
       return(OnOrder(_order));
    }
@@ -249,9 +248,9 @@ class CTrailingStop : CAppObject
       
       //if (event.Debug ()) event.Debug ("Trailing Stop",__FUNCTION__);
       bool ret = false;
-      for (int i=0; i < om.OrdersTotal(); i++)
+      for (int i=0; i < App().orderrepository.Total(); i++)
       {
-         COrder* _order = om.GetOrderByIdx(i);
+         COrderInterface* _order = App().orderrepository.GetByIdx(i);
          if (!ordertype_select(type,_order.GetType())) continue;
          if (!state_select(state,_order.State())) continue;
          OnOrder(_order);
@@ -281,9 +280,9 @@ class CTrailingStop : CAppObject
       
       //if (event.Debug ()) event.Debug ("Trailing Stop",__FUNCTION__);
       bool ret = false;
-      for (int i=0; i < om.OrdersTotal(); i++)
+      for (int i=0; i < App().orderrepository.Total(); i++)
       {
-         COrder* _order = om.GetOrderByIdx(i);
+         COrder* _order = App().orderrepository.GetByIdx(i);
          if (!ordertype_select(type,_order.GetType())) continue;
          if (!state_select(state,_order.State())) continue;
          TrailingTPOnOrder(_order);
@@ -294,9 +293,9 @@ class CTrailingStop : CAppObject
    bool OnAllByIndicator(double buysl, double sellsl)
    {
       bool ret = false;
-      for (int i=0; i < om.OrdersTotal(); i++)
+      for (int i=0; i < App().orderrepository.Total(); i++)
       {
-         COrder* _order = om.GetOrderByIdx(i);
+         COrder* _order = App().orderrepository.GetByIdx(i);
          _order.Select();
          if (_order.State() == ORDER_STATE_FILLED) {
             loadsymbol(_order.symbol);
@@ -323,9 +322,9 @@ class CTrailingStop : CAppObject
    bool OnAllByIndicatorUpDn(double buysl, double sellsl)
    {
       bool ret = false;
-      for (int i=0; i < om.OrdersTotal(); i++)
+      for (int i=0; i < App().orderrepository.Total(); i++)
       {
-         COrder* _order = om.GetOrderByIdx(i);
+         COrder* _order = App().orderrepository.GetByIdx(i);
          _order.Select();
          if (_order.State() == ORDER_STATE_FILLED) {
             loadsymbol(_order.symbol);

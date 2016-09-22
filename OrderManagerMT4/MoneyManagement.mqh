@@ -1,14 +1,17 @@
 //
 #include "moneymanagement_helper.mqh"
 
-class CMoneyManagement : public CAppObject {
+class CMoneyManagement : public CMoneyManagementInterface {
+private:
+   bool delete_after_use;   
+
 public:
    TraitAppAccess
    TraitLoadSymbolFunction
 
    virtual int Type() const { return classMT4MoneyManagement; }
-   bool delete_after_use;
    virtual bool DeleteAfterUse() { return delete_after_use; }
+   void DeleteAfterUse(bool value) { delete_after_use = value; }
    CMoneyManagement* UseOnce() { this.delete_after_use = true; return GetPointer(this); }
 
 public:
@@ -39,7 +42,7 @@ public:
    double lotsize;
    CLotsize(double _lotsize) {
       lotsize = _lotsize;
-      delete_after_use = true;
+      DeleteAfterUse(true);
    }
    virtual double GetLotsize() {
       return lotsize;

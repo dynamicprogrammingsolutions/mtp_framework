@@ -81,6 +81,18 @@ public:
       return (CStopsCalcInterface*)GetPointer(this);
    }
    
+   virtual CStopsCalcInterface* SetTakeProfit(CStopsCalcInterface* tp)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return NULL;
+   }
+
+   virtual CStopsCalcInterface* SetStopLoss(CStopsCalcInterface* sl)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return NULL;
+   }
+   
    virtual void Calculate() { }
    
    virtual double GetTicks()
@@ -131,6 +143,12 @@ public:
    {
    }
    
+   virtual CStopsCalcInterface* SetTakeProfit(CStopsCalcInterface* _tp)
+   {
+      tp = _tp;
+      return NULL;
+   }
+   
    CStopLoss(double _ticks) {
       zero_is_nosl = true;
       if (_ticks == 0) this.SetPrice(0);
@@ -167,6 +185,12 @@ public:
       if (_ticks == 0) this.SetPrice(0);
       else this.SetTicks(_ticks);
       delete_after_use = true;
+   }
+
+   virtual CStopsCalcInterface* SetStopLoss(CStopsCalcInterface* _sl)
+   {
+      sl = _sl;
+      return NULL;
    }
 
 protected:

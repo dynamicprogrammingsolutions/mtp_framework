@@ -1,1 +1,1 @@
-#define TraitGetType virtual int Type() const
+#define TraitGetType(type) virtual int Type() const { return type; }

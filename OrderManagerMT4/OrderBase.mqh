@@ -155,6 +155,8 @@ public:
    
    bool Isset() { return(executestate != ES_NOT_EXECUTED); }  
    
+   virtual int Id() { return id; }
+   
    COrderInfo* GetOrderInfo();
    bool GetOrderInfo(COrderInfo *_orderinfo);
    bool GetOrderInfoB();
@@ -254,10 +256,10 @@ public:
    bool SetStopLoss(CStopLoss* _sl, bool checkchange = false, bool checkhigher = false);
    bool SetTakeProfit(CTakeProfit* _tp, bool check = false);
    
-   static void DeleteIf(CStopLoss* obj) {
+   static void DeleteIf(CStopsCalc* obj) {
       if (obj.DeleteAfterUse()) delete obj;
    }
-
+/*
    static void DeleteIf(CTakeProfit* obj) {
       if (obj.DeleteAfterUse()) delete obj;
    }
@@ -265,7 +267,7 @@ public:
    static void DeleteIf(CEntry* obj) {
       if (obj.DeleteAfterUse()) delete obj;
    }
-   
+   */
    static void DeleteIf(CMoneyManagement* obj) {
       if (obj.DeleteAfterUse()) delete obj;
    }

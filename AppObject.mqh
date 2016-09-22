@@ -31,8 +31,12 @@ public:
 
    CObject* AppBase() {
       if (CheckPointer(appbase) == POINTER_INVALID) {
-         Print("App not set in: ",EnumToString((ENUM_CLASS_NAMES)this.Type()));
-         return global_application_object;
+         #ifndef GLOBAL_APPLICATION_OBJECT
+            Print("App not set in: ",EnumToString((ENUM_CLASS_NAMES)this.Type()));
+            return NULL;
+         #else
+            return global_application_object;
+         #endif
       } else {
          return appbase;
       }

@@ -3,7 +3,7 @@
 class CAttachedOrder : public COrderBase
 {
 public:
-   TraitGetType { return classMT4AttachedOrder; }
+   TraitGetType(classMT4AttachedOrder)
    TraitNewObject { return new CAttachedOrder(); }
 
 public:

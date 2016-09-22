@@ -18,7 +18,7 @@ public:
 class CDependencyManager : CDependencyManagerInterface
 {
 public:
-   TraitGetType { return classDependencyManager; }
+   TraitGetType(classDependencyManager)
 
    int FindDependency(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency)
    {

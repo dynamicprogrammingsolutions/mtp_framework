@@ -40,6 +40,28 @@ public:
       return NULL;
    }
    
+   virtual CStopsCalcInterface* SetTakeProfit(CStopsCalcInterface* _tp)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return NULL;
+   }
+
+   virtual CStopsCalcInterface* SetStopLoss(CStopsCalcInterface* _sl)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return NULL;
+   }
+   
+   virtual void Calculate()
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+   }
+   
+   virtual void Reset()
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+   }
+   
    virtual double GetTicks()
    {
       AbstractFunctionWarning(__FUNCTION__);
