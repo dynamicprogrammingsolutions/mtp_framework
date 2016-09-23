@@ -1,4 +1,6 @@
 //
+#include "Loader.mqh"
+
 class COrderSet : public COrderArray {
 public:
    virtual int Type() const { return classMT4OrderSet; }

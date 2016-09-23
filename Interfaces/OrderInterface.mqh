@@ -1,51 +1,16 @@
 //
+#include "..\Loader.mqh"
+
+#define ORDER_INTERFACE_H
 
 #ifdef __MQL4__
-enum ENUM_ORDER_STATE {
-   ORDER_STATE_UNKNOWN = 0,
-   ORDER_STATE_PLACED = 1,
-   ORDER_STATE_FILLED = 2,
-   ORDER_STATE_CLOSED = 3,
-   ORDER_STATE_DELETED = 4
-};
+#include "..\OrderManager\Enums\EnumOrderState.mqh"
 #endif
 
-enum ENUM_EXECUTE_STATE
-{
-   ES_NOT_EXECUTED,
-   ES_EXECUTED,
-   ES_VIRTUAL,
-   ES_CANCELED
-};
-
-enum ENUM_ORDERSELECT {
-   ORDERSELECT_ANY,
-   ORDERSELECT_MARKET,
-   ORDERSELECT_PENDING,
-   ORDERSELECT_LIMIT,
-   ORDERSELECT_STOP,
-   ORDERSELECT_BUY,
-   ORDERSELECT_SELL,
-   ORDERSELECT_BUYSTOP,
-   ORDERSELECT_SELLSTOP,
-   ORDERSELECT_BUYLIMIT,
-   ORDERSELECT_SELLLIMIT,
-   ORDERSELECT_LONG,
-   ORDERSELECT_SHORT,
-   ORDERSELECT_LONGPENDING,
-   ORDERSELECT_SHORTPENDING,
-   ORDERSELECT_NONE
-};
-
-enum ENUM_STATESELECT {
-   STATESELECT_ANY,
-   STATESELECT_PLACED,
-   STATESELECT_CANCELED,
-   STATESELECT_FILLED,
-   STATESELECT_UNDONE,
-   STATESELECT_ONGOING,
-   STATESELECT_CLOSED
-};
+#include "..\OrderManager\Enums\EnumExecuteState.mqh"
+#include "..\OrderManager\Enums\EnumOrderSelect.mqh"
+#include "..\OrderManager\Enums\EnumStateSelect.mqh"
+#include "..\OrderManager\Enums\EnumActivity.mqh"
 
 class COrderInterface : public CAppObject
 {

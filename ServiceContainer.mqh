@@ -1,6 +1,7 @@
 //
 #include "Loader.mqh"
 
+#define SERVICE_CONTAINER_H
 class CServiceContainer : public CArrayObj
 {
 public:

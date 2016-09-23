@@ -1,4 +1,7 @@
 //
+#include "Loader.mqh"
+
+#define HELPER_STATESELECT_H
 bool state_placed(ENUM_ORDER_STATE orderstate)
 {
    if (orderstate == ORDER_STATE_PLACED) return(true);

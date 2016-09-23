@@ -1,6 +1,7 @@
 //
-#include "..\..\Loader.mqh"
+#include "Loader.mqh"
 
+#define ORDER_MANAGER_INTERFACE_H
 class COrderManagerInterface : public CServiceProvider
 {
 public:

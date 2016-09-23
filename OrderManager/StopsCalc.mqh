@@ -1,7 +1,7 @@
 //
-#include "..\Loader.mqh"
-#include "HelperOrderselect.mqh"
+#include "Loader.mqh"
 
+#define STOPS_CALC_H
 class CStopsCalc : public CStopsCalcInterface
 {
 public:

@@ -1,6 +1,8 @@
 //
+#include "Loader.mqh"
 #include "moneymanagement_helper.mqh"
 
+#define MONEY_MANAGEMENT_H
 class CMoneyManagement : public CMoneyManagementInterface {
 private:
    bool delete_after_use;   

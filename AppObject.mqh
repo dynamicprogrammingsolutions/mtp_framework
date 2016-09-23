@@ -1,6 +1,7 @@
 //
 #include "Loader.mqh"
 
+#define APP_OBJECT_H
 class CAppObject : public CObject
 {
 private:

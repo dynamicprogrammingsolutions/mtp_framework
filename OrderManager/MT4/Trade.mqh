@@ -1,17 +1,8 @@
-//+------------------------------------------------------------------+
-//|                                                        Trade.mqh |
-//|                      Copyright © 2010, MetaQuotes Software Corp. |
-//|                                       http://www.metaquotes.net/ |
-//|                                              Revision 2010.02.08 |
-//+------------------------------------------------------------------+
-/*
-#include <Object.mqh>
-#include "..\SymbolInfoMT4\MTPSymbolInfo.mqh"
-#include "MT4OrderInfo.mqh"
-*/
-//+------------------------------------------------------------------+
-//| enumerations                                                     |
-//+------------------------------------------------------------------+
+//
+#include "Loader.mqh"
+
+#define TRADE_H
+
 enum ENUM_LOG_LEVELS
   {
    LOG_LEVEL_NO    =0,
@@ -28,11 +19,7 @@ enum ENUM_TRADE_ACTION
    TRADE_ACTION_CLOSEBY,
    TRADE_ACTION_DELETE
 };
-//+------------------------------------------------------------------+
-//| Class CTrade.                                                    |
-//| Appointment: Class trade operations.                             |
-//|              Derives from class CObject.                         |
-//+------------------------------------------------------------------+
+
 class CTrade : public CObject
   {
 public:

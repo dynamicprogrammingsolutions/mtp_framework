@@ -1,4 +1,5 @@
 //
+#include "..\Loader.mqh"
 
 class CSymbolInfo : public CSymbolInfoInterface
   {

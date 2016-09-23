@@ -1,5 +1,6 @@
-#include "..\..\Loader.mqh"
+#include "Loader.mqh"
 
+#define DEPENDENCY_MANAGER_INTERFACE_H
 class CDependencyManagerInterface : public CServiceProviderArrayObj
 {
 

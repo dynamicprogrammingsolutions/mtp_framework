@@ -1,4 +1,7 @@
 //
+#include "Loader.mqh"
+
+#define HELPER_ORDERSELECT_H
 
 int ordertype_opposite(int in_ordertype) {
    switch (in_ordertype) {

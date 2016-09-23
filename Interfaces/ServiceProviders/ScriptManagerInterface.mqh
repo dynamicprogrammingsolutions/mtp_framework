@@ -1,6 +1,7 @@
 //
-#include "..\..\Loader.mqh"
+#include "Loader.mqh"
 
+#define SCRIPT_MANAGER_INTERFACE_H
 class CScriptManagerInterface : public CServiceProvider
 {
 public:

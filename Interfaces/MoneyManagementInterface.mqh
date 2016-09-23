@@ -1,4 +1,7 @@
 //
+#include "..\Loader.mqh"
+
+#define MONEY_MANAGEMENT_INTERFACE_H
 class CMoneyManagementInterface : public CAppObject {
 
 public:

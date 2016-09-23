@@ -1,5 +1,7 @@
 //
+#include "Loader.mqh"
 
+#define ATTACHED_ORDER_H
 class CAttachedOrder : public COrderBase
 {
 public:

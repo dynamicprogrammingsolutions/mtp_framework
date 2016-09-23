@@ -7,11 +7,8 @@ public:
 
    TraitAppAccess
 
-   COrderManager* ordermanager;
-   
    virtual void Initalize()
    {
-      this.ordermanager = this.App().GetService(srvOrderManager);   
       LISTEN(COrderCommand::CommandOpenBuy,1);
       LISTEN(COrderCommand::CommandOpenSell,2);
       LISTEN(COrderCommand::CommandCloseBuy,3);

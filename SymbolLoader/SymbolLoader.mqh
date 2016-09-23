@@ -9,6 +9,7 @@
 #include "..\SymbolInfoMT5\MTPSymbolInfo.mqh"
 #endif
 
+#define SYMBOL_LOADER_H
 class CSymbolLoader : public CSymbolLoaderInterface
 {
 public:

@@ -1,4 +1,7 @@
 //
+#include "..\Loader.mqh"
+
+#define STOPS_CALC_INTERFACE_H
 class CStopsCalcInterface : public CAppObject
 {
 public:

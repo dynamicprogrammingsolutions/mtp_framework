@@ -2,6 +2,9 @@
 
 #include "Loader.mqh"
 
+#ifndef ORDER_REPOSITORY_H
+#define ORDER_REPOSITORY_H
+
 class COrderRepository : public COrderRepositoryInterface
 {
 private:
@@ -420,4 +423,6 @@ double COrderRepository::TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STA
       }
    }
    return totalprofit;
-}   
+}
+
+#endif

@@ -1,6 +1,7 @@
 //
 #include "..\..\Loader.mqh"
 
+#define ORDER_REPOSITORY_INTERFACE_H
 class COrderRepositoryInterface : public CServiceProvider
 {
 public:

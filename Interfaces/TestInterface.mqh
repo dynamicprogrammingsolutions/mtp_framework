@@ -1,4 +1,7 @@
 //
+#include "..\Loader.mqh"
+
+#define TEST_INTERFACE_H
 class CTestInterface : public CAppObject
 {
 public:

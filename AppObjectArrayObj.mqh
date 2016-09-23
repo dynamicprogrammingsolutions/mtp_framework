@@ -1,4 +1,7 @@
 //
+#include "Loader.mqh"
+
+#define APP_OBJECT_ARRAY_OBJ_H
 class CAppObjectArrayObj : public CAppObjectArray
   {
 protected:

@@ -1,5 +1,7 @@
 //
+#include "..\Loader.mqh"
 
+#define SYMBOL_INFO_INTERFACE_H
 class CSymbolInfoInterface : public CAppObject
 {
    public:

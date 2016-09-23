@@ -1,10 +1,4 @@
-//+------------------------------------------------------------------+
-//|                                              objectfunctions.mq4 |
-//|                                            Zoltan Laszlo Ferenci |
-//|                              http://www.metatraderprogrammer.com |
-//+------------------------------------------------------------------+
-#property copyright "Zoltan Laszlo Ferenci"
-#property link      "http://www.metatraderprogrammer.com"
+//
 
 #include "strfunctions.mqh"
 

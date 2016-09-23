@@ -1,6 +1,7 @@
 //
-#include "..\..\Loader.mqh"
+#include "Loader.mqh"
 
+#define SYMBOL_LOADER_INTERFACE_H
 class CSymbolLoaderInterface : public CServiceProviderArrayObj
 {
 protected:

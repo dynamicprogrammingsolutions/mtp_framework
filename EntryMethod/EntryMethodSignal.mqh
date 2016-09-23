@@ -7,12 +7,6 @@ public:
 
    TraitAppAccess
    
-   COrderManager* ordermanager;
-   virtual void Initalize()
-   {
-      this.ordermanager = this.App().GetService(srvOrderManager);
-   }
-
    CSignal* mainsignal;
    int bar;
 

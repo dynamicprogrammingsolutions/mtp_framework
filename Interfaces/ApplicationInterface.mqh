@@ -1,4 +1,7 @@
 //
+#include "Loader.mqh"
+
+#define APPLICATION_INTERFACE_H
 class CApplicationInterface : public CObject
 {
 public:

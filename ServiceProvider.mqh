@@ -1,4 +1,7 @@
 //
+#include "Loader.mqh"
+
+#define SERVICE_PROVIDER_H
 class CServiceProvider : public CAppObject
 {
 public:

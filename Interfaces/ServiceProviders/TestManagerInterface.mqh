@@ -1,6 +1,7 @@
 //
-#include "..\..\Loader.mqh"
+#include "Loader.mqh"
 
+#define TEST_MANAGER_INTERFACE_H
 class CTestManagerInterface : public CServiceProvider
 {
 public:

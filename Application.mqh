@@ -3,6 +3,7 @@
 
 #include "Loader.mqh"
 
+#define APPLICATION_H
 class CApplication : public CApplicationInterface
 {
 private:
@@ -15,8 +16,10 @@ public:
 
    CApplication()
    {
-      global_application_object = GetPointer(this);
-      app = GetPointer(this);
+      #ifdef GLOBAL_APPLICATION_OBJECT
+         global_application_object = GetPointer(this);
+         app = GetPointer(this);
+      #endif
    }
 
 #include "__service_fastaccess_objects.mqh"

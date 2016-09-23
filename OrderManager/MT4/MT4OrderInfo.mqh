@@ -4,10 +4,10 @@
 //|                                       http://www.metaquotes.net/ |
 //|                                              Revision 2010.08.01 |
 //+------------------------------------------------------------------+
-/*
-#include <Object.mqh>
-#include "..\SymbolInfoMT4\SymbolInfo.mqh"
-*/
+
+#include "Loader.mqh"
+
+#define MT4_ORDER_INFO_H
 
 bool orderinfo_log = false;
 ulong COrderInfo_SelectedTicket = -1;

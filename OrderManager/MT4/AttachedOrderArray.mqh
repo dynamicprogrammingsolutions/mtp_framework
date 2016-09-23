@@ -1,6 +1,7 @@
-// *** CAttachedOrderArray ***
-//#include "AttachedOrder.mqh"
+//
+#include "Loader.mqh"
 
+#define ATTACHED_ORDER_ARRAY_H
 class CAttachedOrderArray : public CAppObjectArrayObj
 {
 public:

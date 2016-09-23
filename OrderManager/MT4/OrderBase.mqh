@@ -1,19 +1,8 @@
 //
-//
-/*
-#include "MoneyManagement.mqh"
-#include "Trade.mqh"
-#include "MT4OrderInfo.mqh"
-#include "..\ServiceProviderBase\OrderBaseBase.mqh"
-#include "..\ServiceProviderBase\OrderManagerBase.mqh"
-#include "EnumActivity.mqh"
-#include "EnumExecuteState.mqh"
-*/
 
 #include "Loader.mqh"
-#include "..\libraries\objectfunctions.mqh"
-#include "..\libraries\commonfunctions.mqh"
 
+#define ORDER_BASE_H
 class COrderBase : public COrderInterface
 {
 public:

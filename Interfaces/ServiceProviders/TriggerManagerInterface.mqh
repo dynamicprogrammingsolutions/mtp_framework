@@ -1,8 +1,8 @@
-//+------------------------------------------------------------------+
 //
 
-#include "..\..\Loader.mqh"
+#include "Loader.mqh"
 
+#define TRIGGER_MANAGER_INTERFACE_H
 class CTriggerManagerInterface : public CServiceProvider
 {
 public:

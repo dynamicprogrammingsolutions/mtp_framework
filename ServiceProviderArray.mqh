@@ -1,4 +1,7 @@
 //
+#include "Loader.mqh"
+
+#define SERVICE_PROVIDER_ARRAY_H
 class CServiceProviderArray : public CServiceProvider
   {
 protected:

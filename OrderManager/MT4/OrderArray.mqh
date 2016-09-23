@@ -1,6 +1,8 @@
 //
 #include "Loader.mqh"
 
+#ifndef ORDER_ARRAY_H
+#define ORDER_ARRAY_H
 class COrderArray : public CAppObjectArrayObjManaged
 {
 public:
@@ -199,3 +201,5 @@ public:
       }
       
 };
+
+#endif

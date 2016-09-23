@@ -1,6 +1,7 @@
 //
-#include "..\..\Loader.mqh"
+#include "Loader.mqh"
 
+#define EVENT_HANDLER_INTERFACE_H
 class CEventHandlerInterface : public CServiceProvider
 {
 public:

@@ -17,8 +17,10 @@
 
 #include "Loader.mqh"
 
-#include "..\libraries\file.mqh"
+#include "..\..\libraries\file.mqh"
 
+#ifndef ORDER_MANAGER_H
+#define ORDER_MANAGER_H
 class COrderManager : public COrderManagerInterface
 {
 public:
@@ -43,11 +45,8 @@ public:
    
    void Initalize()
    {
-      event = App().eventhandler;
       Prepare(GetPointer(attachedorders));
    }
-   
-   CEventHandlerInterface* event;
       
    virtual COrderInterface* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,
       const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0);
@@ -59,37 +58,13 @@ public:
    virtual COrderInterface* NewOrder(COrderInterface* _order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagementInterface* mm, CStopsCalcInterface* _price,
                                     CStopsCalcInterface* _stoploss, CStopsCalcInterface* _takeprofit,const string _comment="",const datetime _expiration=0);
   
-   COrder* ExistingOrder(int ticket, bool add = true);
-   
-   void AssignAttachedOrders(bool remove_if_not_found = true);
-   
-
    virtual COrderInterface* NewOrderObject() { return this.App().NewObject(neworder); }
    virtual COrderInterface* NewAttachedOrderObject() { return App().GetDependency(classOrder,classAttachedOrder); }
-   
-   int LoadOpenOrders(string __symbol, int __magic)
-   {
-      int cnt = 0;
-      for (int i = OriginalOrdersTotal()-1; i >= 0; i--) {
-         if (OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) {
 
-            if (OrderSymbol() != __symbol) continue;
-            if (OrderMagicNumber() != __magic) continue;
-            if (App().orderrepository.GetIdxByTicket(OrderTicket()) >= 0) continue;
-
-            COrder* exord;
-            exord = ExistingOrder(OrderTicket());
-            if (exord != NULL) {
-               Print("new order found: ticket "+exord.GetTicket()+" type: "+EnumToString((ENUM_CLASS_NAMES)exord.Type()));
-               cnt++;
-            } else {
-               //Print("Order Adding Failed");
-            }
-         }
-      }
-      AssignAttachedOrders();
-      return cnt;
-   }
+   bool ExistingOrder(int ticket, COrderBase*& orderbase, COrderBase*& _order, COrderBase*& attachedorder);
+   COrder* ExistingOrder(int ticket, bool add = true);
+   void AssignAttachedOrders(bool remove_if_not_found = true);
+   int LoadOpenOrders(string __symbol, int __magic);
 
 };
    
@@ -169,6 +144,24 @@ COrderInterface* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER
    return(_order);
 }
 
+bool COrderManager::ExistingOrder(int ticket, COrderBase*& orderbase, COrderBase*& _order, COrderBase*& attachedorder) {
+   if (orderbase.ExistingOrder(ticket)) {
+      if (CAttachedOrder::IsAttached(orderbase.comment)) {
+         if (attachedorder == NULL) attachedorder = global_app().GetDependency(classOrder,classAttachedOrder);
+         orderbase.Copy(attachedorder);
+         delete _order;
+      } else {
+         if (_order == NULL) _order = this.NewOrderObject(); 
+         orderbase.Copy(_order);   
+         delete attachedorder;
+      }
+      return(true);         
+   } else {
+      return(false);
+   }
+};   
+
+
 COrder* COrderManager::ExistingOrder(int ticket, bool add = true)
 {
    COrderBase* _order = this.Prepare(new COrderBase());
@@ -176,7 +169,7 @@ COrder* COrderManager::ExistingOrder(int ticket, bool add = true)
    COrder* mainorder = NewOrderObject();
    CAttachedOrder* attachedorder = NewAttachedOrderObject();
    
-   if (!COrder::ExistingOrder(ticket,_order,mainorder,attachedorder)) {
+   if (!ExistingOrder(ticket,_order,mainorder,attachedorder)) {
       delete _order;
       return(NULL);
    }
@@ -218,20 +211,20 @@ void COrderManager::AssignAttachedOrders(bool remove_if_not_found = true)
       int attachedtoticket = str_getvalue(attachedorder.comment,"a="," ");
       string _name = str_getvalue(attachedorder.comment,"n=");
       
-      if (event.Info ()) event.Info ("Checking Attached Order "+attachedorder.ticket+" comment: "+attachedorder.comment+" parent:"+attachedtoticket+" name:"+_name,__FUNCTION__);
+      if (App().eventhandler.Info ()) App().eventhandler.Info ("Checking Attached Order "+attachedorder.ticket+" comment: "+attachedorder.comment+" parent:"+attachedtoticket+" name:"+_name,__FUNCTION__);
       
       //Looking for the main order
-      if (event.Info ()) event.Info ("Looking for main order ",__FUNCTION__);
+      if (App().eventhandler.Info ()) App().eventhandler.Info ("Looking for main order ",__FUNCTION__);
       for (int i1 = App().orderrepository.Total()-1; i1 >= 0; i1--) {
          _order = App().orderrepository.GetByIdx(i1);  
-         if (event.Info ()) event.Info ("Looking in "+_order.ticket,__FUNCTION__);
+         if (App().eventhandler.Info ()) App().eventhandler.Info ("Looking in "+_order.ticket,__FUNCTION__);
          if (_order.ticket == attachedtoticket) {
             // Find out if the order is already attached
             bool found = false;               
             for (int i2 = _order.attachedorders.Total()-1; i2>=0; i2++) {
                attachedorder1 = (CAttachedOrder*)_order.attachedorders.At(i2);
                if (attachedorder1.ticket == attachedorder.ticket) {
-                  if (event.Info ()) event.Info ("Already Attached to order "+_order.ticket,__FUNCTION__);
+                  if (App().eventhandler.Info ()) App().eventhandler.Info ("Already Attached to order "+_order.ticket,__FUNCTION__);
                   found = true;
                   break;
                }
@@ -239,7 +232,7 @@ void COrderManager::AssignAttachedOrders(bool remove_if_not_found = true)
             
             // If not found, adding
             if (!found) {
-               if (event.Info ()) event.Info ("Not Found, Attaching",__FUNCTION__);
+               if (App().eventhandler.Info ()) App().eventhandler.Info ("Not Found, Attaching",__FUNCTION__);
                attachedorder.name = _name;
                _order.attachedorders.Add(attachedorder);
             }
@@ -255,10 +248,35 @@ void COrderManager::AssignAttachedOrders(bool remove_if_not_found = true)
       
       for (i = attachedorders.Total()-1; i >= 0; i--) {
          attachedorder = (CAttachedOrder*)attachedorders.At(i);
-         if (event.Info ()) event.Info ("Remove unassigned attached order "+attachedorder.ticket,__FUNCTION__);
+         if (App().eventhandler.Info ()) App().eventhandler.Info ("Remove unassigned attached order "+attachedorder.ticket,__FUNCTION__);
          attachedorder.Close();
          attachedorders.Delete(i);
       }
    }
    
 }
+
+int COrderManager::LoadOpenOrders(string __symbol, int __magic)
+{
+   int cnt = 0;
+   for (int i = OriginalOrdersTotal()-1; i >= 0; i--) {
+      if (OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) {
+
+         if (OrderSymbol() != __symbol) continue;
+         if (OrderMagicNumber() != __magic) continue;
+         if (App().orderrepository.GetIdxByTicket(OrderTicket()) >= 0) continue;
+
+         COrder* exord;
+         exord = ExistingOrder(OrderTicket());
+         if (exord != NULL) {
+            Print("new order found: ticket "+exord.GetTicket()+" type: "+EnumToString((ENUM_CLASS_NAMES)exord.Type()));
+            cnt++;
+         } else {
+            //Print("Order Adding Failed");
+         }
+      }
+   }
+   AssignAttachedOrders();
+   return cnt;
+}
+#endif
