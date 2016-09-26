@@ -148,7 +148,7 @@ public:
    virtual double GetLotsize() {
       moneymanagement_init(this.symbol);
       if (use_equity) accountbalance = accountequity;
-      return mmgetlot_stoploss(stoploss.GetTicks(), riskpercent);
+      return mmgetlot_stoploss((int)stoploss.GetTicks(), riskpercent);
   }
 };
 
@@ -164,7 +164,7 @@ public:
       addaccountbalance = false;
       addfixbalance = riskmoney;
       moneymanagement_init(this.symbol);
-      return mmgetlot_stoploss(stoploss.GetTicks(), 100);
+      return mmgetlot_stoploss((int)stoploss.GetTicks(), 100);
   }
 };
 

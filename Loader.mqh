@@ -1,7 +1,7 @@
 //
-//#include "LoaderBase.mqh"
-
 #include <Arrays\ArrayObj.mqh>
+#include "libraries\commonfunctions.mqh"
+#include "libraries\math.mqh"
 
 #include "EnumClassNames.mqh"
 #include "EnumApplicationService.mqh"
@@ -44,3 +44,69 @@
 #ifdef APPLICATION_H
 #define LOADER_H
 #endif
+
+#ifdef LOADER_H
+
+#ifdef LOAD_EVENT_HANDLER
+#include "EventHandler\EventHandler.mqh"
+#endif
+
+#ifdef LOAD_TRIGGER_MANAGER
+#include "TriggerManager\TriggerManager.mqh"
+#endif
+
+#ifdef LOAD_DEPENDENCY_MANAGER
+#include "DependencyManager\DependencyManager.mqh"
+#endif
+
+#ifdef LOAD_TEST_MANAGER
+#include "TestManager\Loader.mqh"
+#endif
+
+#ifdef LOAD_SYMBOL_LOADER
+#include "SymbolLoader\SymbolLoader.mqh"
+#endif
+
+#ifdef LOAD_SCRIPT_MANAGER
+#include "ScriptManager\ScriptManagerBase.mqh"
+#endif
+
+#ifdef EXPIRATION_DAYS
+#include "Modules\Expiration.mqh"
+#endif
+
+#ifdef INDICATOR_EXPIRATION_DAYS
+#include "Modules\Expiration.mqh"
+#endif
+
+void loadservices(CApplication* _application)
+{
+#ifdef LOAD_EVENT_HANDLER
+   _application.RegisterService(new CEventHandler(),srvEvent,"eventhandler");
+#endif
+#ifdef LOAD_TRIGGER_MANAGER
+   _application.RegisterService(new CTriggerManager(),srvTriggerManager,"triggers");
+#endif
+#ifdef LOAD_DEPENDENCY_MANAGER
+   _application.RegisterService(new CDependencyManager(),srvDependencyManager,"dependencymanager");
+#endif
+#ifdef LOAD_TEST_MANAGER
+   _application.RegisterService(new CTestManager(), srvTestManager, "testmanager");
+#endif
+#ifdef LOAD_SYMBOL_LOADER
+   _application.RegisterService(new CSymbolLoader(),srvSymbolLoader,"symbolloader");
+#endif
+#ifdef LOAD_SCRIPT_MANAGER
+   _application.RegisterService(new CScriptManagerBase(),srvScriptManager,"scriptmanager");
+#endif
+#ifdef EXPIRATION_DAYS
+   app.RegisterService(new CExpiration(EXPIRATION_DAYS),srvNone,"expiration");
+#endif
+#ifdef INDICATOR_EXPIRATION_DAYS
+   app.RegisterService(new CExpiration(INDICATOR_EXPIRATION_DAYS),srvNone,"expiration");
+#endif
+
+}
+
+#endif
+

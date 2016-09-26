@@ -34,22 +34,22 @@ public:
       AssertLarger(symbolinfo.TickSize(),0,"ticksize");
       AssertLarger(symbolinfo.InTicks(symbolinfo.Ask()),0,"InTicks(Ask())");
       AssertLarger(symbolinfo.TickSizeInPoints(),0,"TickSizeInPoints()");
-      AssertLarger(symbolinfo.StopsLevelInTicks(),0,"StopsLevelInTicks()");
-      AssertLarger(symbolinfo.MinTakeProfit(),0,"MinTakeProfit()");
-      AssertLarger(symbolinfo.MinStopLoss(),0,"MinStopLoss()");
+      AssertLargerOrEqual(symbolinfo.StopsLevelInTicks(),0,"StopsLevelInTicks()");
+      AssertLargerOrEqual(symbolinfo.MinTakeProfit(),0,"MinTakeProfit()");
+      AssertLargerOrEqual(symbolinfo.MinStopLoss(),0,"MinStopLoss()");
       AssertLarger(symbolinfo.SpreadInTicks(),0,"SpreadInTicks()");
       AssertLarger(symbolinfo.SpreadInPrice(),0,"SpreadInPrice()");
       AssertLarger(symbolinfo.LotValue(),0,"LotValue()");
-      AssertEqual(symbolinfo.PriceRound(symbolinfo.Bid()+0.000001),symbolinfo.Bid(),"PriceRound(Bid+0.000001)");
+      AssertEqualD(symbolinfo.PriceRound(symbolinfo.Bid()+0.000001),symbolinfo.Bid(),"PriceRound(Bid+0.000001)");
       symbolinfo.LotRoundUp(0.5,false);
-      AssertEqual(symbolinfo.LotRoundUp(),0.5,"LotRoundUp()");      
-      AssertEqual(symbolinfo.LotRound(1.0001),1,"LotRound(1.0001)");
-      AssertEqual(symbolinfo.LotRound(0.9999),1,"LotRound(0.9999)");
-      AssertEqual(symbolinfo.LotRound(0.0001),0,"LotRound(0.0001)");
+      AssertEqualD(symbolinfo.LotRoundUp(),0.5,"LotRoundUp()");      
+      AssertEqualD(symbolinfo.LotRound(1.0001),1.0,"LotRound(1.0001)");
+      AssertEqualD(symbolinfo.LotRound(0.9999),1.0,"LotRound(0.9999)");
+      AssertEqualD(symbolinfo.LotRound(0.0001),0.0,"LotRound(0.0001)");
       symbolinfo.LotRoundUpClose(0.5,false);
-      AssertEqual(symbolinfo.LotRound(1.0001,true),1,"LotRound(1.0001,true)");
-      AssertEqual(symbolinfo.LotRound(0.9999,true),1,"LotRound(0.9999,true)");
-      AssertEqual(symbolinfo.LotRound(0.0001,true),0,"LotRound(0.0001,true)");
+      AssertEqualD(symbolinfo.LotRound(1.0001,true),1.0,"LotRound(1.0001,true)");
+      AssertEqualD(symbolinfo.LotRound(0.9999,true),1.0,"LotRound(0.9999,true)");
+      AssertEqualD(symbolinfo.LotRound(0.0001,true),0.0,"LotRound(0.0001,true)");
       return false;
    }
    

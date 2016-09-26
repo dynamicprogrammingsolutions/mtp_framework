@@ -107,7 +107,7 @@ bool COrderRepository::Load(const int handle)
 
 void COrderRepository::OnTick()
 {
-   COrder* _order;
+   COrderInterface* _order;
 
    for (int i = 0; i < orders.Total(); i++) {
       if (!isset(orders.At(i))) continue;
@@ -115,11 +115,11 @@ void COrderRepository::OnTick()
       _order.OnTick();
       
       // TODO: adding a use_history variable, and the retrainhistory would also work on the main orders array, if the use_history is false.         
-      if (_order.closed || _order.executestate == ES_CANCELED) {
-         if ((retainhistory>1 || retainhistory==0) && !_order.do_not_archive) {
+      if (_order.ClosedOrDeleted() || _order.ExecuteState() == ES_CANCELED) {
+         if ((retainhistory>1 || retainhistory==0) && !_order.DoNotArchive()) {
             historyorders.Add(orders.Detach(i));
             i--;
-         } else if (retainhistory == 1 && !_order.do_not_delete && !_order.do_not_archive) {
+         } else if (retainhistory == 1 && !_order.DoNotDelete() && !_order.DoNotArchive()) {
             orders.Delete(i);
             i--;
          }            
@@ -205,7 +205,7 @@ bool COrderRepository::CloseAll(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT s
          if (in_magic != -1 && _order.magic != in_magic) { continue; }
          if (!ordertype_select(orderselect,_order.GetType())) { continue; }
          if (_order.executestate == ES_EXECUTED || _order.executestate == ES_VIRTUAL) {
-            if (App().eventhandler.Info()) App().eventhandler.Info("Closing Order "+_order.ticket+" selection:"+orderselect,__FUNCTION__);
+            if (App().eventhandler.Info()) App().eventhandler.Info("Closing Order "+(string)_order.ticket+" selection:"+EnumToString(orderselect),__FUNCTION__);
             if (_order.State() == ORDER_STATE_FILLED) {
                if (_order.Close()) {
                   ret = true;
@@ -240,7 +240,7 @@ bool COrderRepository::CloseAll(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT s
          if (!ordertype_select(orderselect,_order.GetType())) { continue; }
          if (_order.executestate == ES_EXECUTED || _order.executestate == ES_VIRTUAL) {
             if (!callbackobj.callback(0,_order)) continue;
-            if (App().eventhandler.Info()) App().eventhandler.Info("Closing Order "+_order.ticket+" selection:"+orderselect,__FUNCTION__);
+            if (App().eventhandler.Info()) App().eventhandler.Info("Closing Order "+(string)_order.ticket+" selection:"+EnumToString(orderselect),__FUNCTION__);
             if (_order.State() == ORDER_STATE_FILLED) {
                if (_order.Close()) {
                   ret = true;
@@ -395,18 +395,16 @@ double COrderRepository::TotalProfit(ENUM_ORDERSELECT orderselect, ENUM_STATESEL
 double COrderRepository::TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1, bool _commission = true, bool swap = true)
 {
    double totalprofit = 0;
-   COrder *_order;
+   COrderInterface *_order;
    int i;
    for (i = orders.Total()-1; i >= 0; i--) {
       _order = orders.At(i);
       if (isset(_order)) {
          if (!state_select(stateselect,_order.State())) { continue; }
          if (!ordertype_select(orderselect,_order.GetType())) { continue; }
-         if (in_symbol != "" && _order.symbol != in_symbol) { continue; }
-         if (in_magic != -1 && _order.magic != in_magic) { continue; }
-         if (_order.Select()) {
-            totalprofit += OrderProfit()+(_commission?OrderCommission():0)+(swap?OrderSwap():0);
-         }
+         if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
+         if (in_magic != -1 && _order.GetMagicNumber() != in_magic) { continue; }
+         totalprofit += _order.GetProfitMoney()-(_commission?_order.GetCommission():0)+(swap?_order.GetSwap():0);
       }
    }
    if (state_select(stateselect,ORDER_STATE_CLOSED)) {
@@ -415,10 +413,9 @@ double COrderRepository::TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STA
          if (isset(_order)) {
             if (!state_select(stateselect,_order.State())) { continue; }
             if (!ordertype_select(orderselect,_order.GetType())) { continue; }
-            if (in_symbol != "" && _order.symbol != in_symbol) { continue; }
-            if (in_magic != -1 && _order.magic != in_magic) { continue; }
-            if (_order.Select())
-               totalprofit += OrderProfit()+(_commission?OrderCommission():0)-(swap?OrderSwap():0);
+            if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
+            if (in_magic != -1 && _order.GetMagicNumber() != in_magic) { continue; }
+            totalprofit += _order.GetProfitMoney()-(_commission?_order.GetCommission():0)+(swap?_order.GetSwap():0);
          }
       }
    }

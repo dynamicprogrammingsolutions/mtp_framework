@@ -111,7 +111,7 @@ public:
       return(ret);
    }
    
-   bool OnOrder(ulong ticket)
+   bool OnOrder(int ticket)
    {
       COrder* _order = App().orderrepository.GetByTicket(ticket);
       if (_order == NULL) return(false);
@@ -338,7 +338,7 @@ public:
                change = (_order.GetStopLoss() == 0 || !q(_order.GetStopLoss(),newsl));               
             }
             if (change) {   
-               Print("modify sl from "+ _order.GetStopLoss() + " to "+newsl);       
+               Print("modify sl from "+ (string)_order.GetStopLoss() + " to "+(string)newsl);       
                _order.SetStopLoss(newsl);
                _order.SetTakeProfit(_order.GetTakeProfit());
                _order.Modify();

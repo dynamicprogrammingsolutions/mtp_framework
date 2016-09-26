@@ -12,6 +12,7 @@
 class CMTPSymbolInfo : public CSymbolInfo
 {
 public:
+   TraitAppAccess
    virtual int Type() const { return classMT4MTPSymbolInfo; }
 
 public:
@@ -35,13 +36,7 @@ public:
          lot_extradigits = 0;
          roundup_to_minlot = true;
       }
-      
-      CEventHandlerInterface* event;
-      virtual void Initalize()
-      {
-         event = ((CApplication*)AppBase()).eventhandler;
-      }
-      
+            
       virtual bool Name(string name);
 
       double TickSizeR() { return(TickSize()==0?CMTPSymbolInfo::m_point:TickSize()); }
@@ -69,9 +64,9 @@ bool CMTPSymbolInfo::Name(string name)
       //event.Info("object already initalized for symbol "+name,__FUNCTION__);
       return(true);
    }
-   if (event.Info ()) event.Info ("initalizing symbol "+name,__FUNCTION__);
+   if (App().eventhandler.Info ()) App().eventhandler.Info ("initalizing symbol "+name,__FUNCTION__);
    if (!CSymbolInfo::Name(name)) {
-      if (event.Error ()) event.Error ("Invalid Symbol "+name,__FUNCTION__);
+      if (App().eventhandler.Error ()) App().eventhandler.Error ("Invalid Symbol "+name,__FUNCTION__);
       m_name = "";
       return(false);
    } else {

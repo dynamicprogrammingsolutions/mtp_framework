@@ -60,8 +60,26 @@ public:
    {
       return Assert(value > compare,name,(string)value+" > "+(string)compare);
    }
-   bool AssertEqual(double value, double compare, string name)
+   bool AssertLargerOrEqual(double value, double compare, string name)
    {
-      return Assert(value == compare,name,(string)value+" == "+(string)compare);
+      return Assert(value >= compare,name,(string)value+" >= "+(string)compare);
+   }
+   bool AssertSmaller(double value, double compare, string name)
+   {
+      return Assert(value < compare,name,(string)value+" < "+(string)compare);
+   }
+   bool AssertSmallerOrEqual(double value, double compare, string name)
+   {
+      return Assert(value <= compare,name,(string)value+" <= "+(string)compare);
+   }
+   template<typename T>
+   bool AssertEqual(T value, T compare, string name)
+   {
+      return Assert(value==compare,name,(string)value+" == "+(string)compare);
+   }
+
+   bool AssertEqualD(double value, double compare, string name)
+   {
+      return Assert(q(value,compare),name,(string)value+" == "+(string)compare);
    }
 };

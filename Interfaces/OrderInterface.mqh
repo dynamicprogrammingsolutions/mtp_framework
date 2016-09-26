@@ -16,51 +16,63 @@ class COrderInterface : public CAppObject
 {
 public:
 
-   virtual int Id() { return -1; }
+   virtual int Id() { AbstractFunctionWarning(__FUNCTION__); return 0; }
    
-   virtual ENUM_ORDER_STATE State() { return 0; }
+   virtual bool DoNotArchive() { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool DoNotDelete() { AbstractFunctionWarning(__FUNCTION__); return false; }
+   
+   virtual ENUM_ORDER_STATE State() { AbstractFunctionWarning(__FUNCTION__); return 0; }
+   virtual ENUM_EXECUTE_STATE ExecuteState() { AbstractFunctionWarning(__FUNCTION__); return 0; }
    
    virtual bool NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,
-   const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0) { return false; }
+   const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0) { AbstractFunctionWarning(__FUNCTION__); return false; }
+   
+   virtual void OnTick() { AbstractFunctionWarning(__FUNCTION__); return; }
       
-   virtual bool Execute() { return false; }
-   virtual bool Close(double closevolume = 0, double closeprice = 0) { return false; }
-   virtual bool Cancel() { return false; }
-   virtual bool Modify() { return false; }
+   virtual bool Execute() { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool Close(double closevolume = 0, double closeprice = 0) { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool Cancel() { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool Modify() { AbstractFunctionWarning(__FUNCTION__); return false; }
 
-   virtual bool CreateAttached(ENUM_ORDER_TYPE _ordertype, double _volume, double _price, double _limit_price, string _name, string _comment) { return false; }
-   virtual bool AddStopLoss(double in_price, double stopvolume = 0, string name = "") { return false; }
-   virtual bool AddTakeProfit(double in_price, double stopvolume = 0, string name = "") { return false; } 
+   virtual bool CreateAttached(ENUM_ORDER_TYPE _ordertype, double _volume, double _price, double _limit_price, string _name, string _comment) { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool AddStopLoss(double in_price, double stopvolume = 0, string name = "") { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool AddTakeProfit(double in_price, double stopvolume = 0, string name = "") { AbstractFunctionWarning(__FUNCTION__); return false; } 
 
-   virtual bool Closed() { return false; }
-   virtual bool Deleted() { return false; }
-   virtual bool ClosedOrDeleted() { return false; }   
+   virtual bool Closed() { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool Deleted() { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool ClosedOrDeleted() { AbstractFunctionWarning(__FUNCTION__); return false; }   
          
-   virtual long GetTicket() { return 0; }
-   virtual int GetMagicNumber() { return 0; }
-   virtual string GetSymbol() { return NULL; }
-   virtual string GetComment() { return NULL; }
+   virtual long GetTicket() { AbstractFunctionWarning(__FUNCTION__); return 0; }
+   virtual int GetMagicNumber() { AbstractFunctionWarning(__FUNCTION__); return 0; }
+   virtual string GetSymbol() { AbstractFunctionWarning(__FUNCTION__); return NULL; }
+   virtual string GetComment() { AbstractFunctionWarning(__FUNCTION__); return NULL; }
    virtual ENUM_ORDER_TYPE GetType() { return NULL; }
-   virtual datetime GetOpenTime() { return 0; }
-   virtual double GetOpenPrice() { return 0; }
-   virtual double GetLots() { return 0; }
-   virtual double GetClosePrice() { return 0; }
-   virtual datetime GetCloseTime() { return 0; }
-   virtual int GetStopLossTicks() { return 0; }   
-   virtual double GetStopLoss() { return 0; }   
-   virtual int GetTakeProfitTicks() { return 0; }
-   virtual double GetTakeProfit() { return 0; }   
-   virtual int GetProfitTicks() { return 0; }
-   virtual datetime GetExpiration() { return 0; }
+   virtual datetime GetOpenTime() { AbstractFunctionWarning(__FUNCTION__); return 0; }
+   virtual double GetOpenPrice() { AbstractFunctionWarning(__FUNCTION__); return 0; }
+   virtual double GetLots() { AbstractFunctionWarning(__FUNCTION__); return 0; }
+   virtual double GetClosePrice() { AbstractFunctionWarning(__FUNCTION__); return 0; }
+   virtual datetime GetCloseTime() { AbstractFunctionWarning(__FUNCTION__); return 0; }
+   virtual int GetStopLossTicks() { AbstractFunctionWarning(__FUNCTION__); return 0; }   
+   virtual double GetStopLoss() { AbstractFunctionWarning(__FUNCTION__); return 0; }   
+   virtual int GetTakeProfitTicks() { AbstractFunctionWarning(__FUNCTION__); return 0; }
+   virtual double GetTakeProfit() { AbstractFunctionWarning(__FUNCTION__); return 0; }   
+   virtual int GetProfitTicks() { AbstractFunctionWarning(__FUNCTION__); return 0; }
+   virtual datetime GetExpiration() { AbstractFunctionWarning(__FUNCTION__); return 0; }
+   virtual double GetProfitMoney() { AbstractFunctionWarning(__FUNCTION__); return 0; }
+   virtual double GetCommission() { AbstractFunctionWarning(__FUNCTION__); return 0; }
+   virtual double GetSwap() { AbstractFunctionWarning(__FUNCTION__); return 0; }
 
-   virtual void SetOrderType(const ENUM_ORDER_TYPE value) { }
-   virtual void SetMagic(const int value) { }
-   virtual void SetSymbol(const string value) { }
-   virtual void SetComment(const string value) { }
-   virtual void SetLots(const double value) { }
-   virtual void SetExpiration(const datetime value) { }
-   virtual void SetPrice(const double value) { }
-   virtual void SetStopLoss(const double value) { }
-   virtual void SetTakeProfit(const double value) { }
+   virtual void SetOrderType(const ENUM_ORDER_TYPE value) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void SetMagic(const int value) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void SetSymbol(const string value) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void SetComment(const string value) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void SetLots(const double value) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void SetExpiration(const datetime value) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void SetPrice(const double value) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void SetStopLoss(const double value) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual void SetTakeProfit(const double value) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual bool SetStopLoss(CStopsCalcInterface* _sl, bool checkchange = false, bool checkhigher = false) { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool SetTakeProfit(CStopsCalcInterface* _tp, bool check = false)  { AbstractFunctionWarning(__FUNCTION__); return false; }
+   
    
 };

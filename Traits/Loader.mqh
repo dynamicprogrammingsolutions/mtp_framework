@@ -4,3 +4,7 @@
 #include "TraitNewObject.mqh"
 #include "Triggers.mqh"
 #include "TraitRefCount.mqh"
+#include "TraitUseEvent.mqh"
+#include "TraitServiceAlias.mqh"
+#include "TraitInitEvent.mqh"
+#include "TraitEvent.mqh"

@@ -15,7 +15,7 @@ public:
    }
 };
 
-class CDependencyManager : CDependencyManagerInterface
+class CDependencyManager : public CDependencyManagerInterface
 {
 public:
    TraitGetType(classDependencyManager)

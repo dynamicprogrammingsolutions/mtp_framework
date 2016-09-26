@@ -1,0 +1,1 @@
+#define TraitInitEvent(__class__,__event__) int __class__::__event__ = 0;

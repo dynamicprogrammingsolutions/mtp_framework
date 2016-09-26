@@ -1,4 +1,6 @@
 //
+#include "..\Loader.mqh"
+
 class COrderDataSaver : public CServiceProvider
 {
 public:
@@ -39,7 +41,7 @@ public:
             if(handle==INVALID_HANDLE) {
                Print("Operation FileOpen failed, error ",GetLastError()); 
             }
-            if (!App().ordermanager.Load(handle)) {
+            if (!App().orderrepository.Load(handle)) {
                Print("file load failed");
             }
             FileClose(handle);
@@ -64,7 +66,7 @@ public:
          if(handle==INVALID_HANDLE) {
             Print("Operation FileOpen failed, error ",GetLastError()); 
          }
-         if (!App().ordermanager.Save(handle)) {
+         if (!App().orderrepository.Save(handle)) {
             Print("file save failed");
          }
          FileClose(handle);

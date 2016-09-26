@@ -40,9 +40,9 @@ public:
    bool get_new_price_for_retry;
 
 protected:
-   ulong             m_magic;           // expert magic number
-   ulong             m_deviation;       // deviation default
-   ulong             m_deviation_close;       // deviation default
+   int             m_magic;           // expert magic number
+   int             m_deviation;       // deviation default
+   int             m_deviation_close;       // deviation default
    ENUM_LOG_LEVELS   m_log_level;
    int m_ticket;
    int m_errcode;
@@ -68,11 +68,11 @@ public:
    void              LogLevel(ENUM_LOG_LEVELS log_level)     { m_log_level=log_level;               }
 
    //--- trade methods
-   void              SetExpertMagicNumber(ulong magic)       { m_magic=magic;                       }
-   void              SetDeviationInPoints(ulong deviation)   { m_deviation=deviation; m_deviation_close = deviation; }
-   void              SetSlippage(ulong deviation)   { m_deviation=deviation; m_deviation_close = deviation; }
-   void              SetSlippageOpen(ulong deviation)   { m_deviation=deviation; }
-   void              SetSlippageClose(ulong deviation)   { m_deviation_close = deviation; }
+   void              SetExpertMagicNumber(int magic)       { m_magic=magic;                       }
+   void              SetDeviationInPoints(int deviation)   { m_deviation=deviation; m_deviation_close = deviation; }
+   void              SetSlippage(int deviation)   { m_deviation=deviation; m_deviation_close = deviation; }
+   void              SetSlippageOpen(int deviation)   { m_deviation=deviation; }
+   void              SetSlippageClose(int deviation)   { m_deviation_close = deviation; }
    void              SetColors(color buycl, color sellcl)   { cl_buy = buycl; cl_pendingbuy = buycl; cl_closebuy = buycl; cl_cancelbuy = buycl;
       cl_sell = sellcl; cl_pendingsell = sellcl; cl_closesell = sellcl; cl_cancelsell = sellcl; }
    void              SetIsEcn(bool ecn) { m_isecn = ecn; }
@@ -83,12 +83,12 @@ public:
    //--- methods for working with pending orders
    bool              PositionOpen(const string symbol, const int order_type,const double volume, const double price, const double _sl = 0, const double _tp = 0, const string _comment = "");
    bool              OrderOpen(const string symbol, const int order_type, const double volume, double price = 0, const double _sl = 0, const double _tp = 0, const datetime expiration = 0,const string _comment = "");   
-   bool              OrderModify(ulong ticket,double price,double _sl = 0,double _tp = 0, datetime expiration = 0, COrderInfo* orderinfo = NULL);   
-   bool              OrderDelete(ulong ticket, COrderInfo* orderinfo = NULL);   
-   bool              OrderClose(ulong ticket, double lots = 0, double price = 0, COrderInfo* orderinfo = NULL);
-   int               OrderClosePartial(ulong ticket, double lots = 0, double price = 0, COrderInfo* orderinfo = NULL);
+   bool              OrderModify(int ticket,double price,double _sl = 0,double _tp = 0, datetime expiration = 0, COrderInfo* orderinfo = NULL);   
+   bool              OrderDelete(int ticket, COrderInfo* orderinfo = NULL);   
+   bool              OrderClose(int ticket, double lots = 0, double price = 0, COrderInfo* orderinfo = NULL);
+   int               OrderClosePartial(int ticket, double lots = 0, double price = 0, COrderInfo* orderinfo = NULL);
    int               FindNewTicket(datetime orderopentime, double orderopenprice, string ordersymbol);
-   int               CloseBy(ulong ticket1, ulong ticket2, COrderInfo* orderinfo = NULL);
+   int               CloseBy(int ticket1, int ticket2, COrderInfo* orderinfo = NULL);
 
    bool              CheckRetry(int errcode, ENUM_TRADE_ACTION action, int& retrycnt);
 
@@ -253,7 +253,7 @@ bool CTrade::PositionOpen(const string in_symbol, const int order_type, const do
       
       int res;
       if (!twosteps) {
-         res = OrderSend(in_symbol,order_type,volume,price,m_deviation,_sl,_tp,_comment,m_magic,0,getcolor(order_type));
+         res = OrderSend(in_symbol,order_type,volume,price,(int)m_deviation,_sl,_tp,_comment,(int)m_magic,0,getcolor(order_type));
       } else {
          res = OrderSend(in_symbol,order_type,volume,price,m_deviation,0,0,_comment,m_magic,0,getcolor(order_type));
       }
@@ -296,7 +296,7 @@ bool CTrade::PositionOpen(const string in_symbol, const int order_type, const do
 //| OUTPUT: true-if successful, false otherwise.                     |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-bool CTrade::OrderModify(ulong ticket,double price,double _sl = 0,double _tp = 0, datetime expiration = 0, COrderInfo* orderinfo = NULL)
+bool CTrade::OrderModify(int ticket,double price,double _sl = 0,double _tp = 0, datetime expiration = 0, COrderInfo* orderinfo = NULL)
 {
 //--- check stopped
    if(IsStopped(__FUNCTION__)) return(false);
@@ -342,7 +342,7 @@ bool CTrade::OrderModify(ulong ticket,double price,double _sl = 0,double _tp = 0
 //| OUTPUT: true-if successful, false otherwise.                     |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-bool CTrade::OrderDelete(ulong ticket, COrderInfo* orderinfo = NULL)
+bool CTrade::OrderDelete(int ticket, COrderInfo* orderinfo = NULL)
   {
 //--- check stopped
    if(IsStopped(__FUNCTION__)) return(false);
@@ -377,7 +377,7 @@ bool CTrade::OrderDelete(ulong ticket, COrderInfo* orderinfo = NULL)
    return(false);
   }
   
-bool CTrade::OrderClose(ulong ticket, double lots = 0, double price = 0, COrderInfo* orderinfo = NULL)
+bool CTrade::OrderClose(int ticket, double lots = 0, double price = 0, COrderInfo* orderinfo = NULL)
 {
 //--- check stopped
    if(IsStopped(__FUNCTION__)) return(false);
@@ -402,9 +402,9 @@ bool CTrade::OrderClose(ulong ticket, double lots = 0, double price = 0, COrderI
    }
    
       
-   datetime orderopentime;
-   double orderopenprice;  
-   string ordersymbol;
+   datetime orderopentime = 0;
+   double orderopenprice = 0;  
+   string ordersymbol = "";
    
    if (partial) {
       orderopentime = orderinfo.GetOpenTime();
@@ -450,7 +450,7 @@ bool CTrade::OrderClose(ulong ticket, double lots = 0, double price = 0, COrderI
    return(false);
 }
 
-int CTrade::OrderClosePartial(ulong ticket, double lots = 0, double price = 0, COrderInfo* orderinfo = NULL)
+int CTrade::OrderClosePartial(int ticket, double lots = 0, double price = 0, COrderInfo* orderinfo = NULL)
 {
 //--- check stopped
    if(IsStopped(__FUNCTION__)) return(false);
@@ -518,7 +518,7 @@ int CTrade::FindNewTicket(datetime orderopentime, double orderopenprice, string 
    return(-1);
 }
 
-int CTrade::CloseBy(ulong ticket1, ulong ticket2, COrderInfo* orderinfo = NULL)
+int CTrade::CloseBy(int ticket1, int ticket2, COrderInfo* orderinfo = NULL)
 {
 //--- check stopped
    if(IsStopped(__FUNCTION__)) return(false);

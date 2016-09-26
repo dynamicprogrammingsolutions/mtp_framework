@@ -2,18 +2,22 @@
 
 #include "..\Loader.mqh"
 
+/*
 #ifdef __MQL5__
    #include "..\OrderManagerMT5\Loader.mqh"
 #else
    #include "..\OrderManagerMT4\Loader.mqh"
 #endif
+*/
+
+#include "..\OrderManager\StopsCalc.mqh"
 
 class CTrailing : public CAppObject
 {
 public:
    TraitAppAccess
    
-   virtual bool OnOrder(COrder* in_order)
+   virtual bool OnOrder(COrderInterface* in_order)
    {
       return false;
    }
@@ -27,20 +31,20 @@ public:
    
    bool checkhigher;
    
-   virtual CStopLoss* Calc(COrder* in_order)
+   virtual CStopsCalcInterface* Calc(COrderInterface* in_order)
    {
       return NULL;
    }
    
-   virtual bool OnOrder(COrder* in_order)
+   virtual bool OnOrder(COrderInterface* in_order)
    {
       if (!isset(in_order)) return false;
-      CStopLoss* newsl = Calc(in_order);
+      CStopsCalcInterface* newsl = Calc(in_order);
       if (isset(newsl)) {
          //in_order.PrepareSLForModify(newsl);
          //Print("new sl: "+newsl.GetPrice()+" ticks: "+newsl.GetTicks());
          if (checkhigher) {
-            if (in_order.PrepareSLForModify(newsl).GetTicks() >= in_order.GetStopLossTicks()) {
+            if (newsl.SetEntryPrice(in_order.GetOpenPrice()).SetSymbol(in_order.GetSymbol()).SetOrderType(in_order.GetType()).GetTicks() >= in_order.GetStopLossTicks()) {
                delete newsl;
                return false;
             }
@@ -55,7 +59,7 @@ public:
 
 };
 
-class CTrailingSLTicks : CTrailingSL
+class CTrailingSLTicks : public CTrailingSL
 {
 public:
    bool trailingstop_round;
@@ -66,7 +70,7 @@ public:
 
    CTrailingSLTicks(int in_starttrailing, int in_stoptrailing, int in_trailingdist, int in_trailingstep, bool in_round) : activate(in_starttrailing), stoptrailing(in_stoptrailing), trailingstop(in_trailingdist), step(in_trailingstep), trailingstop_round(in_round) { }
 
-   virtual CStopLoss* Calc(COrder* in_order)
+   virtual CStopsCalcInterface* Calc(COrderInterface* in_order)
    {
       double sl_price = in_order.GetStopLoss();
       double sl = sl_price==0?EMPTY_VALUE:in_order.GetStopLossTicks();
@@ -92,7 +96,7 @@ public:
    }
 };
 
-class CTrailingSLLockin : CTrailingSL
+class CTrailingSLLockin : public CTrailingSL
 {
 public:
 
@@ -101,7 +105,7 @@ public:
    
    CTrailingSLLockin(int in_lockinat, int in_lockinprofit) : lockin(in_lockinat), lockinprofit(in_lockinprofit) {}
    
-   virtual CStopLoss* Calc(COrder* in_order)
+   virtual CStopsCalcInterface* Calc(COrderInterface* in_order)
    {
       double sl_price = in_order.GetStopLoss();
       double sl = sl_price==0?EMPTY_VALUE:in_order.GetStopLossTicks();

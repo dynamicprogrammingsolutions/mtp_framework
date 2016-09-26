@@ -27,11 +27,6 @@ bool isset(const CObject* anyobject)
    return(CheckPointer(anyobject)!=POINTER_INVALID);
 }
 
-bool pointer_exists(ENUM_POINTER_TYPE pointer)
-{
-   return(pointer!=POINTER_INVALID);
-}
-
 bool empty(double val)
 {
    return(val == 0 || val == EMPTY_VALUE);

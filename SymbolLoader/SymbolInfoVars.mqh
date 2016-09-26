@@ -2,7 +2,7 @@
 #property link      "http://www.metatraderprogrammer.com"
 
 #include "..\Loader.mqh"
-#include "..\libraries\commonfunctions.mqh"
+#include "SymbolLoader.mqh"
 #include "..\ChartInfo\IsFirstTick.mqh"
 
 //CAccountInfo accountinfo;
@@ -157,9 +157,9 @@ double inticksd(double price)
    return((double)symbolinfo.InTicksD(price));
 }
 
-double convertfract(double pips)
+int convertfract(double pips)
 {
-   return convertfract_enabled?symbolinfo.ConvertFractional(pips):pips;
+   return (int)(convertfract_enabled?symbolinfo.ConvertFractional(pips):pips);
 }
 
 double priceround(double price)

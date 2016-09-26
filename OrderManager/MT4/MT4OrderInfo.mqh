@@ -12,7 +12,7 @@
 bool orderinfo_log = false;
 ulong COrderInfo_SelectedTicket = -1;
 
-class COrderInfo : private CObject
+class COrderInfo : public CObject
   {
 public:
    virtual int Type() const { return classMT4OrderInfo; }
@@ -40,6 +40,10 @@ protected:
    double m_stoploss;
    double m_takeprofit;
    datetime m_expiration;
+   
+   double m_profitmoney;
+   double m_commission;
+   double m_swap;
 
    int m_pool;
 
@@ -69,14 +73,17 @@ public:
    double GetStopLoss() { return(m_stoploss!=EMPTY_VALUE ? m_stoploss : (CheckTicket()?m_stoploss=OrderStopLoss():m_stoploss)); }
    double GetTakeProfit() { return(m_takeprofit!=EMPTY_VALUE ? m_takeprofit : (CheckTicket()?m_takeprofit=OrderTakeProfit():m_takeprofit)); }
    datetime GetExpiration() { return(m_expiration!=-1 ? m_expiration : (CheckTicket()?m_expiration=OrderExpiration():m_expiration)); }
-
+   double GetProfitMoney() { return(m_profitmoney!=EMPTY_VALUE ? m_profitmoney : (CheckTicket()?m_profitmoney=OrderProfit():m_profitmoney)); }
+   double GetCommission() { return(m_commission!=EMPTY_VALUE ? m_commission : (CheckTicket()?m_commission=OrderCommission():m_commission)); }
+   double GetSwap() { return(m_swap!=EMPTY_VALUE ? m_swap : (CheckTicket()?m_swap=OrderSwap():m_swap)); }
+   
    //--- info methods
    static string FormatType(string& str,const uint type);
    static string FormatType(const uint type);
 
    //--- method for select order
 
-   bool Select(ulong ticket, int pool = MODE_TRADES);
+   bool Select(int ticket, int pool = MODE_TRADES);
    bool SelectByIndex(int index, int pool = MODE_TRADES);
 
    //--- addition methods
@@ -114,6 +121,8 @@ COrderInfo::COrderInfo()
    m_stoploss = EMPTY_VALUE;
    m_takeprofit = EMPTY_VALUE;
    m_expiration = -1;
+   
+   m_profitmoney = EMPTY_VALUE;
 
    m_pool = MODE_TRADES;
 }
@@ -168,7 +177,7 @@ static string COrderInfo::FormatType(const uint type)
    return(str);
 }
 
-bool COrderInfo::Select(ulong ticket, int pool = MODE_TRADES)
+bool COrderInfo::Select(int ticket, int pool = MODE_TRADES)
 {   
    if (ticket != m_ticket) {
       m_ticket = ticket;
@@ -196,6 +205,10 @@ bool COrderInfo::Select(ulong ticket, int pool = MODE_TRADES)
       m_stoploss = EMPTY_VALUE;
       m_takeprofit = EMPTY_VALUE;
       m_expiration = -1;
+      
+      m_profitmoney = EMPTY_VALUE;
+      m_commission = EMPTY_VALUE;
+      m_swap = EMPTY_VALUE;
 
       m_laststate = m_state;      
       m_state = 0;      
@@ -269,6 +282,10 @@ bool COrderInfo::SelectByIndex(int index, int pool = MODE_TRADES)
       m_stoploss = EMPTY_VALUE;
       m_takeprofit = EMPTY_VALUE;
       m_expiration = -1;
+
+      m_profitmoney = EMPTY_VALUE;
+      m_commission = EMPTY_VALUE;
+      m_swap = EMPTY_VALUE;
 
       return(true);
    }

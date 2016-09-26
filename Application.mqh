@@ -1,5 +1,5 @@
 //
-#define MTP_FRAMEWORK_VERSION 1.3
+#define MTP_FRAMEWORK_VERSION "1.4"
 
 #include "Loader.mqh"
 

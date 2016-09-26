@@ -46,6 +46,48 @@ void addcomment(const string c1)
    commentstring[0] = commentstring[0]+c1;
 }
 
+template<typename T1, typename T2>
+void addcomment(const T1 c1, const T2 c2)
+{
+   addcomment(StringConcatenate(c1,c2));
+}
+
+template<typename T1, typename T2, typename T3>
+void addcomment(const T1 c1, const T2 c2, const T3 c3)
+{
+   addcomment(StringConcatenate(c1,c2,c3));
+}
+
+template<typename T1, typename T2, typename T3, typename T4>
+void addcomment(const T1 c1, const T2 c2, const T3 c3, const T4 c4)
+{
+   addcomment(StringConcatenate(c1,c2,c3,c4));
+}
+
+template<typename T1>
+void addcommentln(const T1 c1)
+{
+   addcomment(StringConcatenate(c1,"\n"));
+}
+
+template<typename T1, typename T2>
+void addcommentln(const T1 c1, const T2 c2)
+{
+   addcomment(StringConcatenate(c1,c2,"\n"));
+}
+
+template<typename T1, typename T2, typename T3>
+void addcommentln(const T1 c1, const T2 c2, const T3 c3)
+{
+   addcomment(StringConcatenate(c1,c2,c3,"\n"));
+}
+
+template<typename T1, typename T2, typename T3, typename T4>
+void addcommentln(const T1 c1, const T2 c2, const T3 c3, const T4 c4)
+{
+   addcomment(StringConcatenate(c1,c2,c3,c4,"\n"));
+}
+
 void commentln(const string c1)
 {
    addcomment(c1+"\n");

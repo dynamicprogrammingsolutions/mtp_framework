@@ -21,8 +21,9 @@ public:
       if (IsExpired()) {
          if (comment_enabled) addcomment("EA Expired\n");
          if (this.App().ServiceIsRegistered(srvSignalManager)) application.DeregisterService(srvSignalManager);
+         if (this.App().ServiceIsRegistered(srvEntryMethod)) application.DeregisterService(srvEntryMethod);
          if (this.App().ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvScriptManager);
-         if (this.App().ServiceIsRegistered(srvScriptManager)) application.DeregisterService(srvMain);
+         if (this.App().ServiceIsRegistered(srvMain)) application.DeregisterService(srvMain);
          this.App().orderrepository.CloseAll(ORDERSELECT_ANY);
       } else {
          if (comment_enabled) addcomment("This is a test version. EA will work until "+TimeToStr(GetExpirationTime()-1,TIME_DATE)+"\n");

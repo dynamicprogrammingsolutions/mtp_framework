@@ -8,6 +8,8 @@ class COrderBase : public COrderInterface
 public:
    virtual int Type() const { return classMT4OrderBase; }
    
+   TraitServiceAlias(CEventHandlerInterface*,eventhandler,event)
+
    static int EventTriggeringVirtualOrderOverride;
    static int EventTriggeringVirtualOrderEnabled;
    static int EventTriggeringVirtualOrderEnabledOrCancel;
@@ -15,7 +17,7 @@ public:
    static int EventUpdate;
 
 protected:
-   CEventHandlerInterface* event;
+   //CEventHandlerInterface* event;
    
    // Used Traits:
    TraitAppAccess
@@ -134,10 +136,10 @@ public:
       delete this.orderinfo;
    };
    
-   virtual void Initalize()
+   /*virtual void Initalize()
    {
       event = App().eventhandler;
-   }
+   }*/
    
    void Copy(COrderBase*& target);
    bool ExistingOrder(int existing_ticket);
@@ -172,7 +174,7 @@ public:
    virtual string GetSymbol() { return(this.symbol); }
    virtual string GetComment() { if (!CheckOrderInfo()) return(this.comment); else return(orderinfo.GetComment()); }
    
-   CStopLoss* PrepareSLForModify(CStopLoss* _sl) { return _sl.SetEntryPrice(this.GetOpenPrice()).SetSymbol(this.symbol).SetOrderType(this.GetType()); }   
+   //CStopLoss* PrepareSLForModify(CStopLoss* _sl) { return _sl.SetEntryPrice(this.GetOpenPrice()).SetSymbol(this.symbol).SetOrderType(this.GetType()); }   
    
    bool Select() { if (this.executestate != ES_NOT_EXECUTED) return(GetOrderInfoB()); else return(false); } 
      
@@ -183,10 +185,15 @@ public:
       }
       if (laststate != state) {
          laststate = state;
-         activity = activity | ACTIVITY_STATECHANGE;
+         activity = activity | (ushort)ACTIVITY_STATECHANGE;
          TRIGGER(EventStateChange);
       }
       return(this.state);
+   }
+   
+   ENUM_EXECUTE_STATE ExecuteState()
+   {
+      return this.executestate;
    }
    
    void State(ENUM_ORDER_STATE newstate)
@@ -194,15 +201,15 @@ public:
       this.state = newstate;
    }
    
-   double Price() {
+   /*double Price() {
          if (!CheckOrderInfo()) return(price);
          else return(this.orderinfo.GetOpenPrice());
-   }   
+   }*/
    
-   double CurrentPrice() {
+   /*double CurrentPrice() {
          if (CheckOrderInfo()) return(this.orderinfo.GetClosePrice());
          else return(0);
-   }
+   }*/
    
    // Change After State Change:
    virtual ENUM_ORDER_TYPE GetType() { if (!CheckOrderInfo()) return(this.ordertype); else return(orderinfo.GetType()); }
@@ -220,11 +227,15 @@ public:
    double GetInternalPrice() { return(price); }
    double GetInternalLot() { return(volume); }
 
-   virtual int GetStopLossTicks() { double _sl = this.GetStopLoss(); return(_sl==0?EMPTY_VALUE:getstoplossticks(this.symbol, this.GetType(), _sl, this.Price())); }   
+   virtual int GetStopLossTicks() { double _sl = this.GetStopLoss(); return(_sl==0?EMPTY_VALUE:getstoplossticks(this.symbol, this.GetType(), _sl, this.GetOpenPrice())); }   
    virtual double GetStopLoss() { if (this.sl_virtual || executestate == ES_VIRTUAL) return(sl); if (!CheckOrderInfo()) return(0); return(this.orderinfo.GetStopLoss()); }   
-   virtual int GetTakeProfitTicks() { double _tp = this.GetTakeProfit(); return(_tp==0?EMPTY_VALUE:gettakeprofitticks(this.symbol, this.GetType(), _tp, this.Price())); }
+   virtual int GetTakeProfitTicks() { double _tp = this.GetTakeProfit(); return(_tp==0?EMPTY_VALUE:gettakeprofitticks(this.symbol, this.GetType(), _tp, this.GetOpenPrice())); }
    virtual double GetTakeProfit() { if (this.tp_virtual || executestate == ES_VIRTUAL) return(tp); if (!CheckOrderInfo()) return(0); return(this.orderinfo.GetTakeProfit()); }   
-   virtual int GetProfitTicks() { if (State() == ORDER_STATE_PLACED) return(0); else return(gettakeprofitticks(this.symbol, this.GetType(), this.CurrentPrice(), this.Price())); }
+   virtual int GetProfitTicks() { if (State() == ORDER_STATE_PLACED) return(0); else return(gettakeprofitticks(this.symbol, this.GetType(), this.GetClosePrice(), this.GetOpenPrice())); }
+   virtual double GetProfitMoney() { if (!CheckOrderInfo()) return 0; else return this.orderinfo.GetProfitMoney(); }
+   virtual double GetCommission() { if (!CheckOrderInfo()) return 0; else return this.orderinfo.GetCommission(); }
+   virtual double GetSwap() { if (!CheckOrderInfo()) return 0; else return this.orderinfo.GetSwap(); }
+
    //int GetProfitMoney() { if (!CheckOrderInfo()) return(0); return(this.orderinfo.Get()); }
 
    // Change after select:   
@@ -242,8 +253,8 @@ public:
    virtual void SetStopLoss(const double value) { sl_set = true; if (executestate != ES_CANCELED) sl = value; else Print("Cannot change canceled order data (sl)"); }
    virtual void SetTakeProfit(const double value) { tp_set = true; if (executestate != ES_CANCELED) tp = value; else Print("Cannot change canceled order data (tp)"); }
    
-   bool SetStopLoss(CStopLoss* _sl, bool checkchange = false, bool checkhigher = false);
-   bool SetTakeProfit(CTakeProfit* _tp, bool check = false);
+   virtual bool SetStopLoss(CStopsCalcInterface* _sl, bool checkchange = false, bool checkhigher = false);
+   virtual bool SetTakeProfit(CStopsCalcInterface* _tp, bool check = false);
    
    static void DeleteIf(CStopsCalc* obj) {
       if (obj.DeleteAfterUse()) delete obj;
@@ -267,8 +278,6 @@ public:
       file.Handle(handle);            
       if (file.Invalid()) return false;
 
-      Print(__FUNCTION__+" Start Saving pos: "+file.Tell());
-
       if (!file.WriteInteger(id)) return file.Error("id",__FUNCTION__);
       if (!file.WriteInteger(executestate)) return file.Error("executestate",__FUNCTION__);
       if (!file.WriteInteger(state)) return file.Error("state",__FUNCTION__);      
@@ -279,16 +288,16 @@ public:
       if (!file.WriteDouble(price)) return file.Error("price",__FUNCTION__);
       if (!file.WriteDouble(sl)) return file.Error("sl",__FUNCTION__);
       if (!file.WriteDouble(tp)) return file.Error("tp",__FUNCTION__);
-      if (!file.WriteInteger(expiration)) return file.Error("expiration",__FUNCTION__);
+      if (!file.WriteDateTime(expiration)) return file.Error("expiration",__FUNCTION__);
       if (file.WriteString(comment) < 0) return file.Error("comment",__FUNCTION__);
       if (!file.WriteInteger(magic)) return file.Error("magic",__FUNCTION__);
-      if (!file.WriteInteger(closetime)) return file.Error("closetime",__FUNCTION__);
+      if (!file.WriteDateTime(closetime)) return file.Error("closetime",__FUNCTION__);
       if (!file.WriteInteger(sl_virtual)) return file.Error("sl_virtual",__FUNCTION__);
       if (!file.WriteInteger(tp_virtual)) return file.Error("tp_virtual",__FUNCTION__);
       if (!file.WriteInteger(price_virtual)) return file.Error("price_virtual",__FUNCTION__);
       if (!file.WriteInteger(retcode)) return file.Error("retcode",__FUNCTION__);
-      if (!file.WriteInteger(executetime)) return file.Error("executetime",__FUNCTION__);
-      if (!file.WriteInteger(filltime)) return file.Error("filltime",__FUNCTION__);
+      if (!file.WriteDateTime(executetime)) return file.Error("executetime",__FUNCTION__);
+      if (!file.WriteDateTime(filltime)) return file.Error("filltime",__FUNCTION__);
       if (!file.WriteInteger(sl_set)) return file.Error("sl_set",__FUNCTION__);
       if (!file.WriteInteger(tp_set)) return file.Error("tp_set",__FUNCTION__);
       if (!file.WriteInteger(price_set)) return file.Error("price_set",__FUNCTION__);
@@ -297,8 +306,6 @@ public:
       if (!file.WriteInteger(COrderBase::max_virtual_ticket)) return file.Error("max_virtual_ticket",__FUNCTION__);   
       if (!file.WriteInteger(COrderBase::maxid)) return file.Error("maxid",__FUNCTION__);   
       
-      Print(__FUNCTION__+" End Saving pos: "+file.Tell());
-        
       return(true);  
    }
    
@@ -307,8 +314,6 @@ public:
       MTPFileBin file;
       file.Handle(handle);            
       if (file.Invalid()) return false;
-      
-      Print(__FUNCTION__+" Start Loading pos: "+file.Tell());
       
       if (!file.ReadInteger(id)) return file.Error("id",__FUNCTION__);
       maxid = MathMax(maxid,id);
@@ -345,8 +350,6 @@ public:
       if (!file.ReadInteger(COrderBase::max_virtual_ticket)) return file.Error("max_virtual_ticket",__FUNCTION__);   
       if (!file.ReadInteger(COrderBase::maxid)) return file.Error("maxid",__FUNCTION__);   
             
-      Print(__FUNCTION__+" End Loading pos: "+file.Tell());
-      
       return(true);  
    }
 
@@ -438,7 +441,7 @@ bool COrderBase::delete_mm_objects = false;
          this.Update();
          return(true);
       } else {
-         if (event.Error ()) event.Error ("Existing Order Info Select Failed: "+this.ticket,__FUNCTION__);
+         if (event().Error ()) event().Error ("Existing Order Info Select Failed: "+(string)this.ticket,__FUNCTION__);
          return(false);
       }
             
@@ -446,7 +449,7 @@ bool COrderBase::delete_mm_objects = false;
       
    COrderInfo* COrderBase::GetOrderInfo()
    {
-      if (!pointer_exists(CheckPointer(this.orderinfo))) this.orderinfo = new COrderInfo();
+      if (!isset(this.orderinfo)) this.orderinfo = new COrderInfo();
       if (this.orderinfo.Select(ticket,MODE_TRADES)) {
          return(orderinfo);
       }
@@ -466,19 +469,19 @@ bool COrderBase::delete_mm_objects = false;
    bool COrderBase::GetOrderInfoB()
    {
       GetOrderInfo();
-      //if ( event.Verbose ()) event.Verbose ("orderinfo != NULL:"+(orderinfo != NULL),__FUNCTION__);
+      //if ( event().Verbose ()) event().Verbose ("orderinfo != NULL:"+(orderinfo != NULL),__FUNCTION__);
       return(orderinfo != NULL);
    }
    
    bool COrderBase::Execute()
    {
-      activity = activity | ACTIVITY_EXECUTE;
+      activity = activity | (ushort)ACTIVITY_EXECUTE;
       COrderInfo historyorder;
       if (executestate == ES_NOT_EXECUTED) {
          /*if (ordermanager != NULL && ordermanager.simulation_enabled) {         
             return(this.UpdateSimulation());
          } else {*/
-            if ( event.Info ()) event.Info ("Execute Order: type="+ordertype+" volume="+volume+" price="+price+" tp="+tp+" sl="+sl+" expiration="+expiration+" magic="+this.magic+" comment="+comment,__FUNCTION__);
+            if ( event().Info ()) event().Info (StringConcatenate("Execute Order: type=",ordertype," volume=",volume," price=",price," tp=",tp," sl=",sl," expiration=",expiration," magic=",this.magic," comment=",comment),__FUNCTION__);
             bool success;
             bool isvirtual = false;
             string virtual_error = "";
@@ -505,7 +508,7 @@ bool COrderBase::delete_mm_objects = false;
                         success = true;
                      } else {
                         loadsymbol(symbol);
-                        virtual_error = "Invalid Price: "+this.price+" bid/ask:"+_symbol.Bid()+"/"+_symbol.Ask();
+                        virtual_error = "Invalid Price: "+(string)this.price+" bid/ask:"+(string)_symbol.Bid()+"/"+(string)_symbol.Ask();
                      }
                   } else {
                      loadsymbol(symbol);
@@ -515,45 +518,45 @@ bool COrderBase::delete_mm_objects = false;
                      success = trade.OrderOpen(symbol,ordertype,lotround_execute?_symbol.LotRound(volume):volume,_symbol.PriceRound(price),_symbol.PriceRound(real_sl),_symbol.PriceRound(real_tp),expiration,comment);
                   }
                } else {
-                  if (event.Warning ()) event.Warning ("No Price",__FUNCTION__);
+                  if (event().Warning ()) event().Warning ("No Price",__FUNCTION__);
                }
             }
             if (!isvirtual) {
                if (success) {               
                   if (trade.ResultOrder() >= 0) {
                      ticket = trade.ResultOrder();
-                     if ( event.Info ()) event.Info ("Order Executed. Ticket:"+(string)ticket,__FUNCTION__);
+                     if ( event().Info ()) event().Info ("Order Executed. Ticket:"+(string)ticket,__FUNCTION__);
                      executestate = ES_EXECUTED;
                      Update();
                      return(true);
                   } else {
                      retcode = trade.ResultRetcode();
-                     if (event.Warning ()) event.Warning ("No Ticket in trade result retcode: "+(string)trade.ResultRetcode(),__FUNCTION__);
+                     if (event().Warning ()) event().Warning ("No Ticket in trade result retcode: "+(string)trade.ResultRetcode(),__FUNCTION__);
                   } 
                } else {
                   retcode = trade.ResultRetcode();
                   loadsymbol(this.symbol);
-                  if (event.Error ()) event.Error ("Order Open Failed ("+trade.ResultRetcode()+":"+ErrorDescription(trade.ResultRetcode())+"): symbol:"+this.symbol+" ordertype:"+(string)ordertype+", volume:"+(string)volume+", price:"+(string)price+" sl:"+real_sl+" tp:"+tp+" current ask:"+_symbol.Ask()+" bid:"+_symbol.Bid(),__FUNCTION__);
+                  if (event().Error ()) event().Error ("Order Open Failed ("+(string)trade.ResultRetcode()+":"+ErrorDescription(trade.ResultRetcode())+"): symbol:"+this.symbol+" ordertype:"+(string)ordertype+", volume:"+(string)volume+", price:"+(string)price+" sl:"+(string)real_sl+" tp:"+(string)tp+" current ask:"+(string)_symbol.Ask()+" bid:"+(string)_symbol.Bid(),__FUNCTION__);
                   executestate = ES_CANCELED;
                      
                }
             } else {
                if (success) {
-                  if ( event.Info ()) event.Info ("Order Executed. Ticket:"+(string)ticket,__FUNCTION__);
+                  if ( event().Info ()) event().Info ("Order Executed. Ticket:"+(string)ticket,__FUNCTION__);
                   executestate = ES_VIRTUAL;
                   Update();
                   return(true);
                } else {
-                  if (event.Error ()) event.Error ("Order Open Failed ("+virtual_error+"): ordertype:"+(string)ordertype+", volume:"+(string)volume+", price:"+(string)price+" sl:"+real_sl+" tp:"+tp,__FUNCTION__);                  
+                  if (event().Error ()) event().Error ("Order Open Failed ("+virtual_error+"): ordertype:"+(string)ordertype+", volume:"+(string)volume+", price:"+(string)price+" sl:"+(string)real_sl+" tp:"+(string)tp,__FUNCTION__);                  
                   executestate = ES_CANCELED;
                }
             }
          //}
       } else {
          if (executestate == ES_CANCELED) {
-            if ( event.Info ()) event.Info ("Order Already Canceled",__FUNCTION__);
+            if ( event().Info ()) event().Info ("Order Already Canceled",__FUNCTION__);
          } else if (executestate == ES_EXECUTED) {
-            if ( event.Info ()) event.Info ("Order Already Executed",__FUNCTION__);
+            if ( event().Info ()) event().Info ("Order Already Executed",__FUNCTION__);
          }
       }
       return(false);
@@ -561,10 +564,10 @@ bool COrderBase::delete_mm_objects = false;
    
    bool COrderBase::Cancel()
    {
-      activity = activity | ACTIVITY_DELETE;      
+      activity = activity | (ushort)ACTIVITY_DELETE;      
       if (executestate == ES_EXECUTED) {
          if (!Select()) {
-            if (event.Notice ()) event.Notice ("Cannot select order "+this.ticket,__FUNCTION__);
+            if (event().Notice ()) event().Notice ("Cannot select order "+(string)this.ticket,__FUNCTION__);
             return(false);
          }
          State();
@@ -572,27 +575,27 @@ bool COrderBase::delete_mm_objects = false;
             if (trade.OrderDelete(ticket,orderinfo)) {
                this.OnTick();
             } else {
-               if (event.Warning ()) event.Warning ("Order Delete Failed ("+trade.ResultRetcode()+":"+ErrorDescription(trade.ResultRetcode())+"): ticket:"+ticket,__FUNCTION__);
+               if (event().Warning ()) event().Warning ("Order Delete Failed ("+(string)trade.ResultRetcode()+":"+ErrorDescription(trade.ResultRetcode())+"): ticket:"+(string)ticket,__FUNCTION__);
             }
          } else if (state == ORDER_STATE_DELETED) {
-            if (event.Info ()) event.Info ("Order Already Canceled, state:"+(string)state,__FUNCTION__);
+            if (event().Info ()) event().Info ("Order Already Canceled, state:"+(string)state,__FUNCTION__);
          } else if (state == ORDER_STATE_FILLED) {
-            if (event.Info ()) event.Info ("Order Already Filled, state:"+(string)state,__FUNCTION__);
+            if (event().Info ()) event().Info ("Order Already Filled, state:"+(string)state,__FUNCTION__);
          } else {
-            if (event.Info ()) event.Info ("Invalid Order State",__FUNCTION__);
+            if (event().Info ()) event().Info ("Invalid Order State",__FUNCTION__);
          }
       } else if (executestate == ES_NOT_EXECUTED) {
          executestate = ES_CANCELED;
-         if (event.Info ()) event.Info ("Order Not Yet Executed, Execution Canceled",__FUNCTION__);
+         if (event().Info ()) event().Info ("Order Not Yet Executed, Execution Canceled",__FUNCTION__);
       } else if (executestate == ES_VIRTUAL) {
          DeleteVPriceLine();
          state = ORDER_STATE_DELETED;
          closetime = TimeCurrent();
-         if (event.Info ()) event.Info ("Virtual Order Canceled",__FUNCTION__);
+         if (event().Info ()) event().Info ("Virtual Order Canceled",__FUNCTION__);
       } else if (executestate == ES_CANCELED) {
-         if (event.Info ()) event.Info ("Order Not Executed, Execution Already Canceled",__FUNCTION__);
+         if (event().Info ()) event().Info ("Order Not Executed, Execution Already Canceled",__FUNCTION__);
       } else {
-         event.Error("Invalid Execute State",__FUNCTION__);
+         event().Error("Invalid Execute State",__FUNCTION__);
          return(false);
       }
       return(true);
@@ -600,28 +603,28 @@ bool COrderBase::delete_mm_objects = false;
    
    bool COrderBase::Close(double closevolume = 0, double closeprice = 0)
    {      
-      activity = activity | ACTIVITY_CLOSE;
+      activity = activity | (ushort)ACTIVITY_CLOSE;
       
       if (!state_ongoing(this.State())) {
-         if (event.Notice ()) event.Notice ("Order "+this.ticket+" is already closed or canceled",__FUNCTION__);
+         if (event().Notice ()) event().Notice ("Order "+(string)this.ticket+" is already closed or canceled",__FUNCTION__);
          return(true);
       }
       
-      //if ( event.Verbose ()) event.Verbose ("Closing Order type:"+ordertype+" state:"+state,__FUNCTION__);
+      //if ( event().Verbose ()) event().Verbose ("Closing Order type:"+ordertype+" state:"+state,__FUNCTION__);
       
       ordertype = GetType();
       
       if (ordertype_pending(ordertype)) {
-         if (event.Notice ()) event.Notice ("Order to close is pending",__FUNCTION__);
+         if (event().Notice ()) event().Notice ("Order to close is pending",__FUNCTION__);
          if (state_undone(state)) {            
-            if (event.Notice ()) event.Notice ("Order to close is not filled",__FUNCTION__);
+            if (event().Notice ()) event().Notice ("Order to close is not filled",__FUNCTION__);
             return(this.Cancel());
             //return(false);
          }
       }
       
       if (!Select()) {
-         if (event.Notice ()) event.Notice ("Cannot select order "+this.ticket,__FUNCTION__);
+         if (event().Notice ()) event().Notice ("Cannot select order "+(string)this.ticket,__FUNCTION__);
          return(false);
       }      
       
@@ -629,16 +632,16 @@ bool COrderBase::delete_mm_objects = false;
          loadsymbol(symbol);
          if (this.ordertype == ORDER_TYPE_SELL) { closeprice = _symbol.Ask(); }
          else if (this.ordertype == ORDER_TYPE_BUY) { closeprice = _symbol.Bid(); }
-         //if ( event.Verbose ()) event.Verbose ("closeprice: "+(string)closeprice,__FUNCTION__);
+         //if ( event().Verbose ()) event().Verbose ("closeprice: "+(string)closeprice,__FUNCTION__);
       }
       
       if (closevolume == 0) closevolume = GetLots();
       if (closevolume > GetLots()) closevolume = GetLots();
       
-      //if ( event.Verbose ()) event.Verbose ("closevolume="+(string)closevolume+" volume="+(string)volume,__FUNCTION__);
+      //if ( event().Verbose ()) event().Verbose ("closevolume="+(string)closevolume+" volume="+(string)volume,__FUNCTION__);
       
       if (trade.OrderClose(this.ticket,closevolume,closeprice,orderinfo)) {
-         if (event.Info ()) event.Info ("order closed",__FUNCTION__);
+         if (event().Info ()) event().Info ("order closed",__FUNCTION__);
          if (trade.newticket >= 0) {
 
             BeforeTicketChange();
@@ -651,7 +654,7 @@ bool COrderBase::delete_mm_objects = false;
          //this.DeleteVStopLines(); 
          return(true);
       } else {
-         if (event.Error ()) event.Error ("Failed to close order ("+trade.ResultRetcode()+":"+ErrorDescription(trade.ResultRetcode())+"):"+this.ticket+" volume:"+closevolume+" ordervolume:"+volume+" price:"+closeprice+" state:"+state+" type:"+ordertype+" executestate:"+executestate,__FUNCTION__);
+         if (event().Error ()) event().Error ("Failed to close order ("+(string)trade.ResultRetcode()+":"+ErrorDescription(trade.ResultRetcode())+"):"+(string)this.ticket+" volume:"+(string)closevolume+" ordervolume:"+(string)volume+" price:"+(string)closeprice+" state:"+EnumToString(state)+" type:"+EnumToString(ordertype)+" executestate:"+EnumToString(executestate),__FUNCTION__);
       }
             
       return(false);
@@ -665,10 +668,10 @@ bool COrderBase::delete_mm_objects = false;
    
    bool COrderBase::Modify()
    {      
-      activity = activity | ACTIVITY_MODIFY;
+      activity = activity | (ushort)ACTIVITY_MODIFY;
       if (Select()) {
          double real_sl = 0, real_tp = 0;
-         if ( event.Info ()) event.Info ("Modify Order: ticket="+ticket+" price="+price+" tp="+tp+" sl="+sl+" expiration="+expiration,__FUNCTION__);
+         if ( event().Info ()) event().Info ("Modify Order: ticket="+(string)ticket+" price="+(string)price+" tp="+(string)tp+" sl="+(string)sl+" expiration="+TimeToString(expiration),__FUNCTION__);
          loadsymbol(this.symbol);
          if (!sl_virtual) real_sl = _symbol.PriceRound(sl_set?sl:orderinfo.GetStopLoss());
          if (!tp_virtual) real_tp = _symbol.PriceRound(tp_set?tp:orderinfo.GetTakeProfit());
@@ -715,7 +718,7 @@ bool COrderBase::delete_mm_objects = false;
 
             return(true);
          } else {            
-            //if ( event.Verbose ()) event.Verbose ("Failed to get OrderInfo ticket:"+(string)this.ticket,__FUNCTION__);
+            //if ( event().Verbose ()) event().Verbose ("Failed to get OrderInfo ticket:"+(string)this.ticket,__FUNCTION__);
             return(true);
          }
       } else if (executestate == ES_VIRTUAL) {
@@ -748,12 +751,12 @@ bool COrderBase::delete_mm_objects = false;
          }
       } else if (executestate == ES_NOT_EXECUTED) {
          this.state = ORDER_STATE_UNKNOWN;            
-         if (event.Info ()) event.Info ("Execute order",__FUNCTION__);
+         if (event().Info ()) event().Info ("Execute order",__FUNCTION__);
          if (Execute()) {
             //executestate = ES_EXECUTED;
             return(true);
          } else {
-            if (event.Warning ()) event.Warning ("Failed to execute order",__FUNCTION__);
+            if (event().Warning ()) event().Warning ("Failed to execute order",__FUNCTION__);
             // ToDo: Add Counter to retry
             //executestate = ES_CANCELED;
             //if (ordermanager != NULL) ordermanager.MoveToHistory(this.ticket);
@@ -784,7 +787,7 @@ bool COrderBase::delete_mm_objects = false;
                //Print("update Vstops of ",ticket," type:",ordertype);                 
                UpdateVStopLines();
                loadsymbol(symbol);
-               double closeprice;
+               double closeprice = 0;
                ordertype = this.GetType();
                if (ordertype == ORDER_TYPE_SELL) { closeprice = vstops_use_bid?_symbol.Bid():_symbol.Ask(); }
                else if (ordertype == ORDER_TYPE_BUY) { closeprice = _symbol.Bid(); }
@@ -918,7 +921,8 @@ bool COrderBase::delete_mm_objects = false;
       }
    }
    
-   bool COrderBase::SetStopLoss(CStopLoss* _sl, bool checkchange = false, bool checkhigher = false) {
+   bool COrderBase::SetStopLoss(CStopsCalcInterface* _sl, bool checkchange = false, bool checkhigher = false)
+   {
       loadsymbol(this.symbol);
       _sl.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice());
       _sl.Reset();
@@ -935,7 +939,8 @@ bool COrderBase::delete_mm_objects = false;
       return true;
    }
    
-   bool COrderBase::SetTakeProfit(CTakeProfit* _tp, bool check = false) {
+   bool COrderBase::SetTakeProfit(CStopsCalcInterface* _tp, bool check = false)
+   {
       if (!check) {
          SetTakeProfit(_tp.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice()).GetPrice());
          DeleteIf(_tp);
