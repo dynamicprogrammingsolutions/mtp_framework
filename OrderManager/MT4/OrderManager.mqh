@@ -31,10 +31,15 @@ public:
    CAttachedOrderArray attachedorders;
 
    CAppObject* neworder;   
+   
+   COrderManager()
+   {
+   };
 
    COrderManager(CAppObject* _neworder)
    {
-      neworder = _neworder;
+      delete neworder;
+      NewOrderObject(_neworder);
    };
    
    ~COrderManager()
@@ -46,6 +51,12 @@ public:
    void Initalize()
    {
       Prepare(GetPointer(attachedorders));
+   }
+   
+   virtual void NewOrderObject(CAppObject* obj)
+   {
+      if (isset(neworder)) delete neworder;
+      neworder = obj;
    }
       
    virtual COrderInterface* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,

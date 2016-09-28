@@ -82,4 +82,8 @@ public:
    {
       return Assert(q(value,compare),name,(string)value+" == "+(string)compare);
    }
+   bool AssertIsSet(CAppObject*& object, string name)
+   {
+      return Assert(isset(object),name,name+" is not null");
+   }
 };

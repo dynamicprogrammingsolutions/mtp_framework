@@ -69,6 +69,7 @@ public:
    {
       Print("TestOrder Started");
       order = om.NewOrder(symbol,ordertype,mm,entry,sl,tp,comment);
+      ref_add(order);
       timeopened = TimeCurrent();
       
       order.OnTick();
@@ -86,7 +87,6 @@ public:
       COrderInterface* loadedorder = App().NewObject(order);
       if (FileIsExist(filename))
       {
-         Print("loading from file");
          ResetLastError();
          handle = FileOpen(filename,FILE_READ|FILE_BIN);
          if(handle==INVALID_HANDLE) {
@@ -100,55 +100,6 @@ public:
       }
       
       loadedorder.OnTick();
-      
-      /*Print("Original Order:");
-      Print("Test order id: ",order.Id());
-      Print("State: ",EnumToString(order.State()));
-      Print("ExecuteState: ",EnumToString(order.ExecuteState()));
-      Print("GetTicket: ",order.GetTicket());
-      Print("GetMagic: ",order.GetMagicNumber());
-      Print("GetSymbol: ",order.GetSymbol());
-      Print("GetComment: ",order.GetComment());
-      Print("GetType: ",EnumToString(order.GetType()));
-      Print("GetOpenTime: ",TimeToString(order.GetOpenTime()));
-      Print("GetOpenPrice: ",order.GetOpenPrice());
-      Print("GetLots: ",order.GetLots());
-      Print("GetClosePrice: ",order.GetClosePrice());
-      Print("GetCloseTime: ",TimeToString(order.GetCloseTime()));
-      Print("GetStopLossTicks: ",order.GetStopLossTicks());
-      Print("GetStopLoss: ",order.GetStopLoss());
-      Print("GetTakeProfitTicks: ",order.GetTakeProfitTicks());
-      Print("GetTakeProfit: ",order.GetTakeProfit());
-      Print("GetExpiration: ",TimeToString(order.GetExpiration()));
-      Print("GetProfitTicks: ",order.GetProfitTicks());
-      Print("GetProfitMoney: ",order.GetProfitMoney());
-      Print("GetCommission: ",order.GetCommission());
-      Print("GetSwap: ",order.GetSwap());
-      
-      Print("Loaded Order:");
-      Print("Test loadedorder id: ",loadedorder.Id());
-      Print("State: ",EnumToString(loadedorder.State()));
-      Print("ExecuteState: ",EnumToString(loadedorder.ExecuteState()));
-      Print("GetTicket: ",loadedorder.GetTicket());
-      Print("GetMagic: ",loadedorder.GetMagicNumber());
-      Print("GetSymbol: ",loadedorder.GetSymbol());
-      Print("GetComment: ",loadedorder.GetComment());
-      Print("GetType: ",EnumToString(loadedorder.GetType()));
-      Print("GetOpenTime: ",TimeToString(loadedorder.GetOpenTime()));
-      Print("GetOpenPrice: ",loadedorder.GetOpenPrice());
-      Print("GetLots: ",loadedorder.GetLots());
-      Print("GetClosePrice: ",loadedorder.GetClosePrice());
-      Print("GetCloseTime: ",TimeToString(loadedorder.GetCloseTime()));
-      Print("GetStopLossTicks: ",loadedorder.GetStopLossTicks());
-      Print("GetStopLoss: ",loadedorder.GetStopLoss());
-      Print("GetTakeProfitTicks: ",loadedorder.GetTakeProfitTicks());
-      Print("GetTakeProfit: ",loadedorder.GetTakeProfit());
-      Print("GetExpiration: ",TimeToString(loadedorder.GetExpiration()));
-      Print("GetProfitTicks: ",loadedorder.GetProfitTicks());
-      Print("GetProfitMoney: ",loadedorder.GetProfitMoney());
-      Print("GetCommission: ",loadedorder.GetCommission());
-      Print("GetSwap: ",loadedorder.GetSwap());
-      */
       
       AssertEqual(order.Id(),loadedorder.Id(),"Id");
       AssertEqual(order.State(),loadedorder.State(),"State");
@@ -173,6 +124,70 @@ public:
       AssertEqual(order.GetProfitMoney(),loadedorder.GetProfitMoney(),"GetProfitMoney");
       AssertEqual(order.GetCommission(),loadedorder.GetCommission(),"GetCommission");
       AssertEqual(order.GetSwap(),loadedorder.GetSwap(),"GetSwap");
+      
+      delete loadedorder;
+      
+      int orderid = order.Id();
+      
+      filename = "TestOrderSave_"+Symbol()+".dat";
+      ResetLastError(); 
+      handle = FileOpen(filename,FILE_WRITE|FILE_BIN);
+      if(handle==INVALID_HANDLE) {
+         Print("Operation FileOpen failed, error ",GetLastError()); 
+      }
+      if (!App().orderrepository.Save(handle)) {
+         Print("file save failed");
+      }
+      FileClose(handle);
+      
+      App().orderrepository.Clear();
+      
+      if (FileIsExist(filename))
+      {         
+         ResetLastError();
+         handle = FileOpen(filename,FILE_READ|FILE_BIN);
+         if(handle==INVALID_HANDLE) {
+            Print("Operation FileOpen failed, error ",GetLastError()); 
+         }
+         if (!App().orderrepository.Load(handle)) {
+            Print("file load failed");
+         }
+         FileClose(handle);
+         FileDelete(filename);
+      }
+      
+      App().orderrepository.OnTick();
+      
+      loadedorder = App().orderrepository.GetById(orderid);
+      
+      if (AssertIsSet(loadedorder,"loadedorder")) {
+         AssertEqual(order.Id(),loadedorder.Id(),"Id");
+         AssertEqual(order.State(),loadedorder.State(),"State");
+         AssertEqual(order.ExecuteState(),loadedorder.ExecuteState(),"ExecuteState");
+         AssertEqual(order.GetTicket(),loadedorder.GetTicket(),"GetTicket");
+         AssertEqual(order.GetMagicNumber(),loadedorder.GetMagicNumber(),"GetMagicNumber");
+         AssertEqual(order.GetSymbol(),loadedorder.GetSymbol(),"GetSymbol");
+         AssertEqual(order.GetComment(),loadedorder.GetComment(),"GetComment");
+         AssertEqual(order.GetType(),loadedorder.GetType(),"GetType");
+         AssertEqual(order.GetOpenTime(),loadedorder.GetOpenTime(),"GetOpenTime");
+         AssertEqual(order.GetOpenPrice(),loadedorder.GetOpenPrice(),"GetOpenPrice");
+         AssertEqual(order.GetLots(),loadedorder.GetLots(),"GetLots");
+         AssertEqual(order.GetClosePrice(),loadedorder.GetClosePrice(),"GetClosePrice");
+         AssertEqual(order.GetCloseTime(),loadedorder.GetCloseTime(),"GetCloseTime");
+         AssertEqual(order.GetStopLossTicks(),loadedorder.GetStopLossTicks(),"GetStopLossTicks");
+         AssertEqual(order.GetStopLoss(),loadedorder.GetStopLoss(),"GetStopLoss");
+         AssertEqual(order.GetTakeProfitTicks(),loadedorder.GetTakeProfitTicks(),"GetTakeProfitTicks");
+         AssertEqual(order.GetProfitTicks(),loadedorder.GetProfitTicks(),"GetProfitTicks");
+         AssertEqual(order.GetProfitMoney(),loadedorder.GetProfitMoney(),"GetProfitMoney");
+         AssertEqual(order.GetExpiration(),loadedorder.GetExpiration(),"GetExpiration");
+         AssertEqual(order.GetProfitTicks(),loadedorder.GetProfitTicks(),"GetProfitTicks");
+         AssertEqual(order.GetProfitMoney(),loadedorder.GetProfitMoney(),"GetProfitMoney");
+         AssertEqual(order.GetCommission(),loadedorder.GetCommission(),"GetCommission");
+         AssertEqual(order.GetSwap(),loadedorder.GetSwap(),"GetSwap");
+      }
+      
+      delete order;
+      order = loadedorder;
       
       return true;
    }

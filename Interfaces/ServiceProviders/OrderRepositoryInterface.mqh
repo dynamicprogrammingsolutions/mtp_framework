@@ -5,6 +5,10 @@
 class COrderRepositoryInterface : public CServiceProvider
 {
 public:
+   virtual void Clear() { AbstractFunctionWarning(__FUNCTION__); }
+   
+   virtual CAppObjectArrayObjManaged* Orders() { AbstractFunctionWarning(__FUNCTION__); return NULL;  }
+
    virtual COrderInterface* Selected() { AbstractFunctionWarning(__FUNCTION__); return NULL; }
 
    virtual void Add(COrderInterface* order) {AbstractFunctionWarning(__FUNCTION__); }
@@ -27,7 +31,17 @@ public:
    virtual bool SelectByIdxHistory(int idx) { AbstractFunctionWarning(__FUNCTION__); return false; }   
    virtual bool SelectByTicketOrder(uint ticket) { AbstractFunctionWarning(__FUNCTION__); return false; }
    
-   virtual bool GetOrders(ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY, string in_symbol = "", int in_magic = -1, bool no_loop_and_reset = false)
+   virtual bool GetOrders(ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY, string in_symbol = "", int in_magic = -1)
+   {
+      AbstractFunctionWarning(__FUNCTION__); return false;
+   }
+   
+   virtual bool GetOrders(COrderInterface* &order, ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY, string in_symbol = "", int in_magic = -1)
+   {
+      AbstractFunctionWarning(__FUNCTION__); return false;
+   }
+
+   virtual bool GetOrders(int &index, COrderInterface* &order, ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY, string in_symbol = "", int in_magic = -1)
    {
       AbstractFunctionWarning(__FUNCTION__); return false;
    }

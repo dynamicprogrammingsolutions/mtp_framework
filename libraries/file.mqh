@@ -296,6 +296,8 @@ public:
    uint              WriteChar(const char value);
    uint              WriteShort(const short value);
    uint              WriteInteger(const int value);
+   template<typename T>
+   uint              WriteEnum(const T value);
    uint              WriteLong(const long value);
    uint              WriteFloat(const float value);
    uint              WriteDouble(const double value);
@@ -316,6 +318,8 @@ public:
    bool              ReadChar(char &value);
    bool              ReadShort(short &value);
    bool              ReadInteger(int &value);
+   template<typename T>
+   bool              ReadEnum(T &value);
    bool              ReadLong(long &value);
    bool              ReadFloat(float &value);
    bool              ReadDouble(double &value);
@@ -382,6 +386,16 @@ uint MTPFileBinBase::WriteInteger(const int value)
 //--- check handle
    if(m_handle!=INVALID_HANDLE)
       return(FileWriteInteger(m_handle,value,sizeof(int)));
+//--- failure
+   return(0);
+  }
+
+template<typename T>
+uint MTPFileBinBase::WriteEnum(const T value)
+  {
+//--- check handle
+   if(m_handle!=INVALID_HANDLE)
+      return(FileWriteInteger(m_handle,(int)value,sizeof(int)));
 //--- failure
    return(0);
   }
@@ -588,6 +602,19 @@ bool MTPFileBinBase::ReadInteger(int &value)
      {
       ResetLastError();
       value=FileReadInteger(m_handle,sizeof(int));
+      return(GetLastError()==0);
+     }
+//--- failure
+   return(false);
+  }
+template<typename T>
+bool MTPFileBinBase::ReadEnum(T &value)
+  {
+//--- check handle
+   if(m_handle!=INVALID_HANDLE)
+     {
+      ResetLastError();
+      value=(T)FileReadInteger(m_handle,sizeof(int));
       return(GetLastError()==0);
      }
 //--- failure

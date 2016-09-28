@@ -6,7 +6,7 @@ class COrderSimulated : public COrderInterface
 {
 public:
    TraitGetType(classOrderSimulated)
-   TraitNewObject { return new COrderSimulated(); }
+   TraitNewObject(COrderSimulated)
    TraitAppAccess
    TraitLoadSymbolFunction
    TraitRefCount
@@ -51,6 +51,9 @@ public:
       maxid = this.id;
    }
 
+   virtual bool Save(const int handle);
+   virtual bool Load(const int handle);
+
    virtual int Id() { return id; }
    
    virtual bool DoNotArchive() { return false; }
@@ -60,8 +63,8 @@ public:
    void State(ENUM_ORDER_STATE value) {
       state = value;
       if (laststate != state) {
-         laststate = state;
          event().Info(StringConcatenate("new state in simulated order id ",Id(),": ",EnumToString(state)," last state: ",EnumToString(laststate)));
+         laststate = state;
          OnStateChange();
       }
    }
@@ -155,6 +158,76 @@ int COrderSimulated::max_virtual_ticket = 1000000000;
 int COrderSimulated::maxid = 0;
 
 TraitInitEvent(COrderSimulated,EventStateChange)
+
+bool COrderSimulated::Save(const int handle)
+{
+   MTPFileBin file;
+   file.Handle(handle);            
+   if (file.Invalid()) return false;
+   
+   if (!file.WriteInteger(id)) return file.Error("id",__FUNCTION__);
+   if (!file.WriteInteger(max_virtual_ticket)) return file.Error("max_virtual_ticket",__FUNCTION__);
+   if (!file.WriteInteger(maxid)) return file.Error("maxid",__FUNCTION__);
+   if (!file.WriteEnum(executestate)) return file.Error("executestate",__FUNCTION__);
+   if (!file.WriteEnum(state)) return file.Error("state",__FUNCTION__);
+   if (!file.WriteEnum(laststate)) return file.Error("laststate",__FUNCTION__);
+   if (!file.WriteInteger(ticket)) return file.Error("ticket",__FUNCTION__);
+   if (file.WriteString(symbol) < 0) return file.Error("symbol",__FUNCTION__);
+   if (!file.WriteEnum(ordertype)) return file.Error("ordertype",__FUNCTION__);
+   if (!file.WriteDouble(volume)) return file.Error("volume",__FUNCTION__);
+   if (!file.WriteDouble(price)) return file.Error("price",__FUNCTION__);
+   if (!file.WriteDouble(sl)) return file.Error("sl",__FUNCTION__);
+   if (!file.WriteDouble(tp)) return file.Error("tp",__FUNCTION__);
+   if (!file.WriteBool(sl_set)) return file.Error("sl_set",__FUNCTION__);
+   if (!file.WriteBool(tp_set)) return file.Error("tp_set",__FUNCTION__);
+   if (!file.WriteDouble(executed_sl)) return file.Error("executed_sl",__FUNCTION__);
+   if (!file.WriteDouble(executed_tp)) return file.Error("executed_tp",__FUNCTION__);
+   if (!file.WriteDouble(executed_price)) return file.Error("executed_price",__FUNCTION__);
+   if (!file.WriteDateTime(expiration)) return file.Error("expiration",__FUNCTION__);
+   if (file.WriteString(comment) < 0) return file.Error("comment",__FUNCTION__);
+   if (!file.WriteInteger(magic)) return file.Error("magic",__FUNCTION__);
+   if (!file.WriteDateTime(executetime)) return file.Error("executetime",__FUNCTION__);
+   if (!file.WriteDateTime(filltime)) return file.Error("filltime",__FUNCTION__);
+   if (!file.WriteDouble(closeprice)) return file.Error("closeprice",__FUNCTION__);
+   if (!file.WriteDateTime(closetime)) return file.Error("closetime",__FUNCTION__);
+   
+   return true;
+}
+
+bool COrderSimulated::Load(const int handle)
+{
+   MTPFileBin file;
+   file.Handle(handle);            
+   if (file.Invalid()) return false;
+   
+   if (!file.ReadInteger(id)) return file.Error("id",__FUNCTION__);
+   if (!file.ReadInteger(max_virtual_ticket)) return file.Error("max_virtual_ticket",__FUNCTION__);
+   if (!file.ReadInteger(maxid)) return file.Error("maxid",__FUNCTION__);
+   if (!file.ReadEnum(executestate)) return file.Error("executestate",__FUNCTION__);
+   if (!file.ReadEnum(state)) return file.Error("state",__FUNCTION__);
+   if (!file.ReadEnum(laststate)) return file.Error("laststate",__FUNCTION__);
+   if (!file.ReadInteger(ticket)) return file.Error("ticket",__FUNCTION__);
+   if (!file.ReadString(symbol)) return file.Error("symbol",__FUNCTION__);
+   if (!file.ReadEnum(ordertype)) return file.Error("ordertype",__FUNCTION__);
+   if (!file.ReadDouble(volume)) return file.Error("volume",__FUNCTION__);
+   if (!file.ReadDouble(price)) return file.Error("price",__FUNCTION__);
+   if (!file.ReadDouble(sl)) return file.Error("sl",__FUNCTION__);
+   if (!file.ReadDouble(tp)) return file.Error("tp",__FUNCTION__);
+   if (!file.ReadBool(sl_set)) return file.Error("sl_set",__FUNCTION__);
+   if (!file.ReadBool(tp_set)) return file.Error("tp_set",__FUNCTION__);
+   if (!file.ReadDouble(executed_sl)) return file.Error("executed_sl",__FUNCTION__);
+   if (!file.ReadDouble(executed_tp)) return file.Error("executed_tp",__FUNCTION__);
+   if (!file.ReadDouble(executed_price)) return file.Error("executed_price",__FUNCTION__);
+   if (!file.ReadDateTime(expiration)) return file.Error("expiration",__FUNCTION__);
+   if (!file.ReadString(comment)) return file.Error("comment",__FUNCTION__);
+   if (!file.ReadInteger(magic)) return file.Error("magic",__FUNCTION__);
+   if (!file.ReadDateTime(executetime)) return file.Error("executetime",__FUNCTION__);
+   if (!file.ReadDateTime(filltime)) return file.Error("filltime",__FUNCTION__);
+   if (!file.ReadDouble(closeprice)) return file.Error("closeprice",__FUNCTION__);
+   if (!file.ReadDateTime(closetime)) return file.Error("closetime",__FUNCTION__);
+   
+   return true;
+}
 
 bool COrderSimulated::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,
 const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0)

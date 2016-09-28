@@ -3,11 +3,26 @@
 
 #define APP_OBJECT_ARRAY_OBJ_H
 class CAppObjectArrayObj : public CAppObjectArray
-  {
+{
+public:
+/*
+New Object Creation:
+Save the Type() as Integer
+Load the Type() from the file and compare with the object added by CreateElement.
+
+Alternative method for CreateElement:
+Have an extra parameter for CreateElement with the Type() value. Have an array containing objects, and find the right Type within them.
+The CreateElement can be programmed here instead of having to be programmed in every single subclass.
+If it's programmed here, there can be 2 options for handling new object creations, one is having a single object, other is having an array of objects.
+It can keep the option for using the original CreateElement, and if it's not used, thus the CreateElement returns false, the new method is used.
+*/  
+  
 protected:
    CObject          *m_data[];           // data array
    bool              m_free_mode;        // flag of necessity of "physical" deletion of object
-
+   CAppObject       *newelement;
+   int foreach_index;
+   int foreach_cachemax;
 public:
                      CAppObjectArrayObj(void);
                     ~CAppObjectArrayObj(void);
@@ -15,12 +30,14 @@ public:
    bool              FreeMode(void) const { return(m_free_mode); }
    void              FreeMode(const bool mode) { m_free_mode=mode; }
    //--- method of identifying the object
-   virtual int       Type(void) const { return(0x7778); }
+   virtual int       Type(void) const { return(classAppObjectArrayObj); }
    //--- methods for working with files
    virtual bool      Save(const int file_handle);
    virtual bool      Load(const int file_handle);
    //--- method of creating an element of array
+   virtual void      NewElement(CAppObject* obj) { newelement = obj; }
    virtual bool      CreateElement(const int index) { return(false); }
+   virtual bool      CreateElement(const int index, const ENUM_CLASS_NAMES type);
    //--- methods of managing dynamic memory
    bool              Reserve(const int size);
    bool              Resize(const int size);
@@ -52,6 +69,46 @@ public:
    int               SearchLessOrEqual(const CObject *element) const;
    int               SearchFirst(const CObject *element) const;
    int               SearchLast(const CObject *element) const;
+   
+   template<typename IT>
+   bool ForEach(IT &item)
+   {
+      if (foreach_index == 0) {
+         foreach_cachemax = Total();
+      }
+      if (foreach_index != foreach_cachemax) {
+         if (isset(this.At(foreach_index))) {
+            item = this.At(foreach_index);
+            foreach_index++;
+            return true;
+         } else {
+            return false;
+         }
+      } else {
+         foreach_index = 0;
+         return false;
+      }
+   }
+   
+   template<typename IT>
+   bool ForEach(IT &item, int &index)
+   {
+      if (index == 0) {
+         foreach_cachemax = Total();
+      }
+      if (index != foreach_cachemax) {
+         if (isset(this.At(index))) {
+            item = this.At(index);
+            index++;
+            return true;
+         } else {
+            return false;
+         }
+      } else {
+         index = 0;
+         return false;
+      }
+   }
 
 protected:
    void              QuickSort(int beg,int end,const int mode);
@@ -73,6 +130,7 @@ CAppObjectArrayObj::~CAppObjectArrayObj(void)
   {
    if(m_data_max!=0)
       Shutdown();
+   delete newelement;
   }
 //+------------------------------------------------------------------+
 //| Moving the memory within a single array                          |
@@ -696,9 +754,12 @@ bool CAppObjectArrayObj::Save(const int file_handle)
    if(FileWriteInteger(file_handle,m_data_total,INT_VALUE)!=INT_VALUE)
       return(false);
 //--- write array
-   for(i=0;i<m_data_total;i++)
+   for(i=0;i<m_data_total;i++) {
+      if (FileWriteInteger(file_handle,m_data[i].Type(),INT_VALUE)!=INT_VALUE)
+         return false;
       if(m_data[i].Save(file_handle)!=true)
          break;
+   }
 //--- result
    return(i==m_data_total);
   }
@@ -722,11 +783,17 @@ bool CAppObjectArrayObj::Load(const int file_handle)
       for(i=0;i<num;i++)
         {
          //--- create new element
+         ENUM_CLASS_NAMES type = (ENUM_CLASS_NAMES)FileReadInteger(file_handle,INT_VALUE);
          if(!CreateElement(i)) {
+            if (!CreateElement(i,type)) {
+               Print("failed to create element of object type ",EnumToString(type),"using object type ",isset(newelement)?EnumToString((ENUM_CLASS_NAMES)newelement.Type()):"NULL");
+               break;
+            }
+         }
+         if(m_data[i].Load(file_handle)!=true) {
+            Print("failed to load object type ",EnumToString(type));
             break;
          }
-         if(m_data[i].Load(file_handle)!=true)
-            break;
          m_data_total++;
         }
      }
@@ -735,3 +802,26 @@ bool CAppObjectArrayObj::Load(const int file_handle)
    return(m_data_total==num);
   }
 //+------------------------------------------------------------------+
+
+bool  CAppObjectArrayObj::CreateElement(const int index, const ENUM_CLASS_NAMES type)
+{
+   if (!isset(newelement)) return false;
+   if (newelement.Type() != classAppObjectArrayObj) {
+      if (newelement.Type() == type) {
+         newelement.callback(0,m_data[index]);
+         Prepare(m_data[index]);
+         return true;
+      }
+   } else {
+      CAppObjectArrayObj* list = newelement;
+      for (int i = 0; i < list.Total(); i++) {
+         CAppObject* thiselement = list.At(i);
+         if (thiselement.Type() == type) {
+            thiselement.callback(0,m_data[index]);
+            Prepare(m_data[index]);
+            return true;
+         }
+      }  
+   }
+   return(false);
+}

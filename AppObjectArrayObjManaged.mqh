@@ -78,12 +78,18 @@ public:
          for(i=0;i<num;i++)
            {
             //--- create new element
+            ENUM_CLASS_NAMES type = (ENUM_CLASS_NAMES)FileReadInteger(file_handle,INT_VALUE);
             if(!CreateElement(i)) {
-               break;
+               if (!CreateElement(i,type)) {
+                  Print("failed to create element of object type ",EnumToString(type),"using object type ",isset(newelement)?EnumToString((ENUM_CLASS_NAMES)newelement.Type()):"NULL");
+                  break;
+               }
             }
             ref_add(m_data[i]);
-            if(m_data[i].Load(file_handle)!=true)
+            if(m_data[i].Load(file_handle)!=true) {
+               Print("failed to load object type ",EnumToString(type));
                break;
+            }
             m_data_total++;
            }
         }

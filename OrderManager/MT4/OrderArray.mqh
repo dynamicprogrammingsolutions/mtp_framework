@@ -18,41 +18,41 @@ public:
       
       COrderArray()
       {
-         neworder = new COrder();
+         this.NewElement(new COrder());
+         m_free_mode = true;
       }
       
       ~COrderArray()
       {
-         delete neworder;
+         //delete neworder;
       }
 
-      CAppObject* neworder;   
+      //CAppObject* neworder;   
       COrderArray(CAppObject* _neworder)
       {
-         neworder = _neworder;
+         this.NewElement(_neworder);
          m_free_mode = true;
       }
       COrder* Order(int nIndex){ if (!isset(At(nIndex))) return(NULL); else return((COrder*)At(nIndex)); }     
       
-      virtual bool  CreateElement(const int index) {
-         Print("create element");
+      /*virtual bool  CreateElement(const int index) {
          m_data[index] = (CObject*)(App().NewObject(neworder));
          return(true);
-      }
+      }*/
       
       int CntOrders(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1)
       {
          //if ( event.Debug ()) event.Debug ("Cnt Orders",__FUNCTION__);
          int cnt = 0;
-         COrder *_order;
+         COrderInterface *_order;
          for (int i = this.Total()-1; i >= 0; i--) {
             _order = this.At(i);
             //_order.Update();
             if (isset(_order)) {
                if (!state_select(stateselect,_order.State())) { continue; }
                if (!ordertype_select(orderselect,_order.GetType())) { continue; }
-               if (in_symbol != "" && _order.symbol != in_symbol) { continue; }
-               if (in_magic != -1 && _order.magic != in_magic) { continue; }
+               if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
+               if (in_magic != -1 && _order.GetMagicNumber() != in_magic) { continue; }
                cnt++;
             }
          }    
@@ -65,17 +65,17 @@ public:
          double sum_lots_buy = 0;
          double sum_price_sell = 0;
          double sum_lots_sell = 0;
-         COrder *_order;
+         COrderInterface *_order;
          for (int i = this.Total()-1; i >= 0; i--) {
             _order = this.At(i);
             //_order.Update();
             if (isset(_order)) {
                if (!state_select(stateselect,_order.State())) { continue; }
                if (!ordertype_select(orderselect,_order.GetType())) { continue; }
-               if (in_symbol != "" && _order.symbol != in_symbol) { continue; }
-               if (in_magic != -1 && _order.magic != in_magic) { continue; }
+               if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
+               if (in_magic != -1 && _order.GetMagicNumber()  != in_magic) { continue; }
                
-               loadsymbol(_order.symbol);
+               loadsymbol(_order.GetSymbol());
 
                if (ordertype_select(ORDERSELECT_LONG,_order.GetType())) {
                   sum_lots_buy += _order.GetLots();
@@ -110,18 +110,16 @@ public:
       double TotalProfitMoney(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1, bool _commission = true, bool swap = true)
       {
          double totalprofit = 0;
-         COrder *_order;
+         COrderInterface *_order;
          int i;
          for (i = this.Total()-1; i >= 0; i--) {
             _order = this.At(i);
             if (isset(_order)) {
                if (!state_select(stateselect,_order.State())) { continue; }
                if (!ordertype_select(orderselect,_order.GetType())) { continue; }
-               if (in_symbol != "" && _order.symbol != in_symbol) { continue; }
-               if (in_magic != -1 && _order.magic != in_magic) { continue; }
-               if (_order.Select()) {
-                  totalprofit += OrderProfit()+(_commission?OrderCommission():0)+(swap?OrderSwap():0);
-               }
+               if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
+               if (in_magic != -1 && _order.GetMagicNumber()  != in_magic) { continue; }
+               totalprofit += _order.GetProfitMoney()-(_commission?_order.GetCommission():0)+(swap?_order.GetSwap():0);
             }
          }
          return totalprofit;
@@ -133,15 +131,15 @@ public:
          double sum_lots_buy = 0;
          double sum_price_sell = 0;
          double sum_lots_sell = 0;
-         COrder *_order;
+         COrderInterface *_order;
          for (int i = this.Total()-1; i >= 0; i--) {
             _order = this.At(i);
             //_order.Update();
             if (isset(_order)) {
                if (!state_select(stateselect,_order.State())) { continue; }
                if (!ordertype_select(orderselect,_order.GetType())) { continue; }
-               if (in_symbol != "" && _order.symbol != in_symbol) { continue; }
-               if (in_magic != -1 && _order.magic != in_magic) { continue; }
+               if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
+               if (in_magic != -1 && _order.GetMagicNumber()  != in_magic) { continue; }
                
                if (ordertype_select(ORDERSELECT_LONG,_order.GetType())) {
                   sum_lots_buy += _order.GetLots();
@@ -164,22 +162,46 @@ public:
          return 0;
       }
       
+      double TotalLots(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1)
+      {
+         double sum_lots_buy = 0;
+         double sum_lots_sell = 0;
+         COrderInterface *_order;
+         for (int i = this.Total()-1; i >= 0; i--) {
+            _order = this.At(i);
+            //_order.Update();
+            if (isset(_order)) {
+               if (!state_select(stateselect,_order.State())) { continue; }
+               if (!ordertype_select(orderselect,_order.GetType())) { continue; }
+               if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
+               if (in_magic != -1 && _order.GetMagicNumber() != in_magic) { continue; }
+               
+               if (ordertype_select(ORDERSELECT_LONG,_order.GetType())) {
+                  sum_lots_buy += _order.GetLots();
+               }
+               if (ordertype_select(ORDERSELECT_SHORT,_order.GetType())) {
+                  sum_lots_sell += _order.GetLots();
+               }
+            }
+         }    
+         return sum_lots_buy+sum_lots_sell;
+      }
       
       bool CloseAll(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING, string in_symbol = "", int in_magic = -1)
       {
          //if ( event.Debug ()) event.Debug ("Close All",__FUNCTION__);
          bool ret = false;
-         COrder *_order;
+         COrderInterface *_order;
          for (int i = this.Total()-1; i >= 0; i--) {
 	      if (!isset(this.At(i))) continue;
             _order = this.At(i);
             //_order.Update();
             if (isset(_order)) {
                if (!state_select(stateselect,_order.State())) { continue; }
-               if (in_symbol != "" && _order.symbol != in_symbol) { continue; }
-               if (in_magic != -1 && _order.magic != in_magic) { continue; }
+               if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
+               if (in_magic != -1 && _order.GetMagicNumber()  != in_magic) { continue; }
                if (!ordertype_select(orderselect,_order.GetType())) { continue; }
-               if (_order.executestate == ES_EXECUTED || _order.executestate == ES_VIRTUAL) {
+               if (_order.ExecuteState() == ES_EXECUTED || _order.ExecuteState() == ES_VIRTUAL) {
                   //if (event.Info()) event.Info("Closing Order "+_order.ticket+" selection:"+orderselect,__FUNCTION__);
                   if (_order.State() == ORDER_STATE_FILLED) {
                      if (_order.Close()) {

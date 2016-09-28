@@ -6,7 +6,7 @@ class CAttachedOrder : public COrderBase
 {
 public:
    TraitGetType(classMT4AttachedOrder)
-   TraitNewObject { return new CAttachedOrder(); }
+   TraitNewObject(CAttachedOrder)
 
 public:
    string name;  

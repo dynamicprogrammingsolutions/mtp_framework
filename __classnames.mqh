@@ -1,3 +1,4 @@
+classAppObjectArrayObj,
 #include "Interfaces\__classnames.mqh"
 #include "Commands\__classnames.mqh"
 #include "EventHandler\__classnames.mqh"
