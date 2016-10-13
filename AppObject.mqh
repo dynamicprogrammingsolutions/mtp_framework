@@ -6,6 +6,7 @@ class CAppObject : public CObject
 {
 private:
    CObject* appbase;
+   int refcount;
    
 protected:
 
@@ -56,12 +57,12 @@ public:
    
    //Reference Counting:
    
-   virtual bool ReferenceCountActive()
+   bool ReferenceCountActive()
    {
-      return false;
+      return true;
    }
    
-   virtual CAppObject* RefAdd()
+   /*virtual CAppObject* RefAdd()
    {
       AbstractFunctionWarning(__FUNCTION__);
       return GetPointer(this);
@@ -76,7 +77,33 @@ public:
    virtual void RefClean()
    {
       AbstractFunctionWarning(__FUNCTION__);
+   }*/
+   
+   CAppObject* RefAdd()
+   {
+      refcount++;
+      return GetPointer(this);
    }
+   
+   CAppObject* RefDel()
+   {
+      refcount--;
+      return GetPointer(this);
+   }
+   
+   void RefClean()
+   {
+      if (refcount <= 0) {
+         //Print("delete object type "+EnumToString((ENUM_CLASS_NAMES)obj.Type()));
+         delete GetPointer(this);
+      }
+   }
+   
+   int RefCount()
+   {
+      return refcount;
+   }
+
    
    // callback for command:
    //    object parameter is used for return.

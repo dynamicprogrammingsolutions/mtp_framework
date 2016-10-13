@@ -7,7 +7,10 @@
 #include "EnumApplicationService.mqh"
 #include "Traits\Loader.mqh"
 
+#include "Ptr.mqh"
+#ifdef PTR_H
 #include "AppObject.mqh"
+#endif
 #ifdef APP_OBJECT_H
 #include "AppObjectArray.mqh"
 #endif

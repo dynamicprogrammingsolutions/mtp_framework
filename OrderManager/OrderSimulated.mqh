@@ -9,7 +9,7 @@ public:
    TraitNewObject(COrderSimulated)
    TraitAppAccess
    TraitLoadSymbolFunction
-   TraitRefCount
+   //TraitRefCount
    TraitServiceAlias(CEventHandlerInterface*,eventhandler,event)
    
    TraitEvent(EventStateChange,OnStateChange)

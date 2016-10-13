@@ -24,6 +24,8 @@
 
 #define CBFUNC(__id__,__name__) case __id__: return __name__(obj);
 
+#define CBFUNC_2NDPARAM(__id__,__name__,__2ndparam__) case __id__: return __name__(obj,__2ndparam__);
+
 #define CBFUNC_POBJ(__id__,__name__) case __id__: return __name__(CheckPointer(obj)!=POINTER_INVALID?obj:NULL);
 
 #define CBFUNC_RETOBJ(__id__,__name__) case __id__: obj = __name__(); return true;

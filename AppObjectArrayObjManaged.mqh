@@ -23,8 +23,17 @@ public:
    //--- successful
       return(true);
   }
+  /*CObject *CAppObjectArrayObj::At(const int index) const
+  {
+//--- check
+   if(index<0 || index>=m_data_total)
+      return(NULL);
+//--- result
+   return(m_data[index]);
+  }*/
    bool Add(CObject *element)
    {
+      //return CAppObjectArrayObj::Add(new CSharedPtr<CObject>(element));
       ref_add(element);
       return CAppObjectArrayObj::Add(element);
    }
@@ -49,7 +58,7 @@ public:
       
       for(int i=0;i<m_data_total;i++)
       {
-         ref_del(m_data[i]);
+         if (isset(m_data[i])) ref_del(m_data[i]);
          if(m_free_mode)
          {
             if(CheckPointer(m_data[i])==POINTER_DYNAMIC) {

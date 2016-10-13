@@ -121,6 +121,11 @@ public:
 class CEntry : public CStopsCalc {
 public:
    virtual int Type() const { return classEntry; }
+   CEntry() {}
+   CEntry(double _price) {
+      this.SetPrice(_price);
+      delete_after_use = true;
+   }
 
 protected:
    virtual void CalcTicks()

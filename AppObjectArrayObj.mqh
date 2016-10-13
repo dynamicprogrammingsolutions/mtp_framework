@@ -91,6 +91,26 @@ public:
    }
    
    template<typename IT>
+   bool ForEachBackward(IT &item)
+   {
+      if (foreach_index == 0) {
+         foreach_cachemax = Total();
+      }
+      if (foreach_index != foreach_cachemax) {
+         if (isset(this.At(foreach_cachemax-foreach_index))) {
+            item = this.At(foreach_cachemax-foreach_index);
+            foreach_index++;
+            return true;
+         } else {
+            return false;
+         }
+      } else {
+         foreach_index = 0;
+         return false;
+      }
+   }
+   
+   template<typename IT>
    bool ForEach(IT &item, int &index)
    {
       if (index == 0) {
@@ -755,10 +775,15 @@ bool CAppObjectArrayObj::Save(const int file_handle)
       return(false);
 //--- write array
    for(i=0;i<m_data_total;i++) {
-      if (FileWriteInteger(file_handle,m_data[i].Type(),INT_VALUE)!=INT_VALUE)
-         return false;
-      if(m_data[i].Save(file_handle)!=true)
-         break;
+      if (isset(m_data[i])) {
+         if (FileWriteInteger(file_handle,m_data[i].Type(),INT_VALUE)!=INT_VALUE)
+            return false;
+         if(m_data[i].Save(file_handle)!=true)
+            break;
+      } else {
+         if (FileWriteInteger(file_handle,-1,INT_VALUE)!=INT_VALUE)
+            return false;
+      }
    }
 //--- result
    return(i==m_data_total);
@@ -784,15 +809,19 @@ bool CAppObjectArrayObj::Load(const int file_handle)
         {
          //--- create new element
          ENUM_CLASS_NAMES type = (ENUM_CLASS_NAMES)FileReadInteger(file_handle,INT_VALUE);
-         if(!CreateElement(i)) {
-            if (!CreateElement(i,type)) {
-               Print("failed to create element of object type ",EnumToString(type),"using object type ",isset(newelement)?EnumToString((ENUM_CLASS_NAMES)newelement.Type()):"NULL");
+         if (type == -1) {
+            m_data[i] = NULL;
+         } else {
+            if(!CreateElement(i)) {
+               if (!CreateElement(i,type)) {
+                  Print("failed to create element of object type ",EnumToString(type),"using object type ",isset(newelement)?EnumToString((ENUM_CLASS_NAMES)newelement.Type()):"NULL");
+                  break;
+               }
+            }
+            if(m_data[i].Load(file_handle)!=true) {
+               Print("failed to load object type ",EnumToString(type));
                break;
             }
-         }
-         if(m_data[i].Load(file_handle)!=true) {
-            Print("failed to load object type ",EnumToString(type));
-            break;
          }
          m_data_total++;
         }
