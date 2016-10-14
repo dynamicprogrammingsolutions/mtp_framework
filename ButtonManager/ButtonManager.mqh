@@ -55,7 +55,6 @@ public:
    }
    virtual void OnChartEvent(int id,long lparam,double dparam,string sparam)
    {
-      Print("check buttons");
       CActionButton* button;
       while(buttons.ForEach(button)) {
          button.Check();

@@ -12,6 +12,9 @@
 #include "..\OrderManager\Enums\EnumStateSelect.mqh"
 #include "..\OrderManager\Enums\EnumActivity.mqh"
 
+#define POrder shared_ptr<COrderInterface>
+#define NewPOrder(__object__) POrder::make_shared(__object)
+
 class COrderInterface : public CAppObject
 {
 public:

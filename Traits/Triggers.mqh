@@ -6,7 +6,7 @@
 
 #define TRIGGERC(__signal__,__parameter__) (APP.triggers.Send(__signal__,__parameter__,true))
 
-#define TRIGGERCR(__signal__,__parameter__) (APP.triggers.SendR(__signal__,__parameter__,true))
+#define TRIGGERCR(__signal__,__parameter__) (APP.triggers.SendR(__signal__,make_shared(__parameter__).get()))
 
 #define TRIGGER(__signal__) (APP.triggers.SendR(__signal__,GetPointer(this)))
 

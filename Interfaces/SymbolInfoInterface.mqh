@@ -2,6 +2,10 @@
 #include "..\Loader.mqh"
 
 #define SYMBOL_INFO_INTERFACE_H
+
+#define PSymbolInfo shared_ptr<CSymbolInfoInterface>
+#define NewPSymbolInfo(__object__) PSymbolInfo::make_shared(__object)
+
 class CSymbolInfoInterface : public CAppObject
 {
    public:

@@ -30,6 +30,11 @@ public:
       stoploss = _stoploss;
       return GetPointer(this);
    }
+   virtual CMoneyManagement* SetStopLoss(PStopsCalc &_stoploss)
+   {
+      stoploss = _stoploss.get();
+      return GetPointer(this);
+   }
    virtual CMoneyManagement* SetOrderType(ENUM_ORDER_TYPE _ordertype)
    {
       ordertype = _ordertype;

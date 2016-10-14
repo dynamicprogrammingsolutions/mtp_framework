@@ -68,6 +68,11 @@ public:
                                     CStopsCalcInterface* _stoploss, CStopsCalcInterface* _takeprofit,const string _comment="",const datetime _expiration=0);
    virtual COrderInterface* NewOrder(COrderInterface* _order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagementInterface* mm, CStopsCalcInterface* _price,
                                     CStopsCalcInterface* _stoploss, CStopsCalcInterface* _takeprofit,const string _comment="",const datetime _expiration=0);
+
+   virtual POrder NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,PMoneyManagement &mm, PStopsCalc &_price,
+                                    PStopsCalc &_stoploss, PStopsCalc &_takeprofit,const string _comment="",const datetime _expiration=0);
+   virtual POrder NewOrder(POrder &_order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,PMoneyManagement &mm, PStopsCalc &_price,
+                                    PStopsCalc &_stoploss, PStopsCalc &_takeprofit,const string _comment="",const datetime _expiration=0);
   
    virtual COrderInterface* NewOrderObject() { return this.App().NewObject(neworder); }
    virtual COrderInterface* NewAttachedOrderObject() { return App().GetDependency(classOrder,classAttachedOrder); }
@@ -154,6 +159,52 @@ COrderInterface* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER
    NewOrder(_order, in_symbol, _ordertype,_mm,_price,_stoploss,_takeprofit,_comment,_expiration);
    return(_order);
 }
+
+POrder COrderManager::NewOrder(POrder &_order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,PMoneyManagement &_mm,PStopsCalc &_price,
+                                 PStopsCalc &_stoploss,PStopsCalc &_takeprofit,const string _comment="",const datetime _expiration=0)
+{
+   App().symbolloader.LoadSymbol(in_symbol).RefreshRates();
+
+   if (_price.get() != NULL) {
+      _price.get().SetOrderType(_ordertype).SetSymbol(in_symbol);
+      _price.get().Reset();
+   }
+   
+   if (_stoploss.get() != NULL) {
+      _stoploss.get().SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price.isset() ? _price.get().GetPrice() : 0);
+      _stoploss.get().Reset();
+      _stoploss.get().SetTakeProfit(_takeprofit);
+   }
+   if (_takeprofit.get() != NULL) {
+      _takeprofit.get().SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price.isset() ? _price.get().GetPrice() : 0);
+      _takeprofit.get().Reset();
+      _takeprofit.get().SetStopLoss(_stoploss);
+   }
+   
+   _mm.get().SetSymbol(in_symbol).SetStopLoss(_stoploss).SetOrderType(_ordertype);
+
+   _order.get().NewOrder(
+      in_symbol,_ordertype,_mm.get().GetLotsize(),
+      !_price.isset() ? 0 : _price.get().GetPrice(),
+      !_stoploss.isset() ? 0 : _stoploss.get().GetPrice(),
+      !_takeprofit.isset() ? 0 : _takeprofit.get().GetPrice(),
+      _comment,_expiration);
+      
+   App().orderrepository.Add(_order.get());
+
+   return(_order);
+}
+
+POrder COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,PMoneyManagement &_mm,PStopsCalc &_price,
+                                 PStopsCalc &_stoploss,PStopsCalc &_takeprofit,const string _comment="",const datetime _expiration=0)
+{
+   loadsymbol(in_symbol);
+   _symbol.RefreshRates();
+   POrder _order = NewOrderObject();
+   NewOrder(_order, in_symbol, _ordertype,_mm,_price,_stoploss,_takeprofit,_comment,_expiration);
+   return(_order);
+}
+
 
 bool COrderManager::ExistingOrder(int ticket, COrderBase*& orderbase, COrderBase*& _order, COrderBase*& attachedorder) {
    if (orderbase.ExistingOrder(ticket)) {

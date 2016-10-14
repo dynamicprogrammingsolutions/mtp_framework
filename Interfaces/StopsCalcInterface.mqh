@@ -2,6 +2,10 @@
 #include "..\Loader.mqh"
 
 #define STOPS_CALC_INTERFACE_H
+
+#define PStopsCalc shared_ptr<CStopsCalcInterface>
+#define NewPStopsCalc(__object__) PStopsCalc::make_shared(__object)
+
 class CStopsCalcInterface : public CAppObject
 {
 public:
@@ -50,6 +54,18 @@ public:
    }
 
    virtual CStopsCalcInterface* SetStopLoss(CStopsCalcInterface* _sl)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return NULL;
+   }
+
+   virtual CStopsCalcInterface* SetTakeProfit(PStopsCalc &_tp)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+      return NULL;
+   }
+
+   virtual CStopsCalcInterface* SetStopLoss(PStopsCalc &_sl)
    {
       AbstractFunctionWarning(__FUNCTION__);
       return NULL;

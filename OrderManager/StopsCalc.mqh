@@ -92,6 +92,16 @@ public:
       AbstractFunctionWarning(__FUNCTION__);
       return NULL;
    }
+
+   virtual CStopsCalcInterface* SetTakeProfit(PStopsCalc &tp)
+   {
+      return SetTakeProfit(tp.get());
+   }
+
+   virtual CStopsCalcInterface* SetStopLoss(PStopsCalc &sl)
+   {
+      return SetTakeProfit(sl.get());
+   }
    
    virtual void Calculate() { }
    

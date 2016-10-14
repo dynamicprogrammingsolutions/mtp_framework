@@ -7,7 +7,7 @@ template<typename T>
 #define ISSET(__obj__) (CheckPointer(__obj__)!=POINTER_INVALID)
 #endif
 
-class CSharedObj {
+/*class CSharedObj {
    
 private:
    T *obj;
@@ -47,13 +47,13 @@ public:
    {
       return obj;
    }
-};
+};*/
 
 template<typename T>
 class shared_ptr : public CObject
 {
 private:
-   CSharedObj<CObject> *sharedobj;
+   T *sharedobj;
 public:
    shared_ptr()
    {
@@ -64,19 +64,15 @@ public:
       sharedobj = ptr.sharedobj.RefAdd();
    }
 
-   shared_ptr(CSharedObj<CObject> *obj)
+   shared_ptr(T *obj)
    {
       sharedobj = obj;
       sharedobj.RefAdd();
    }
-   shared_ptr(CSharedObj<CObject> &obj)
+   shared_ptr(T &obj)
    {
       sharedobj = GetPointer(obj);
       sharedobj.RefAdd();
-   }
-   shared_ptr(T *obj)
-   {
-      sharedobj = (new CSharedObj<CObject>(obj)).RefAdd();
    }
    ~shared_ptr()
    {
@@ -84,27 +80,21 @@ public:
          sharedobj.RefDel().RefClean();
       }
    }
+   
    template<typename T1>
    void assign(shared_ptr<T1> &ptr)
    {
       if (ISSET(sharedobj)) {
          sharedobj.RefDel().RefClean();
       }
-      sharedobj = ptr.obj_shared().RefAdd();
+      sharedobj = ptr.get().RefAdd();
    }
-   void assign(CSharedObj<CObject> *obj)
+   void reset(T *obj)
    {
       if (ISSET(sharedobj)) {
          sharedobj.RefDel().RefClean();
       }
       sharedobj = obj.RefAdd();
-   }
-   void assign(T *obj)
-   {
-      if (ISSET(sharedobj)) {
-         sharedobj.RefDel().RefClean();
-      }
-      sharedobj = (new CSharedObj<CObject>(obj)).RefAdd();
    }
    int refcount()
    {
@@ -117,17 +107,10 @@ public:
    {
       return ISSET(sharedobj);
    }
-   CSharedObj<CObject> *obj_shared() const
-   {
-      if (ISSET(sharedobj))
-         return sharedobj;
-      else 
-         return NULL;
-   }
-   T *obj()
+   T *get()
    {
       if (ISSET(sharedobj)) {
-         return sharedobj.Obj();
+         return sharedobj;
       } else
          return NULL;
    }
@@ -136,6 +119,12 @@ public:
    {
       shared_ptr<T> ptr(obj);
       return ptr;
+   }
+   
+   template<typename T1>
+   static shared_ptr<T> convert(T1 &ptr)
+   {
+      return ptr.get();
    }
 
 };

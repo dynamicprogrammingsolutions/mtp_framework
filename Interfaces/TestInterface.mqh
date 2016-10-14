@@ -2,6 +2,9 @@
 #include "..\Loader.mqh"
 
 #define TEST_INTERFACE_H
+
+#define PTest shared_ptr<CTestInterface>
+
 class CTestInterface : public CAppObject
 {
 public:

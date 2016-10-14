@@ -2,6 +2,10 @@
 #include "Loader.mqh"
 
 #define APP_OBJECT_H
+
+#define PAppObject shared_ptr<CAppObject>
+#define NewPAppObject(__object__) PAppObject::make_shared(__object__)
+
 class CAppObject : public CObject
 {
 private:
@@ -103,7 +107,13 @@ public:
    {
       return refcount;
    }
-
+   
+   template<typename T>
+   shared_ptr<T> make_shared(T *obj)
+   {
+      shared_ptr<T> ptr(obj);
+      return ptr;
+   }
    
    // callback for command:
    //    object parameter is used for return.
