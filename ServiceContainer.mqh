@@ -2,7 +2,7 @@
 #include "Loader.mqh"
 
 #define SERVICE_CONTAINER_H
-class CServiceContainer : public CArrayObj
+class CServiceContainer : public CArrayObject<CServiceProvider>
 {
 public:
    CServiceProvider* ServiceProvider(int i)
@@ -74,8 +74,8 @@ public:
       for (int i = 0; i < count; i++) {
          CServiceProvider* service = ServiceProvider(i);
          if (service.srv == newservice.srv) {
-            delete service;
-            this.m_data[i] = newservice;
+            //delete service;
+            this.m_data[i].reset(newservice);
             return true;
          }
       }

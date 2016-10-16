@@ -22,8 +22,12 @@ double MathMinNoZero(double value1, double value2)
    return MathMin(value1,value2);
 }
 
+#ifndef ISSET
 #define ISSET(__obj__) (CheckPointer(__obj__)!=POINTER_INVALID)
+#endif
+#ifdef ISNSET
 #define ISNSET(__obj__) (CheckPointer(__obj__)==POINTER_INVALID)
+#endif
 
 bool isset(const CObject* anyobject)
 {

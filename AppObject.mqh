@@ -18,7 +18,6 @@ private:
    CObject* appbase;
    int refcount;
    int owned_by_unique;
-   bool deleteattempt;
    
 protected:
 
@@ -127,7 +126,10 @@ public:
          delete GetPointer(this);
       }
    }
-   
+   bool Owned()
+   {
+      return owned_by_unique;
+   }
    int RefCount()
    {
       return refcount;

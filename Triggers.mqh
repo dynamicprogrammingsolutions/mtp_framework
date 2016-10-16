@@ -117,7 +117,7 @@ public:
 
       if (trigger_id == 0) {
          arr.Add(new CArrayObject<CTriggerCB>());
-         trigger_id = container.Total();
+         trigger_id = arr.Total();
       }
       
       int trigger_idx = trigger_id-1;
@@ -127,7 +127,7 @@ public:
       if (arr.At(trigger_idx) == NULL) EError_Ret(false);
       if (!arr.At(trigger_idx).Add(new CTriggerCB(callback,handler_id))) EError_Ret(false);
       
-      EInfo(Conc("trigger handler successfully added for ",TypeToString(classtype)));
+      EInfo(Conc("trigger handler successfully added for ",TypeToString(classtype)," trigger id: "+trigger_id));
       
       return true;
    }

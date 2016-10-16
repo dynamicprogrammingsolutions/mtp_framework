@@ -5,8 +5,13 @@ template<typename T>
 
 #ifndef ISSET
 #define ISSET(__obj__) (CheckPointer(__obj__)!=POINTER_INVALID)
+#endif
+#ifndef ISNSET
 #define ISNSET(__obj__) (CheckPointer(__obj__)==POINTER_INVALID)
 #endif
+
+#define UISSET(__obj__) (__obj__!=NULL)
+#define UISNSET(__obj__) (__obj__==NULL)
 
 enum ENUM_PTR_TYPE
 {
@@ -23,7 +28,7 @@ protected:
    ENUM_PTR_TYPE ptrtype;
    T *sharedobj;
 public:
-   base_ptr()
+   base_ptr() : sharedobj(NULL)
    {
       
    }
@@ -31,83 +36,113 @@ public:
    base_ptr(const base_ptr<T> &ptr)
    {
       ptrtype = ptr.ptrtype;
-      copy(ptr);      
+      if (ptr.isnset()) {
+         sharedobj = NULL;
+         return;
+      }
+      sharedobj = ptr.sharedobj;
+      switch(ptrtype) {
+         case ptrShared:
+            sharedobj.RefAdd();
+            break;
+         case ptrUnique:
+            sharedobj.UniqueLock();
+            break;
+      }     
    }
    
    ~base_ptr()
    {
-      destroy();
-   }
-   
-   void copy(const base_ptr<T> &ptr)
-   {
-      switch(ptrtype) {
-         case ptrShared:
-            sharedobj = ptr.sharedobj;
-            if (ISSET(sharedobj)) sharedobj.RefAdd();
-            break;
-         case ptrUnique:
-            sharedobj = ptr.sharedobj;
-            if (ISSET(sharedobj)) sharedobj.UniqueLock();
-         case ptrWeak:
-            sharedobj = ptr.sharedobj;
-      }
-   }
-   
-   void destroy()
-   {
+      /*if (this.isset())
+         Print("deinit pointer of type "+EnumToString((ENUM_CLASS_NAMES)sharedobj.Type())+" counter: "+sharedobj.RefCount()+" owned: "+sharedobj.Owned()+" ptrtype: "+EnumToString(ptrtype));
+      else
+         Print("deinit pointer to NULL");*/
       switch(ptrtype) {
          case ptrUnique:
             if (ISSET(sharedobj)) {
                sharedobj.UniqueRelease();
                sharedobj.UniqueDelete();
-               sharedobj = NULL;
             }
             break;
          case ptrShared:
             if (ISSET(sharedobj)) {
                sharedobj.RefDel().RefClean();
-               sharedobj = NULL;
             }
             break;
-         case ptrWeak:
-            sharedobj = NULL;
-            break;
       }
+      sharedobj = NULL;
    }
    
-   /*template<typename T1>
+   template<typename T1>
    void assign(base_ptr<T1> &ptr)
    {
       switch(ptrtype) {
          case ptrShared:
-            ptr.get().RefAdd();
-            if (ISSET(sharedobj)) {
-               sharedobj.RefDel().RefClean();
-            }
-            sharedobj = ptr.get();
+            if (ptr.isset()) ptr.get().RefAdd();
+            if (UISSET(sharedobj)) sharedobj.RefDel().RefClean();
+            break;
+         case ptrUnique:
+            if (UISSET(sharedobj)) sharedobj.UniqueRelease();
+            if (ptr.isset()) ptr.get().UniqueLock();
+            if (UISSET(sharedobj)) sharedobj.UniqueDelete();
+            break;
+      }
+      sharedobj = ptr.get();
    }
    void reset(T *obj)
    {
-      obj.RefAdd();
-      if (ISSET(sharedobj)) {
-         sharedobj.RefDel().RefClean();
+      switch(ptrtype) {
+         case ptrShared:
+            if (ISSET(obj)) obj.RefAdd();
+            if (UISSET(sharedobj)) sharedobj.RefDel().RefClean();
+            break;
+         case ptrUnique:
+            if (UISSET(sharedobj)) sharedobj.UniqueRelease();
+            if (ISSET(obj)) obj.UniqueLock();
+            if (UISSET(sharedobj)) sharedobj.UniqueDelete();
+            break;
       }
-      sharedobj = obj;
+      if (ISSET(obj)) sharedobj = obj;
+      else sharedobj = NULL;
    }
+   
    T *detach()
    {
-      if (ISSET(sharedobj)) {
-         T *temp = sharedobj;
-         sharedobj = NULL;
-         temp.RefDel();
-         return temp;
-      } else {
-         return NULL;
+      switch(ptrtype) {
+         case ptrShared:
+            if (UISSET(sharedobj)) {
+               T *temp = sharedobj;
+               sharedobj = NULL;
+               temp.RefDel();
+               return temp;
+            } else {
+               return NULL;
+            }
+            break;
+         case ptrUnique:
+            if (UISSET(sharedobj)) {
+               T *temp = sharedobj;
+               sharedobj = NULL;
+               temp.UniqueRelease();
+               return temp;
+            } else {
+               return NULL;
+            }
+            break;
+         case ptrWeak:
+            if (ISSET(sharedobj)) {
+               T *temp = sharedobj;
+               sharedobj = NULL;
+               return temp;
+            } else {
+               return NULL;
+            }
+            break;
       }
-   }*/
+      return NULL;
+   }
    
-   int refcount()
+   int refcount() const
    {
       if (ISSET(sharedobj))
          return sharedobj.RefCount();
@@ -115,27 +150,34 @@ public:
          return -1;
    }
    
-   bool isset()
+   bool isset() const
    {
-      return ISSET(sharedobj);
+      if (ptrtype != ptrWeak)
+         return UISSET(sharedobj);
+      else
+         return ISSET(sharedobj);
    }
    
-   bool isnset()
+   bool isnset() const
    {
-      return ISNSET(sharedobj);
+      if (ptrtype != ptrWeak)
+         return UISNSET(sharedobj);
+      else
+         return ISNSET(sharedobj);
    }
    
    T *get() const
    {
-      if (ISSET(sharedobj)) {
-         return sharedobj;
-      } else
-         return NULL;
+      if (ptrtype == ptrWeak) {
+         if (ISSET(sharedobj)) return sharedobj;
+         else return NULL;
+      }
+      return sharedobj;
    }
    
    virtual bool      Save(const int file_handle)                         
    {
-      if (ISSET(sharedobj))
+      if (isset())
          return sharedobj.Save(file_handle);
       else
          return true;
@@ -143,7 +185,7 @@ public:
    
    virtual bool      Load(const int file_handle)
    {
-      if (ISSET(sharedobj))
+      if (isset())
          return sharedobj.Load(file_handle);
       else
          return true;
@@ -151,7 +193,7 @@ public:
 
    virtual int       Type(void)
    {
-      if (ISSET(sharedobj))
+      if (isset())
          return sharedobj.Type();
       else
          return 0;
@@ -159,7 +201,7 @@ public:
 
    virtual int       Compare(const CObject *node,const int mode=0) const
    {
-      if (ISSET(sharedobj))
+      if (isset())
          return sharedobj.Compare(node,mode);
       else
          return 0;
@@ -178,103 +220,51 @@ public:
    shared_ptr(const base_ptr<T> &ptr)
    {
       ptrtype = ptrShared;
-      sharedobj = ptr.get();
-      if (ISSET(sharedobj)) sharedobj.RefAdd();
+      if (ptr.isset()) {
+         sharedobj = ptr.get();
+         sharedobj.RefAdd();
+      }
    }
-   /*shared_ptr(const unique_ptr<T> &ptr)
-   {
-      ptrtype = ptrShared;
-      sharedobj = ptr.get();
-      if (ISSET(sharedobj)) sharedobj.RefAdd();
-   }
-   shared_ptr(const shared_ptr<T> &ptr)
-   {
-      ptrtype = ptrShared;
-      sharedobj = ptr.sharedobj;
-      if (ISSET(sharedobj)) sharedobj.RefAdd();
-   }
-   shared_ptr(const weak_ptr<T> &ptr)
-   {
-      ptrtype = ptrShared;
-      sharedobj = ptr.get();
-      if (ISSET(sharedobj)) sharedobj.RefAdd();
-   }*/
    shared_ptr(T *obj)
    {
       ptrtype = ptrShared;
-      sharedobj = obj;
-      if (ISSET(sharedobj)) sharedobj.RefAdd();
+      if (ISSET(obj)) {
+         sharedobj = obj;
+         sharedobj.RefAdd();
+      }
    }
    shared_ptr(T &obj)
    {
       ptrtype = ptrShared;
       sharedobj = GetPointer(obj);
-      if (ISSET(sharedobj)) sharedobj.RefAdd();
+      if (ISSET(sharedobj)) {
+         sharedobj.RefAdd();
+      } else {
+         sharedobj = NULL;
+      }  
    }
    template<typename T1>
-   void assign(base_ptr<T1> &ptr)
-   {
-      ptr.get().RefAdd();
-      if (ISSET(sharedobj)) {
-         sharedobj.RefDel().RefClean();
-      }
-      sharedobj = ptr.get();
-   }
-   void reset(T *obj)
-   {
-      obj.RefAdd();
-      if (ISSET(sharedobj)) {
-         sharedobj.RefDel().RefClean();
-      }
-      sharedobj = obj;
-   }
-   T *detach()
-   {
-      if (ISSET(sharedobj)) {
-         T *temp = sharedobj;
-         sharedobj = NULL;
-         temp.RefDel();
-         return temp;
-      } else {
-         return NULL;
-      }
-   }
-
    static shared_ptr<T> make_shared(T &obj)
    {
-      //shared_ptr<T> ptr(obj);
       return obj;
    }
    
    static shared_ptr<T> make_shared(T *obj)
    {
-      //shared_ptr<T> ptr(obj);
       return obj;
    }
 
    static shared_ptr<T> make_shared()
    {
-      //shared_ptr<T> ptr(obj);
       return NULL;
    }
 
    template<typename T1>
-   static shared_ptr<T> make_shared(shared_ptr<T1> &ptr)
+   static shared_ptr<T> make_shared(base_ptr<T1> &ptr)
    {
       return ptr.get();
    }
 
-   template<typename T1>
-   static shared_ptr<T> make_shared(unique_ptr<T1> &ptr)
-   {
-      return ptr.get();
-   }
-
-   template<typename T1>
-   static shared_ptr<T> make_shared(weak_ptr<T1> &ptr)
-   {
-      return ptr.get();
-   }
 };
 
 template<typename T>
@@ -288,117 +278,52 @@ public:
    unique_ptr(const base_ptr<T> &ptr)
    {
       ptrtype = ptrUnique;      
-      sharedobj = ptr.get();
-      if (ISSET(sharedobj)) sharedobj.UniqueLock();
+      if (ptr.isset()) {
+         sharedobj = ptr.get();
+         sharedobj.UniqueLock();
+      } else {
+         sharedobj = NULL;
+      }
    }
-   /*unique_ptr(const unique_ptr<T> &ptr)
-   {
-      ptrtype = ptrUnique;      
-      sharedobj = ptr.sharedobj;
-      if (ISSET(sharedobj)) sharedobj.UniqueLock();
-   }
-   unique_ptr(const shared_ptr<T> &ptr)
-   {
-      ptrtype = ptrUnique;      
-      sharedobj = ptr.get();
-      if (ISSET(sharedobj)) sharedobj.UniqueLock();
-   }
-   unique_ptr(const weak_ptr<T> &ptr)
-   {
-      ptrtype = ptrUnique;      
-      sharedobj = ptr.get();
-      if (ISSET(sharedobj)) sharedobj.UniqueLock();
-   }*/
    unique_ptr(T *obj)
    {
-      ptrtype = ptrUnique;      
-      sharedobj = obj;
-      if (ISSET(sharedobj)) sharedobj.UniqueLock();
+      ptrtype = ptrUnique;   
+      if (ISSET(obj)) {   
+         sharedobj = obj;
+         sharedobj.UniqueLock();
+      }
    }
    unique_ptr(T &obj)
    {
       ptrtype = ptrUnique;      
       sharedobj = GetPointer(obj);
-      if (ISSET(sharedobj)) sharedobj.UniqueLock();
-   }
-   
-   template<typename T1>
-   void assign(unique_ptr<T1> &ptr)
-   {
       if (ISSET(sharedobj)) {
-         sharedobj.UniqueRelease();
-      }
-      ptr.get().UniqueLock();
-      if (ISSET(sharedobj)) {
-         sharedobj.UniqueDelete();
-      }
-      sharedobj = ptr.get();
-   }
-   void reset(T *obj)
-   {
-      if (ISSET(sharedobj)) {
-         sharedobj.UniqueRelease();
-      }
-      obj.UniqueLock();
-      if (ISSET(sharedobj)) {
-         sharedobj.UniqueDelete();
-      }
-      sharedobj = obj;
-   }
-   T *detach()
-   {
-      if (ISSET(sharedobj)) {
-         T *temp = sharedobj;
-         sharedobj = NULL;
-         temp.UniqueRelease();
-         return temp;
+         sharedobj.UniqueLock();
       } else {
-         return NULL;
+         sharedobj = NULL;
       }
    }
-
    static unique_ptr<T> make_unique(T &obj)
    {
-      //shared_ptr<T> ptr(obj);
       return obj;
    }
    
    static unique_ptr<T> make_unique(T *obj)
    {
-      //shared_ptr<T> ptr(obj);
       return obj;
    }
 
    static unique_ptr<T> make_unique()
    {
-      //shared_ptr<T> ptr(obj);
       return NULL;
    }
 
    template<typename T1>
-   static unique_ptr<T> make_unique(shared_ptr<T1> &ptr)
+   static unique_ptr<T> make_unique(base_ptr<T1> &ptr)
    {
       return ptr.get();
    }
 
-   template<typename T1>
-   static unique_ptr<T> make_unique(unique_ptr<T1> &ptr)
-   {
-      return ptr.get();
-   }
-
-   template<typename T1>
-   static unique_ptr<T> make_unique(weak_ptr<T1> &ptr)
-   {
-      return ptr.get();
-   }
-
-   template<typename T1>
-   static unique_ptr<T> convert(T1 &ptr)
-   {
-      return ptr.get();
-   }
-   
 };
 
 
@@ -412,55 +337,24 @@ public:
    }
    weak_ptr(const base_ptr<T> &ptr)
    {
-      ptrtype = ptrWeak;            
-      sharedobj = ptr.get();
+      ptrtype = ptrWeak;
+      sharedobj = ptr.get();            
    }
-   /*weak_ptr(const unique_ptr<T> &ptr)
-   {
-      ptrtype = ptrWeak;            
-      sharedobj = ptr.get();
-   }
-   weak_ptr(const shared_ptr<T> &ptr)
-   {
-      ptrtype = ptrWeak;            
-      sharedobj = ptr.get();
-   }
-   weak_ptr(const weak_ptr<T> &ptr)
-   {
-      ptrtype = ptrWeak;            
-      sharedobj = ptr.sharedobj;
-   }*/
    weak_ptr(T *obj)
    {
-      ptrtype = ptrWeak;            
-      sharedobj = obj;
+      ptrtype = ptrWeak;
+      if (ISSET(obj))
+         sharedobj = obj;
+      else
+         sharedobj = NULL;
    }
    weak_ptr(T &obj)
    {
-      ptrtype = ptrWeak;            
+      ptrtype = ptrWeak;    
       sharedobj = GetPointer(obj);
-   }
-   
-   template<typename T1>
-   void assign(weak_ptr<T1> &ptr)
-   {
-      sharedobj = ptr.get();
-   }
-   void reset(T *obj)
-   {
-      sharedobj = obj;
-   }
-   T *detach()
-   {
-      if (ISSET(sharedobj)) {
-         T *temp = sharedobj;
+      if (ISNSET(sharedobj))
          sharedobj = NULL;
-         return temp;
-      } else {
-         return NULL;
-      }
    }
-   
    static weak_ptr<T> make_weak(T &obj)
    {
       return obj;
@@ -477,19 +371,7 @@ public:
    }
 
    template<typename T1>
-   static weak_ptr<T> make_weak(shared_ptr<T1> &ptr)
-   {
-      return ptr.get();
-   }
-
-   template<typename T1>
-   static weak_ptr<T> make_weak(unique_ptr<T1> &ptr)
-   {
-      return ptr.get();
-   }
-
-   template<typename T1>
-   static weak_ptr<T> make_weak(weak_ptr<T1> &ptr)
+   static weak_ptr<T> make_weak(base_ptr<T1> &ptr)
    {
       return ptr.get();
    }
