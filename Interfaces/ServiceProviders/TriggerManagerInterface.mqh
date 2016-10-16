@@ -2,6 +2,9 @@
 
 #include "Loader.mqh"
 
+#define PTriggerManager shared_ptr<CTriggerManagerInterface>
+#define NewPTriggerManager(__obj__) PTriggerManager::make_shared(__obj__)
+
 #define TRIGGER_MANAGER_INTERFACE_H
 class CTriggerManagerInterface : public CServiceProvider
 {

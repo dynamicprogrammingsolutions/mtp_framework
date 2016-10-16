@@ -1,6 +1,9 @@
 //
 #include "Loader.mqh"
 
+#define POrderManager shared_ptr<COrderManagerInterface>
+#define NewPOrderManager(__obj__) POrderManager::make_shared(__obj__)
+
 #define ORDER_MANAGER_INTERFACE_H
 class COrderManagerInterface : public CServiceProvider
 {

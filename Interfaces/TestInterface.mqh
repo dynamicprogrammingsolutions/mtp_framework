@@ -4,6 +4,8 @@
 #define TEST_INTERFACE_H
 
 #define PTest shared_ptr<CTestInterface>
+#define NewPTest(__object__) PTest::make_shared(__object)
+#define MakeTest(__object__) PTest::make_shared(__object)
 
 class CTestInterface : public CAppObject
 {

@@ -1,6 +1,9 @@
 //
 #include "Loader.mqh"
 
+#define PEventHandler shared_ptr<CEventHandlerInterface>
+#define NewPEventHandler(__obj__) PEventHandler::make_shared(__obj__)
+
 #define EVENT_HANDLER_INTERFACE_H
 class CEventHandlerInterface : public CServiceProvider
 {

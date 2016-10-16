@@ -1,13 +1,16 @@
 //
 #include "..\..\Loader.mqh"
 
+#define POrderRepository shared_ptr<COrderRepositoryInterface>
+#define NewPOrderRepository(__obj__) POrderRepository::make_shared(__obj__)
+
 #define ORDER_REPOSITORY_INTERFACE_H
 class COrderRepositoryInterface : public CServiceProvider
 {
 public:
    virtual void Clear() { AbstractFunctionWarning(__FUNCTION__); }
    
-   virtual CAppObjectArrayObjManaged* Orders() { AbstractFunctionWarning(__FUNCTION__); return NULL;  }
+   virtual CArrayObject<COrderInterface>* Orders() { AbstractFunctionWarning(__FUNCTION__); return NULL;  }
 
    virtual COrderInterface* Selected() { AbstractFunctionWarning(__FUNCTION__); return NULL; }
 

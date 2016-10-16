@@ -4,7 +4,8 @@
 #define STOPS_CALC_INTERFACE_H
 
 #define PStopsCalc shared_ptr<CStopsCalcInterface>
-#define NewPStopsCalc(__object__) PStopsCalc::make_shared(__object)
+#define NewPStopsCalc(__object__) PStopsCalc::make_shared(__object__)
+#define MakeStopsCalc(__object__) PStopsCalc::make_shared(__object__)
 
 class CStopsCalcInterface : public CAppObject
 {

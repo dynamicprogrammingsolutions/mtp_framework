@@ -44,7 +44,7 @@ public:
    }
 
    
-   virtual CAppObjectArrayObjManaged* Orders() { return orders; }
+   virtual CArrayObject<COrderInterface>* Orders() { return orders; }
    
    virtual bool Save(const int handle);
    virtual bool Load(const int handle);

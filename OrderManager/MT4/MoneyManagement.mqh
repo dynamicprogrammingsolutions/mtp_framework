@@ -18,7 +18,7 @@ public:
 
 public:
    string symbol;
-   CStopLoss* stoploss;
+   PStopsCalc stoploss;
    ENUM_ORDER_TYPE ordertype;
    virtual CMoneyManagement* SetSymbol(string __symbol)
    {
@@ -27,12 +27,12 @@ public:
    }
    virtual CMoneyManagement* SetStopLoss(CStopLoss* _stoploss)
    {
-      stoploss = _stoploss;
+      stoploss.reset(_stoploss);
       return GetPointer(this);
    }
    virtual CMoneyManagement* SetStopLoss(PStopsCalc &_stoploss)
    {
-      stoploss = _stoploss.get();
+      stoploss.assign(_stoploss);
       return GetPointer(this);
    }
    virtual CMoneyManagement* SetOrderType(ENUM_ORDER_TYPE _ordertype)
@@ -153,7 +153,11 @@ public:
    virtual double GetLotsize() {
       moneymanagement_init(this.symbol);
       if (use_equity) accountbalance = accountequity;
-      return mmgetlot_stoploss((int)stoploss.GetTicks(), riskpercent);
+      if (stoploss.isnset()) {
+         Print("Stoploss is not set in moneymanagement");
+         return 0;
+      }
+      return mmgetlot_stoploss((int)stoploss.get().GetTicks(), riskpercent);
   }
 };
 
@@ -169,7 +173,11 @@ public:
       addaccountbalance = false;
       addfixbalance = riskmoney;
       moneymanagement_init(this.symbol);
-      return mmgetlot_stoploss((int)stoploss.GetTicks(), 100);
+      if (stoploss.isnset()) {
+         Print("Stoploss is not set in moneymanagement");
+         return 0;
+      }
+      return mmgetlot_stoploss((int)stoploss.get().GetTicks(), 100);
   }
 };
 

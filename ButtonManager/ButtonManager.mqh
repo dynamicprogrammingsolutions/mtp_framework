@@ -18,7 +18,7 @@ public:
          Pressed(!Pressed());
          if (isset(callback)) {
             CObject* obj = NULL;
-            callback.callback(callback_id,obj);
+            callback.callback(callback_id);
          }
       }
    }

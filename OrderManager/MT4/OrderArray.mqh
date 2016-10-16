@@ -3,7 +3,7 @@
 
 #ifndef ORDER_ARRAY_H
 #define ORDER_ARRAY_H
-class COrderArray : public CAppObjectArrayObjManaged
+class COrderArray : public CArrayObject<COrderInterface>
 {
 public:
    virtual int Type() const { return classMT4OrderArray; }
@@ -19,7 +19,6 @@ public:
       COrderArray()
       {
          this.NewElement(new COrder());
-         m_free_mode = true;
       }
       
       ~COrderArray()
@@ -31,7 +30,6 @@ public:
       COrderArray(CAppObject* _neworder)
       {
          this.NewElement(_neworder);
-         m_free_mode = true;
       }
       COrder* Order(int nIndex){ if (!isset(At(nIndex))) return(NULL); else return((COrder*)At(nIndex)); }     
       

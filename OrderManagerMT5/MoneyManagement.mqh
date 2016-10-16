@@ -4,8 +4,7 @@
 class CMoneyManagement : public CAppObject {
 public:
    virtual int Type() const { return classMT5MoneyManagement; }
-   bool delete_after_use;
-   virtual bool DeleteAfterUse() { return delete_after_use; }
+
 public:
    string symbol;
    CStopLoss* stoploss;

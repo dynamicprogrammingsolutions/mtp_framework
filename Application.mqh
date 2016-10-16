@@ -4,15 +4,16 @@
 #include "Loader.mqh"
 
 #define APPLICATION_H
-class CApplication : public CApplicationInterface
+class CApplication : public CAppObject
 {
 private:
 
    CServiceContainer services;
 
-   bool initalized;
+   //bool initalized;
      
 public:
+   CTriggers trigger;
 
    CApplication()
    {
@@ -61,8 +62,8 @@ public:
       services.InitalizeServices();
    }
    
-   void SetInitalized() { initalized = true; }
-   bool Initalized() { return initalized; }   
+   //void SetInitalized() { initalized = true; }
+   //bool Initalized() { return initalized; }   
    
    CServiceProvider* DeregisterService(ENUM_APPLICATION_SERVICE srv)
    {

@@ -1,17 +1,15 @@
 //
 
-#define TRIGGERP(__signal__,__parameter__) (APP.triggers.Send(__signal__,__parameter__))
+#include "..\Loader.mqh"
 
-#define TRIGGERPR(__signal__,__parameter__) (APP.triggers.SendR(__signal__,__parameter__))
+/*
+#define TRIGGERP(__signal__,__parameter__) (APP.trigger.Trigger(this,__signal__,__parameter__))
+*/
 
-#define TRIGGERC(__signal__,__parameter__) (APP.triggers.Send(__signal__,__parameter__,true))
+#define TRIGGER(__signal__) (App().trigger.TriggerBoolOr(this.Type(),__signal__,MakeWAppObject(GetPointer(this))))
+#define LISTEN(__classtype__,__signal__,__functionid__) App().trigger.Register(__classtype__,__signal__,this,__functionid__)
 
-#define TRIGGERCR(__signal__,__parameter__) (APP.triggers.SendR(__signal__,make_shared(__parameter__).get()))
-
-#define TRIGGER(__signal__) (APP.triggers.SendR(__signal__,GetPointer(this)))
-
-#define LISTEN(__signal__,__functionid__) APP.triggers.Register(__signal__,GetPointer(this),__functionid__)
-
+/*
 #define HANDLER(__signal__,__callback__,__id__) APP.triggers.Register(__signal__,__callback__,__id__)
 
 #define InitListen CObject* obj = NULL; callback(-1,obj);
@@ -33,6 +31,7 @@
 #define CBFUNC_POBJ_RETOBJ(__id__,__name__) case __id__: obj = __name__(CheckPointer(obj)!=POINTER_INVALID?obj:NULL); return true;
 
 #define CBFUNC_VOID(__id__,__name__) case __id__: __name__(); return true;
+*/
 
 /*
 

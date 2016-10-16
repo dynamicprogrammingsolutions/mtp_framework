@@ -33,10 +33,6 @@ protected:
      
 public:
 
-   bool delete_after_use;
-   virtual bool DeleteAfterUse() { return delete_after_use; }
-   CStopsCalc* UseOnce() { this.delete_after_use = true; return GetPointer(this); }
-
    virtual void Reset() {}
 
    virtual CStopsCalcInterface* SetOrderType(ENUM_ORDER_TYPE _ordertype)
@@ -83,14 +79,12 @@ public:
    
    virtual CStopsCalcInterface* SetTakeProfit(CStopsCalcInterface* tp)
    {
-      AbstractFunctionWarning(__FUNCTION__);
-      return NULL;
+      return GetPointer(this);
    }
 
    virtual CStopsCalcInterface* SetStopLoss(CStopsCalcInterface* sl)
    {
-      AbstractFunctionWarning(__FUNCTION__);
-      return NULL;
+      return GetPointer(this);
    }
 
    virtual CStopsCalcInterface* SetTakeProfit(PStopsCalc &tp)
@@ -132,11 +126,6 @@ class CEntry : public CStopsCalc {
 public:
    virtual int Type() const { return classEntry; }
    CEntry() {}
-   CEntry(double _price) {
-      this.SetPrice(_price);
-      delete_after_use = true;
-   }
-
 protected:
    virtual void CalcTicks()
    {
@@ -164,13 +153,6 @@ public:
       return NULL;
    }
    
-   CStopLoss(double _ticks) {
-      zero_is_nosl = true;
-      if (_ticks == 0) this.SetPrice(0);
-      else this.SetTicks(_ticks);
-      delete_after_use = true;
-   }
-
 protected:
    bool zero_is_nosl;
    
@@ -196,12 +178,6 @@ public:
    {
    }
    
-   CTakeProfit(double _ticks) {
-      if (_ticks == 0) this.SetPrice(0);
-      else this.SetTicks(_ticks);
-      delete_after_use = true;
-   }
-
    virtual CStopsCalcInterface* SetStopLoss(CStopsCalcInterface* _sl)
    {
       sl = _sl;

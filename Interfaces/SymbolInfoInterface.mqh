@@ -5,6 +5,7 @@
 
 #define PSymbolInfo shared_ptr<CSymbolInfoInterface>
 #define NewPSymbolInfo(__object__) PSymbolInfo::make_shared(__object)
+#define MakeSymbolInfo(__object__) PSymbolInfo::make_shared(__object)
 
 class CSymbolInfoInterface : public CAppObject
 {

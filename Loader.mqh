@@ -6,6 +6,7 @@
 #include "EnumClassNames.mqh"
 #include "EnumApplicationService.mqh"
 #include "Traits\Loader.mqh"
+#include "ErrorAndEventHandling.mqh"
 
 #include "Ptr.mqh"
 #ifdef PTR_H
@@ -20,8 +21,15 @@
 #ifdef APP_OBJECT_ARRAY_OBJ_H
 #include "AppObjectArrayObjManaged.mqh"
 #endif
-
 #ifdef APP_OBJECT_ARRAY_OBJ_MANAGED_H
+#include "ArrayObject.mqh"
+#endif
+
+#ifdef ARRAY_OBJECT_H
+#include "Triggers.mqh"
+#endif
+
+#ifdef TRIGGERS_H
 #include "ServiceProvider.mqh"
 #endif
 #ifdef SERVICE_PROVIDER_H
@@ -32,9 +40,6 @@
 #endif
 
 #ifdef SERVICE_PROVIDER_ARRAY_OBJ_H
-#include "Interfaces\ApplicationInterface.mqh"
-#endif
-#ifdef APPLICATION_INTERFACE_H
 #include "Interfaces\Loader.mqh"
 #endif
 #ifdef INTERFACES_LOADER_H

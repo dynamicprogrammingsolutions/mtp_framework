@@ -1,6 +1,9 @@
 //
 #include "Loader.mqh"
 
+#define PSymbolLoader shared_ptr<CSymbolLoaderInterface>
+#define NewPSymbolLoader(__obj__) PSymbolLoader::make_shared(__obj__)
+
 #define SYMBOL_LOADER_INTERFACE_H
 class CSymbolLoaderInterface : public CServiceProviderArrayObj
 {

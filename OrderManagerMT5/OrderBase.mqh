@@ -232,11 +232,6 @@ public:
    
    void SetTypeTime(const ENUM_ORDER_TYPE_TIME value) { typetime_set = true; if (executestate != ES_CANCELED) type_time = value; else Print("Cannot change canceled order data (typetime)"); }
    
-   static void DeleteIf(CStopLoss* obj) { if (obj.DeleteAfterUse()) delete obj; }
-   static void DeleteIf(CTakeProfit* obj) { if (obj.DeleteAfterUse()) delete obj; }
-   static void DeleteIf(CEntry* obj) { if (obj.DeleteAfterUse()) delete obj; }
-   static void DeleteIf(CMoneyManagement* obj) { if (obj.DeleteAfterUse()) delete obj; }
-
 };
 
 CTrade* COrderBase::trade_default = NULL;

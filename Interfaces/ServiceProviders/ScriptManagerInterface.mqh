@@ -1,6 +1,9 @@
 //
 #include "Loader.mqh"
 
+#define PScriptManager shared_ptr<CScriptManagerInterface>
+#define NewPScriptManager(__obj__) PScriptManager::make_shared(__obj__)
+
 #define SCRIPT_MANAGER_INTERFACE_H
 class CScriptManagerInterface : public CServiceProvider
 {

@@ -4,7 +4,8 @@
 #define MONEY_MANAGEMENT_INTERFACE_H
 
 #define PMoneyManagement shared_ptr<CMoneyManagementInterface>
-#define NewPMoneyManagement(__object__) PMoneyManagement::make_shared(__object)
+#define NewPMoneyManagement(__object__) PMoneyManagement::make_shared(__object__)
+#define MakeMoneyManagement(__object__) PMoneyManagement::make_shared(__object__)
 
 class CMoneyManagementInterface : public CAppObject {
 

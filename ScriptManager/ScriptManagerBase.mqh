@@ -55,7 +55,8 @@ public:
    }
    virtual void HandleScript(int id, long lparam, double dparam, string sparam)
    {
-      TRIGGERCR(CScript::Command,new CScript(id,lparam,dparam,sparam));
+      App().trigger.Trigger(classScript,CScript::Command,MakeAppObject(new CScript(id,lparam,dparam,sparam)));
+      //TRIGGERCR(CScript::Command,new CScript(id,lparam,dparam,sparam));
    }
    virtual void OnTick()
    {

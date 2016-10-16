@@ -54,7 +54,7 @@ public:
          }
       }
       return ret;
-   }   
+   }
       
    virtual bool Send(const int id, CObject*& o, const bool deleteobject = false)
    {
