@@ -15,6 +15,11 @@ public:
       return false;
    }
    
+   virtual bool IsStartedOnTick()
+   {
+      return false;
+   }
+   
    virtual bool IsRunning()
    {
       return false;
@@ -36,6 +41,11 @@ public:
    }
   
    virtual void OnTick()
+   {
+     
+   }
+   
+   virtual void StartOnTick()
    {
      
    }

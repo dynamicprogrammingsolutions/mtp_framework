@@ -12,3 +12,4 @@ classAppObjectArrayObj,
 #include "ScriptManager\__classnames.mqh"
 #include "DependencyManager\__classnames.mqh"
 #include "TriggerManager\__classnames.mqh"
+#include "Tests\__classnames.mqh"

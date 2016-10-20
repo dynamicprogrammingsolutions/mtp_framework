@@ -25,41 +25,52 @@ template<typename T>
 class base_ptr : public CObject
 {
 protected:
-   ENUM_PTR_TYPE ptrtype;
+   ENUM_PTR_TYPE m_ptrtype;
    T *sharedobj;
+   
+   bool check_new_object(T *obj)
+   {
+      switch(m_ptrtype) {
+         case ptrShared:
+            if (CheckPointer(obj) == POINTER_AUTOMATIC) {
+               EWarning(Conc("shared_ptr initalized from already managed builtin object: ",CLASS_NAME(obj)));
+            }
+            if (obj.Owned()) {
+               EError(Conc("shared_ptr initalized from owned object ",CLASS_NAME(obj)));
+               return false;
+            }
+            return true;
+            break;
+         case ptrUnique:
+            if (CheckPointer(obj) == POINTER_AUTOMATIC) {
+               EWarning(Conc("unique_ptr initalized from already managed builtin object: ",CLASS_NAME(obj)));
+            }
+            if (obj.Owned()) {
+               EError(Conc("unique_ptr initalized from owned object ",CLASS_NAME(obj)));
+               return false;
+            }
+            if (obj.RefCount()) {
+               EError(Conc("unique_ptr initalized from shared object ",CLASS_NAME(obj)));
+               return false;
+            }
+            return true;
+            break;
+         default:
+            return true;
+      }
+   }
+   
 public:
    base_ptr() : sharedobj(NULL)
    {
       
    }
    
-   base_ptr(const base_ptr<T> &ptr)
-   {
-      ptrtype = ptr.ptrtype;
-      if (ptr.isnset()) {
-         sharedobj = NULL;
-         return;
-      }
-      sharedobj = ptr.sharedobj;
-      switch(ptrtype) {
-         case ptrShared:
-            sharedobj.RefAdd();
-            break;
-         case ptrUnique:
-            sharedobj.UniqueLock();
-            break;
-      }     
-   }
-   
    ~base_ptr()
    {
-      /*if (this.isset())
-         Print("deinit pointer of type "+EnumToString((ENUM_CLASS_NAMES)sharedobj.Type())+" counter: "+sharedobj.RefCount()+" owned: "+sharedobj.Owned()+" ptrtype: "+EnumToString(ptrtype));
-      else
-         Print("deinit pointer to NULL");*/
-      switch(ptrtype) {
+      switch(m_ptrtype) {
          case ptrUnique:
-            if (ISSET(sharedobj)) {
+            if (UISSET(sharedobj)) {
                sharedobj.UniqueRelease();
                sharedobj.UniqueDelete();
             }
@@ -76,42 +87,68 @@ public:
    template<typename T1>
    void assign(base_ptr<T1> &ptr)
    {
-      switch(ptrtype) {
+      T1 *obj = NULL;
+      switch(m_ptrtype) {
          case ptrShared:
-            if (ptr.isset()) ptr.get().RefAdd();
+            if (ptr.isset()) obj = ptr.get();
+            if (obj != NULL) {
+               if (!check_new_object(obj)) obj = NULL;
+               else obj.RefAdd();
+            }
             if (UISSET(sharedobj)) sharedobj.RefDel().RefClean();
+            sharedobj = obj;
             break;
          case ptrUnique:
+            if (ptr.isset()) obj = ptr.get();
             if (UISSET(sharedobj)) sharedobj.UniqueRelease();
-            if (ptr.isset()) ptr.get().UniqueLock();
+            if (obj != NULL) {
+               if (!check_new_object(obj)) obj = NULL;
+               else obj.UniqueLock();
+            }
             if (UISSET(sharedobj)) sharedobj.UniqueDelete();
+            sharedobj = obj;
+            break;
+         case ptrWeak:
+            sharedobj = ptr.get();
             break;
       }
-      sharedobj = ptr.get();
    }
    void reset(T *obj)
    {
-      switch(ptrtype) {
+      switch(m_ptrtype) {
          case ptrShared:
-            if (ISSET(obj)) obj.RefAdd();
+            if (!ISSET(obj)) obj = NULL;
+            if (obj != NULL) {
+               if (!check_new_object(obj)) obj = NULL;
+               else obj.RefAdd();
+            }
             if (UISSET(sharedobj)) sharedobj.RefDel().RefClean();
+            sharedobj = obj;
             break;
          case ptrUnique:
+            if (!ISSET(obj)) obj = NULL;
             if (UISSET(sharedobj)) sharedobj.UniqueRelease();
-            if (ISSET(obj)) obj.UniqueLock();
+            if (obj != NULL) {
+               if (!check_new_object(obj)) obj = NULL;
+               else obj.UniqueLock();
+            }
             if (UISSET(sharedobj)) sharedobj.UniqueDelete();
+            sharedobj = obj;
             break;
+         case ptrWeak:
+            if (ISSET(obj)) sharedobj = obj;
+            else sharedobj = NULL;
+            break;            
       }
-      if (ISSET(obj)) sharedobj = obj;
-      else sharedobj = NULL;
    }
    
    T *detach()
    {
-      switch(ptrtype) {
+      T *temp;
+      switch(m_ptrtype) {
          case ptrShared:
             if (UISSET(sharedobj)) {
-               T *temp = sharedobj;
+               temp = sharedobj;
                sharedobj = NULL;
                temp.RefDel();
                return temp;
@@ -121,7 +158,7 @@ public:
             break;
          case ptrUnique:
             if (UISSET(sharedobj)) {
-               T *temp = sharedobj;
+               temp = sharedobj;
                sharedobj = NULL;
                temp.UniqueRelease();
                return temp;
@@ -131,7 +168,7 @@ public:
             break;
          case ptrWeak:
             if (ISSET(sharedobj)) {
-               T *temp = sharedobj;
+               temp = sharedobj;
                sharedobj = NULL;
                return temp;
             } else {
@@ -142,33 +179,40 @@ public:
       return NULL;
    }
    
+   ENUM_PTR_TYPE ptrtype() const
+   {
+      return m_ptrtype;
+   }
+   
    int refcount() const
    {
       if (ISSET(sharedobj))
          return sharedobj.RefCount();
       else
-         return -1;
+         return 0;
+   }
+   
+   bool owned() const
+   {
+      if (ISSET(sharedobj))
+         return sharedobj.Owned();
+      else
+         return false;
    }
    
    bool isset() const
    {
-      if (ptrtype != ptrWeak)
-         return UISSET(sharedobj);
-      else
-         return ISSET(sharedobj);
+      return ISSET(sharedobj);
    }
    
    bool isnset() const
    {
-      if (ptrtype != ptrWeak)
-         return UISNSET(sharedobj);
-      else
-         return ISNSET(sharedobj);
+      return ISNSET(sharedobj);
    }
    
    T *get() const
    {
-      if (ptrtype == ptrWeak) {
+      if (m_ptrtype == ptrWeak) {
          if (ISSET(sharedobj)) return sharedobj;
          else return NULL;
       }
@@ -209,123 +253,9 @@ public:
 
 };
 
-template<typename T>
-class shared_ptr : public base_ptr<T>
-{
-public:
-   shared_ptr()
-   {
-      ptrtype = ptrShared;
-   }
-   shared_ptr(const base_ptr<T> &ptr)
-   {
-      ptrtype = ptrShared;
-      if (ptr.isset()) {
-         sharedobj = ptr.get();
-         sharedobj.RefAdd();
-      }
-   }
-   shared_ptr(T *obj)
-   {
-      ptrtype = ptrShared;
-      if (ISSET(obj)) {
-         sharedobj = obj;
-         sharedobj.RefAdd();
-      }
-   }
-   shared_ptr(T &obj)
-   {
-      ptrtype = ptrShared;
-      sharedobj = GetPointer(obj);
-      if (ISSET(sharedobj)) {
-         sharedobj.RefAdd();
-      } else {
-         sharedobj = NULL;
-      }  
-   }
-   template<typename T1>
-   static shared_ptr<T> make_shared(T &obj)
-   {
-      return obj;
-   }
-   
-   static shared_ptr<T> make_shared(T *obj)
-   {
-      return obj;
-   }
-
-   static shared_ptr<T> make_shared()
-   {
-      return NULL;
-   }
-
-   template<typename T1>
-   static shared_ptr<T> make_shared(base_ptr<T1> &ptr)
-   {
-      return ptr.get();
-   }
-
-};
-
-template<typename T>
-class unique_ptr : public base_ptr<T>
-{
-public:
-   unique_ptr()
-   {
-      ptrtype = ptrUnique;      
-   }
-   unique_ptr(const base_ptr<T> &ptr)
-   {
-      ptrtype = ptrUnique;      
-      if (ptr.isset()) {
-         sharedobj = ptr.get();
-         sharedobj.UniqueLock();
-      } else {
-         sharedobj = NULL;
-      }
-   }
-   unique_ptr(T *obj)
-   {
-      ptrtype = ptrUnique;   
-      if (ISSET(obj)) {   
-         sharedobj = obj;
-         sharedobj.UniqueLock();
-      }
-   }
-   unique_ptr(T &obj)
-   {
-      ptrtype = ptrUnique;      
-      sharedobj = GetPointer(obj);
-      if (ISSET(sharedobj)) {
-         sharedobj.UniqueLock();
-      } else {
-         sharedobj = NULL;
-      }
-   }
-   static unique_ptr<T> make_unique(T &obj)
-   {
-      return obj;
-   }
-   
-   static unique_ptr<T> make_unique(T *obj)
-   {
-      return obj;
-   }
-
-   static unique_ptr<T> make_unique()
-   {
-      return NULL;
-   }
-
-   template<typename T1>
-   static unique_ptr<T> make_unique(base_ptr<T1> &ptr)
-   {
-      return ptr.get();
-   }
-
-};
-
+/* weak_ptr can be safely initalized from any type of object or ptr
+ * use it for weak reference to builtin objects (not pointers, automatically managed), shared_ptr, unique_ptr
+ */
 
 template<typename T>
 class weak_ptr : public base_ptr<T>
@@ -333,16 +263,16 @@ class weak_ptr : public base_ptr<T>
 public:
    weak_ptr()
    {
-      ptrtype = ptrWeak;            
+      m_ptrtype = ptrWeak;            
    }
    weak_ptr(const base_ptr<T> &ptr)
    {
-      ptrtype = ptrWeak;
+      m_ptrtype = ptrWeak;
       sharedobj = ptr.get();            
    }
    weak_ptr(T *obj)
    {
-      ptrtype = ptrWeak;
+      m_ptrtype = ptrWeak;
       if (ISSET(obj))
          sharedobj = obj;
       else
@@ -350,7 +280,7 @@ public:
    }
    weak_ptr(T &obj)
    {
-      ptrtype = ptrWeak;    
+      m_ptrtype = ptrWeak;    
       sharedobj = GetPointer(obj);
       if (ISNSET(sharedobj))
          sharedobj = NULL;
@@ -377,3 +307,116 @@ public:
    }
 
 };
+
+/* shared_ptr can be safely initalized from : shared_ptr, builtin pointer
+ * do not initalize from: weak_ptr, unique_ptr, builtin object
+ */
+
+template<typename T>
+class shared_ptr : public base_ptr<T>
+{
+public:
+   shared_ptr()
+   {
+      m_ptrtype = ptrShared;
+   }
+   shared_ptr(const shared_ptr<T> &ptr)
+   {
+      m_ptrtype = ptrShared;
+      if (ptr.isset()) {
+         sharedobj = ptr.get();
+         sharedobj.RefAdd();
+      }
+   }
+   shared_ptr(const weak_ptr<T> &ptr)
+   {
+      m_ptrtype = ptrShared;
+      if (ptr.isset()) {
+         T *obj = ptr.get();
+         if (!check_new_object(obj)) return;
+         sharedobj = ptr.get();
+         sharedobj.RefAdd();
+      }
+   }
+   shared_ptr(T *obj)
+   {
+      m_ptrtype = ptrShared;
+      if (ISSET(obj) && check_new_object(obj)) {
+         sharedobj = obj;
+         sharedobj.RefAdd();
+      }
+   }
+   
+   static shared_ptr<T> make_shared(T *obj)
+   {
+      return obj;
+   }
+
+   static shared_ptr<T> make_shared()
+   {
+      return NULL;
+   }
+
+   template<typename T1>
+   static shared_ptr<T> make_shared(shared_ptr<T1> &ptr)
+   {
+      return ptr.get();
+   }
+
+   template<typename T1>
+   static shared_ptr<T> make_shared(weak_ptr<T1> &ptr)
+   {
+      return ptr.get();
+   }
+
+};
+
+/* unique_ptr can be safely initalized from : builtin pointer not owned by unique_ptr
+ * it is not safe to initalize from: unique_ptr, shared_ptr, weak_ptr, builtin object
+ */
+
+template<typename T>
+class unique_ptr : public base_ptr<T>
+{
+public:
+   unique_ptr()
+   {
+      m_ptrtype = ptrUnique;      
+   }
+   unique_ptr(const weak_ptr<T> &ptr)
+   {
+      m_ptrtype = ptrUnique;
+      if (ptr.isset()) {
+         T *obj = ptr.get();
+         if (!check_new_object(obj)) return;
+         sharedobj = obj;
+         sharedobj.UniqueLock();         
+      }   
+   }
+   unique_ptr(T *obj)
+   {
+      m_ptrtype = ptrUnique;   
+      if (ISSET(obj) && check_new_object(obj)) {   
+         sharedobj = obj;
+         sharedobj.UniqueLock();
+      }
+   }
+   
+   static unique_ptr<T> make_unique(T *obj)
+   {
+      return obj;
+   }
+
+   static unique_ptr<T> make_unique()
+   {
+      return NULL;
+   }
+   
+   template<typename T1>
+   static unique_ptr<T> make_unique(weak_ptr<T1> &ptr)
+   {
+      return ptr.get();
+   }
+
+};
+

@@ -6,16 +6,47 @@
 #define CLASS_NAME(__obj__) EnumToString((ENUM_CLASS_NAMES)__obj__.Type())
 #define Conc StringConcatenate
 
-#define NOTIFY_PRINT(__type__,__message__) Print(__type__," at ",__FILE__,",",__LINE__,",",__FUNCTION__,":",__message__);
-#define NOTIFY_ALERT(__type__,__message__) Alert(__type__," at ",__FILE__,",",__LINE__,",",__FUNCTION__,":",__message__);
+bool _DisableReportingError = false;
+bool _DisableReportingWarning = false;
+bool _DisableReportingInfo = false;
 
-#define NOTIFY_PRINT_SIMPLE(__type__,__message__) Print(__type__," in ",__FUNCTION__,":",__message__);
-#define NOTIFY_ALERT_SIMPLE(__type__,__message__) Alert(__type__," in ",__FUNCTION__,":",__message__);
+bool _Error = false;
+bool _Warning = false;
+
+#define NOTIFY_PRINT(__type__,__message__) Print(__type__," at ",__FILE__,",",__LINE__,",",__FUNCTION__,": ",__message__);
+#define NOTIFY_ALERT(__type__,__message__) Alert(__type__," at ",__FILE__,",",__LINE__,",",__FUNCTION__,": ",__message__);
+
+#define NOTIFY_PRINT_SIMPLE(__type__,__message__) Print(__type__," in ",__FUNCTION__,": ",__message__);
+#define NOTIFY_ALERT_SIMPLE(__type__,__message__) Alert(__type__," in ",__FUNCTION__,": ",__message__);
 
 #define PRINT_FATAL(__type__,__message__) NOTIFY_PRINT(__type__,__message__);
 #define ALERT_FATAL(__type__,__message__) NOTIFY_ALERT(__type__,__message__);
 
 // Error
+
+#define GETTING_ERROR _Error = true;
+#define GETTING_WARNING _Warning = true;
+
+#define CHECK_ERROR (_Error?(!(_Error=!_Error)):_Error)
+#define CHECK_WARNING (_Warning?(!(_Warning=!_Warning)):_Warning)
+
+bool check_error()
+{
+   if (_Error) {
+      _Error = false;
+      return true;
+   }
+   return false;
+}
+
+bool check_warning()
+{
+   if (_Warning) {
+      _Warning = false;
+      return true;
+   }
+   return false;
+}
 
 #ifdef EError_Print
 #define PRINT_ERROR(__type__,__message__) NOTIFY_PRINT(__type__,__message__);
@@ -129,10 +160,10 @@
 // 
 
 #define EFatal(__message__) { PRINT_FATAL("Fatal",__message__); ALERT_FATAL("Fatal",__message__); }
-#define EError(__message__) { PRINT_ERROR("Error",__message__); ALERT_ERROR("Error",__message__); }
-#define EWarning(__message__) { PRINT_WARNING("Warning",__message__); ALERT_WARNING("Warning",__message__); }
+#define EError(__message__) { GETTING_ERROR if (!_DisableReportingError) { PRINT_ERROR("Error",__message__); ALERT_ERROR("Error",__message__); } }
+#define EWarning(__message__) { GETTING_WARNING if (!_DisableReportingWarning) { PRINT_WARNING("Warning",__message__); ALERT_WARNING("Warning",__message__); } }
 #define ENotice(__message__) { PRINT_NOTICE("Notice",__message__); ALERT_NOTICE("Notice",__message__); }
-#define EInfo(__message__) { PRINT_INFO("Info",__message__); ALERT_INFO("Info",__message__); }
+#define EInfo(__message__) { if (!_DisableReportingInfo) { PRINT_INFO("Info",__message__); ALERT_INFO("Info",__message__); } }
 #define EDebug(__message__) { PRINT_DEBUG("Debug",__message__); ALERT_DEBUG("Debug",__message__); }
 
 #define EFatal_ EFatal("")

@@ -66,7 +66,7 @@ public:
       }
    }
    
-   virtual bool OnBegin()
+   virtual bool OnBeginOnTick()
    {
       Print("TestOrder Started");
       this.order.assign(om.NewOrder(symbol,ordertype,mm,entry,sl,tp,comment));

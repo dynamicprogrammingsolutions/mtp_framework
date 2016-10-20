@@ -56,8 +56,9 @@ public:
    bool              Update(const int index,T *element);
    bool              Shift(const int index,const int shift);
    //--- methods of deleting
-   T          *Detach(const int index);
+   T                 *Detach(const int index);
    bool              Delete(const int index);
+   bool              DeletePosition(const int index);
    bool              DeleteRange(int from,int to);
    void              Clear(void);
    //--- method for comparing arrays
@@ -73,7 +74,7 @@ public:
    int               SearchLast(const T *element) const;
    
    template<typename IT>
-   bool ForEach(IT &item)
+   bool ForEach(IT *&item)
    {
       if (foreach_index == 0) {
          foreach_cachemax = Total();
@@ -81,11 +82,11 @@ public:
       if (foreach_index != foreach_cachemax) {
          if (isset(this.At(foreach_index))) {
             item = this.At(foreach_index);
-            foreach_index++;
-            return true;
          } else {
-            return false;
+            item = NULL;
          }
+         foreach_index++;
+         return true;
       } else {
          foreach_index = 0;
          return false;
@@ -93,7 +94,7 @@ public:
    }
    
    template<typename IT>
-   bool ForEachBackward(IT &item)
+   bool ForEachBackward(IT *&item)
    {
       if (foreach_index == 0) {
          foreach_cachemax = Total();
@@ -113,7 +114,7 @@ public:
    }
    
    template<typename IT>
-   bool ForEach(IT &item, int &index)
+   bool ForEach(IT *&item, int &index)
    {
       if (index == 0) {
          foreach_cachemax = Total();
@@ -452,13 +453,26 @@ bool CArrayObject::Delete(const int index)
       if(index>=0)
          MemMove(index,index+1,m_data_total-index-1);
      }
-   else
-   if(/*m_free_mode && */CheckPointer(m_data[index])==POINTER_DYNAMIC)
+   else if(/*m_free_mode && */CheckPointer(m_data[index])==POINTER_DYNAMIC)
       delete m_data[index];
    m_data_total--;
 //--- successful
    return(true);
   }
+  
+template<typename T>
+bool CArrayObject::DeletePosition(const int index)
+  {
+//--- check
+   if(index>=m_data_total)
+      return(false);
+//--- delete
+   if (CheckPointer(m_data[index])==POINTER_DYNAMIC)
+      m_data[index].reset(NULL);
+//--- successful
+   return(true);
+  }
+  
 //+------------------------------------------------------------------+
 //| Detach element from the specified position                       |
 //+------------------------------------------------------------------+

@@ -30,41 +30,41 @@ public:
    
    virtual void OnCloseSellSignal(bool valid)
    {
-      if (valid) TRIGGER(COrderCommand::CommandCloseSell);
+      if (valid) TRIGGER_VOID(classOrderCommand,commandCloseSell);
    }
    
    virtual void OnCloseBuySignal(bool valid)
    {
-      if (valid) TRIGGER(COrderCommand::CommandCloseBuy);
+      if (valid) TRIGGER_VOID(classOrderCommand,commandCloseBuy);
    }
    
    virtual void OnCloseAllSignal(bool valid)
    {
-      if (valid) TRIGGER(COrderCommand::CommandCloseAll);
+      if (valid) TRIGGER_VOID(classOrderCommand,commandCloseAll);
    }
    
    virtual void OnCloseBuyOpposite(bool valid)
    {
-      if (valid) TRIGGER(COrderCommand::CommandCloseSell);
+      if (valid) TRIGGER_VOID(classOrderCommand,commandCloseSell);
    }
    
    virtual void OnCloseSellOpposite(bool valid)
    {
-      if (valid) TRIGGER(COrderCommand::CommandCloseBuy);
+      if (valid) TRIGGER_VOID(classOrderCommand,commandCloseBuy);
    }
    
    virtual void OnBuySignal(bool valid)
    {
       if (CloseOpposite()) OnCloseBuyOpposite(valid);
       if (BuySignalFilter(valid)) {
-         TRIGGER(COrderCommand::CommandOpenBuy);
+         TRIGGER_VOID(classOrderCommand,commandOpenBuy);
       }
    }
    virtual void OnSellSignal(bool valid)
    {   
       if (CloseOpposite()) OnCloseSellOpposite(valid);
       if (SellSignalFilter(valid)) {
-         TRIGGER(COrderCommand::CommandOpenSell);
+         TRIGGER_VOID(classOrderCommand,commandOpenSell);
       }
    }
    virtual void OnBothSignal(bool valid)

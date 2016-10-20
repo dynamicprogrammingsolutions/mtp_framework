@@ -17,11 +17,13 @@ class CAppObject : public CObject
 private:
    CObject* appbase;
    int refcount;
-   int owned_by_unique;
+   bool owned_by_unique;
+   static int maxid;
+   int object_id;
    
 protected:
 
-  bool initalized;
+   bool initalized;
   
    void AbstractFunctionWarning(string function = "")
    {
@@ -41,6 +43,15 @@ protected:
    }
    
 public:
+
+   CAppObject() : refcount(0), owned_by_unique(false), object_id(maxid+1)
+   {
+      maxid = this.object_id;
+   
+   }
+   
+   int Id() const { return this.object_id; }
+
    CObject* AppBase() {
       if (CheckPointer(appbase) == POINTER_INVALID) {
          #ifndef GLOBAL_APPLICATION_OBJECT
@@ -104,7 +115,7 @@ public:
    void RefClean()
    {
       if (refcount <= 0 && !owned_by_unique) {
-         Print("delete shared object type "+EnumToString((ENUM_CLASS_NAMES)this.Type()));
+         EDebug("delete shared object type "+EnumToString((ENUM_CLASS_NAMES)this.Type()));
          delete GetPointer(this);
       }
    }
@@ -122,25 +133,25 @@ public:
    void UniqueDelete()
    {
       if (!owned_by_unique) {
-         Print("delete unique object type "+EnumToString((ENUM_CLASS_NAMES)this.Type()));
+         EDebug("delete unique object type "+EnumToString((ENUM_CLASS_NAMES)this.Type()));
          delete GetPointer(this);
       }
    }
-   bool Owned()
+   bool Owned() const
    {
       return owned_by_unique;
    }
-   int RefCount()
+   int RefCount() const
    {
       return refcount;
    }
    
-   template<typename T>
+   /*template<typename T>
    shared_ptr<T> make_shared(T *obj)
    {
       shared_ptr<T> ptr(obj);
       return ptr;
-   }
+   }*/
    
    // callback for command:
    //    object parameter is used for return.
@@ -153,36 +164,38 @@ public:
    virtual bool callback(const int id, CObject*& obj) { AbstractFunctionWarning(__FUNCTION__); return false; }
 
    virtual void callback(const int id, bool obj) { AbstractFunctionWarning(__FUNCTION__); return; }
-   virtual BAppObject callback_obj(const int id, bool obj) { AbstractFunctionWarning(__FUNCTION__); return MakeAppObject(NULL); }
+   virtual PAppObject callback_obj(const int id, bool obj) { AbstractFunctionWarning(__FUNCTION__); return MakeAppObject(NULL); }
    virtual bool callback_bool(const int id, bool obj) { AbstractFunctionWarning(__FUNCTION__); return false; }
    virtual double callback_double(const int id, bool obj) { AbstractFunctionWarning(__FUNCTION__); return 0; }
    virtual int callback_int(const int id, bool obj) { AbstractFunctionWarning(__FUNCTION__); return 0; }
 
    virtual void callback(const int id, int obj) { AbstractFunctionWarning(__FUNCTION__); return; }
-   virtual BAppObject callback_obj(const int id, int obj) { AbstractFunctionWarning(__FUNCTION__); return MakeAppObject(NULL); }
+   virtual PAppObject callback_obj(const int id, int obj) { AbstractFunctionWarning(__FUNCTION__); return MakeAppObject(NULL); }
    virtual bool callback_bool(const int id, int obj) { AbstractFunctionWarning(__FUNCTION__); return false; }
    virtual double callback_double(const int id, int obj) { AbstractFunctionWarning(__FUNCTION__); return 0; }
    virtual int callback_int(const int id, int obj) { AbstractFunctionWarning(__FUNCTION__); return 0; }
 
    virtual void callback(const int id, double obj) { AbstractFunctionWarning(__FUNCTION__); return; }
-   virtual BAppObject callback_obj(const int id, double obj) { AbstractFunctionWarning(__FUNCTION__); return MakeAppObject(NULL); }
+   virtual PAppObject callback_obj(const int id, double obj) { AbstractFunctionWarning(__FUNCTION__); return MakeAppObject(NULL); }
    virtual bool callback_bool(const int id, double obj) { AbstractFunctionWarning(__FUNCTION__); return false; }
    virtual double callback_double(const int id, double obj) { AbstractFunctionWarning(__FUNCTION__); return 0; }
    virtual int callback_int(const int id, double obj) { AbstractFunctionWarning(__FUNCTION__); return 0; }
 
    virtual void callback(const int id, BAppObject &obj) { AbstractFunctionWarning(__FUNCTION__); return; }
-   virtual BAppObject callback_obj(const int id, BAppObject &obj) { AbstractFunctionWarning(__FUNCTION__); return MakeAppObject(NULL); }
+   virtual PAppObject callback_obj(const int id, BAppObject &obj) { AbstractFunctionWarning(__FUNCTION__); return MakeAppObject(NULL); }
    virtual bool callback_bool(const int id, BAppObject &obj) { AbstractFunctionWarning(__FUNCTION__); return false; }
    virtual double callback_double(const int id, BAppObject &obj) { AbstractFunctionWarning(__FUNCTION__); return 0; }
    virtual int callback_int(const int id, BAppObject &obj) { AbstractFunctionWarning(__FUNCTION__); return 0; }
 
    virtual void callback(const int id) { AbstractFunctionWarning(__FUNCTION__); return; }
-   virtual BAppObject callback_obj(const int id) { AbstractFunctionWarning(__FUNCTION__); return MakeAppObject(NULL); }
+   virtual PAppObject callback_obj(const int id) { AbstractFunctionWarning(__FUNCTION__); return MakeAppObject(NULL); }
    virtual bool callback_bool(const int id) { AbstractFunctionWarning(__FUNCTION__); return false; }
    virtual double callback_double(const int id) { AbstractFunctionWarning(__FUNCTION__); return 0; }
    virtual int callback_int(const int id) { AbstractFunctionWarning(__FUNCTION__); return 0; }
 
 };
+
+int CAppObject::maxid = 0;
 
 void ref_clean(CAppObject* obj)
 {

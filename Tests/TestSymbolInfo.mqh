@@ -23,7 +23,7 @@ public:
       
    }
    
-   virtual bool OnBegin()
+   virtual bool OnBeginOnTick()
    {
       Print("SymbolInfo Test Started");
       if (!Assert(symbolinfo.Name(symbol),"loading symbol")) return false;

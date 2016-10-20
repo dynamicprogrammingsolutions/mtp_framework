@@ -27,6 +27,7 @@ public:
       if (tests.Total() == 0) return;
       started = true;
       use_ontick = true;
+      if (!RunTests(false)) Stop();
    }
    
    virtual void Stop()
@@ -40,22 +41,31 @@ public:
       return started && !ended;
    }
    
-   virtual void OnTick()
+   bool RunTests(const bool ontick)
    {
       for (int i = 0; i < tests.Total(); i++) {
          CTestInterface* test = tests.At(i);
          if (!test.IsStarted()) {
 	         test.Start();
          }
-         if (test.IsRunning()) {
-            test.OnTick();
+         if (ontick && test.IsRunning()) {
+            if (!test.IsStartedOnTick()) {
+               test.StartOnTick();
+            } else {
+               test.OnTick();
+            }
          }
          if (test.IsEnded()) {
             continue;
          }
-         return;
+         return true;
       }
-      Stop();
+      return false;
+   }
+   
+   virtual void OnTick()
+   {
+      if (!RunTests(true)) Stop();
    }
 
 };

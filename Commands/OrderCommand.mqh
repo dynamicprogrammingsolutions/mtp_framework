@@ -1,10 +1,26 @@
 #include "..\Loader.mqh"
 
+enum ENUM_ORDER_COMMAND{
+   commandOrderNone,
+   commandOpenOrder,
+   commandOpenBuy,
+   commandOpenSell,
+   commandOpenBuyLimit,
+   commandOpenSellLimit,
+   commandOpenBuyStop,
+   commandOpenSellStop,
+   commandCloseBuy,
+   commandCloseSell,
+   commandCloseAll,
+   commandCloseLast,
+};
+
 class COrderCommand : public CAppObject
 {
 public:
    TraitGetType(classOrderCommand)
 
+   /*
    static int CommandOpenOrder;
    static int CommandOpenBuy;
    static int CommandOpenSell;
@@ -16,6 +32,7 @@ public:
    static int CommandCloseSell;
    static int CommandCloseAll;
    static int CommandCloseLast;
+   */
    
    CStopsCalcInterface* entry;
    CStopsCalcInterface* sl;
@@ -118,6 +135,7 @@ public:
    
 };
 
+/*
 int COrderCommand::CommandOpenOrder = 0;
 int COrderCommand::CommandOpenBuy = 0;
 int COrderCommand::CommandOpenSell = 0;
@@ -129,3 +147,4 @@ int COrderCommand::CommandCloseBuy = 0;
 int COrderCommand::CommandCloseSell = 0;
 int COrderCommand::CommandCloseAll = 0;
 int COrderCommand::CommandCloseLast = 0;
+*/
