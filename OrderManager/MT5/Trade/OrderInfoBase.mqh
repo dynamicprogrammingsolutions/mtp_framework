@@ -1,6 +1,8 @@
 //
 #include "..\Loader.mqh"
 
+#define ORDER_INFO_BASE_H
+
 class COrderInfoBase : public CObject
   {
 

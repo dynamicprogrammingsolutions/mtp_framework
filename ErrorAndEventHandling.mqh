@@ -4,7 +4,11 @@
 
 #define TypeToString(__type__) EnumToString((ENUM_CLASS_NAMES)__type__)
 #define CLASS_NAME(__obj__) EnumToString((ENUM_CLASS_NAMES)__obj__.Type())
+#ifdef __MQL4__
 #define Conc StringConcatenate
+#else
+#define Conc MT4StringConcatenate
+#endif
 
 bool _DisableReportingError = false;
 bool _DisableReportingWarning = false;

@@ -12,7 +12,7 @@ public:
    CAppObject *temp1,*temp2,*temp3;
 
 template<typename T>
-bool AssertPtr(const base_ptr<T> &ptr,const int ref_count,const bool owned, const int id)
+bool AssertPtr(const T &ptr,const int ref_count,const bool owned, const int id)
 {
    bool ret = true;
    ret &= AssertEqual(ptr.isset(),true,"isset",false);
@@ -31,7 +31,7 @@ bool AssertPtr(const base_ptr<T> &ptr,const int ref_count,const bool owned, cons
 }
 
 template<typename T>
-bool AssertPtr(const base_ptr<T> &ptr,const bool is_set, const int ref_count = 0,const bool owned = false, const int id = 0)
+bool AssertPtr(const T &ptr,const bool is_set, const int ref_count = 0,const bool owned = false, const int id = 0)
 {
    bool ret = true;
    ret &= AssertEqual(ptr.isset(),is_set,"isset",false);

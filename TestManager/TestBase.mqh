@@ -143,24 +143,24 @@ public:
    template<typename T>
    bool AssertEqual(T value, T compare, string name, bool print_on_success = true)
    {
-      return Assert(value==compare,name,StringConcatenate(value," == ",compare),print_on_success);
+      return Assert(value==compare,name,Conc(value," == ",compare),print_on_success);
    }
    template<typename T>
    bool AssertNotEqual(T value, T compare, string name, bool print_on_success = true)
    {
-      return Assert(value!=compare,name,StringConcatenate(value," != ",compare),print_on_success);
+      return Assert(value!=compare,name,Conc(value," != ",compare),print_on_success);
    }
 
    template<typename T>
    bool AssertEqualEnum(T value, T compare, string name, bool print_on_success = true)
    {
-      return Assert(value==compare,name,StringConcatenate(EnumToString(value)," == ",EnumToString(compare)),print_on_success);
+      return Assert(value==compare,name,Conc(EnumToString(value)," == ",EnumToString(compare)),print_on_success);
    }
 
    template<typename T>
    bool AssertNotEqualEnum(T value, T compare, string name, bool print_on_success = true)
    {
-      return Assert(value!=compare,name,StringConcatenate(EnumToString(value)," != ",EnumToString(compare)),print_on_success);
+      return Assert(value!=compare,name,Conc(EnumToString(value)," != ",EnumToString(compare)),print_on_success);
    }
 
    bool AssertEqualD(double value, double compare, string name)

@@ -1,14 +1,6 @@
 //
 #include "..\Loader.mqh"
 
-#ifdef __MQL4__
-#include "..\SymbolInfoMT4\MTPSymbolInfo.mqh"
-#endif
-
-#ifdef __MQL5__
-#include "..\SymbolInfoMT5\MTPSymbolInfo.mqh"
-#endif
-
 #define SYMBOL_LOADER_H
 class CSymbolLoader : public CSymbolLoaderInterface
 {

@@ -1,62 +1,53 @@
 //
 #include "..\Loader.mqh"
 
-ulong COrderInfo_SelectedTicket = -1;
+#define HISTORY_ORDER_INFO_V_H
 
-class COrderInfoV : private COrderInfoBase
+ulong CHistoryOrderInfo_SelectedTicket = -1;
+
+class CHistoryOrderInfoV : public COrderInfoBase
   {
 protected:
-   ulong             m_ticket;
-   ENUM_ORDER_TYPE   m_type;
-   ENUM_ORDER_STATE  m_state;
-   datetime          m_expiration;
-   double            m_volume_curr;
-   double            m_stop_loss;
-   double            m_take_profit;
-   
-   ENUM_ORDER_STATE  m_laststate;
-   
-   long m_magic;
-   string m_symbol;
-   string m_comment;
-   bool no_comment;
-   
-   double m_openprice;
-   double m_currentprice;
-   
-   datetime m_timedone;
-   datetime m_timesetup;
-   ENUM_ORDER_TYPE_TIME m_typetime;
-
+   ulong             m_ticket;             // ticket of history order
 public:
-
-                     COrderInfoV();
-   ulong             Ticket()                        { return(m_ticket); }
+   //--- methods of access to protected data
+   bool              Ticket(ulong ticket) {
+      if (HistoryOrderSelect(ticket))
+      {
+         m_ticket=ticket;
+         CHistoryOrderInfo_SelectedTicket = m_ticket;
+         return(true);
+      } else {
+         CHistoryOrderInfo_SelectedTicket = ULONG_MAX;
+         return(false);
+      }
+   }
+   ulong             Ticket()      { return(m_ticket); }
    //--- fast access methods to the integer order propertyes
-   datetime          TimeSetup()                    ;
-   ENUM_ORDER_TYPE   OrderType()                    ;
-   string            TypeDescription()              ;
-   ENUM_ORDER_STATE  State()                        ;
-   string            StateDescription()             ;
-   datetime          TimeExpiration()               ;
-   datetime          TimeDone()                     ;
-   ENUM_ORDER_TYPE_FILLING TypeFilling()            ;
+   datetime          TimeSetup();
+   ENUM_ORDER_TYPE   OrderType();
+   string            TypeDescription() ;
+   ENUM_ORDER_STATE  State() ;
+   string            StateDescription() ;
+   datetime          TimeExpiration() ;
+   datetime          TimeDone() ;
+   ENUM_ORDER_TYPE_FILLING TypeFilling() ;
    string                  TypeFillingDescription() ;
-   ENUM_ORDER_TYPE_TIME    TypeTime()               ;
-   string                  TypeTimeDescription()    ;
-   long              Magic()                        ;
-   long              PositionId()                   ;
+   ENUM_ORDER_TYPE_TIME    TypeTime() ;
+   string                  TypeTimeDescription() ;
+   long              Magic() ;
+   long              PositionId() ;
    //--- fast access methods to the double order propertyes
-   double            VolumeInitial()                ;
-   double            VolumeCurrent()                ;
-   double            PriceOpen()                    ;
-   double            StopLoss()                     ;
-   double            TakeProfit()                   ;
-   double            PriceCurrent()                 ;
-   double            PriceStopLimit()               ;
+   double            VolumeInitial() ;
+   double            VolumeCurrent() ;
+   double            PriceOpen() ;
+   double            StopLoss() ;
+   double            TakeProfit() ;
+   double            PriceCurrent() ;
+   double            PriceStopLimit() ;
    //--- fast access methods to the string order propertyes
-   string            Symbol()                       ;
-   string            Comment()                      ;
+   string            Symbol() ;
+   string            Comment() ;
    //--- access methods to the API MQL5 functions
    bool              InfoInteger(ENUM_ORDER_PROPERTY_INTEGER prop_id,long& var);
    bool              InfoDouble(ENUM_ORDER_PROPERTY_DOUBLE prop_id,double& var);
@@ -68,62 +59,33 @@ public:
    string            FormatTypeTime(string& str,const uint type)                const;
    string            FormatOrder(string& str)                                   ;
    string            FormatPrice(string& str,const double price_order,const double price_trigger,const uint __digits) const;
-   //--- method for select order
-   virtual bool              Select(ulong ticket);
-   //bool              Ticket(ulong ticket) { return(Select(ticket)); }
+   //--- method for select history order
    bool              SelectByIndex(int index);
-   //--- addition methods
-   void              StoreState();
-   bool              CheckState();
-   bool CheckTicket()
+   void CheckTicket()
    {
-      if (COrderInfo_SelectedTicket != m_ticket) return(Select(m_ticket));
-      else return true;
+      if (CHistoryOrderInfo_SelectedTicket != m_ticket) Ticket(m_ticket);
    }
    
   };
-//+------------------------------------------------------------------+
-//| Constructor.                                                     |
-//| INPUT:  no.                                                      |
-//| OUTPUT: no.                                                      |
-//| REMARK: no.                                                      |
-//+------------------------------------------------------------------+
-COrderInfoV::COrderInfoV()
-  {
-   m_ticket     =ULONG_MAX;
-   m_type       =WRONG_VALUE;
-   m_state      =WRONG_VALUE;
-   m_expiration =0;
-   m_volume_curr=0.0;
-   m_stop_loss  =0.0;
-   m_take_profit=0.0;
-   
-   m_magic = -1;
-   m_symbol = "";
-   m_comment = "";
-   no_comment = false;
-   
-  }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_TIME_SETUP".                       |
 //| INPUT:  no.                                                      |
 //| OUTPUT: the property value "ORDER_TIME_SETUP".                   |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-datetime COrderInfoV::TimeSetup()
-{
-   return(m_timesetup!=0 ? m_timesetup : (CheckTicket()?m_timesetup=(datetime)OrderGetInteger(ORDER_TIME_SETUP):m_timesetup)); 
-}
+datetime CHistoryOrderInfoV::TimeSetup() 
+  {   
+   return((datetime)HistoryOrderGetInteger(m_ticket,ORDER_TIME_SETUP));
+  }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_TYPE".                             |
 //| INPUT:  no.                                                      |
 //| OUTPUT: the property value "ORDER_TYPE".                         |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-ENUM_ORDER_TYPE COrderInfoV::OrderType()
+ENUM_ORDER_TYPE CHistoryOrderInfoV::OrderType() 
   {
-   CheckTicket();
-   return((ENUM_ORDER_TYPE)OrderGetInteger(ORDER_TYPE));
+   return((ENUM_ORDER_TYPE)HistoryOrderGetInteger(m_ticket,ORDER_TYPE));
   }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_TYPE" as string.                   |
@@ -131,9 +93,8 @@ ENUM_ORDER_TYPE COrderInfoV::OrderType()
 //| OUTPUT: the property value "ORDER_TYPE" as string.               |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-string COrderInfoV::TypeDescription()
+string CHistoryOrderInfoV::TypeDescription() 
   {
-   CheckTicket();
    string str;
 //---
    return(FormatType(str,OrderType()));
@@ -144,21 +105,18 @@ string COrderInfoV::TypeDescription()
 //| OUTPUT: the property value "ORDER_STATE".                        |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-ENUM_ORDER_STATE COrderInfoV::State()
-{
-   CheckTicket();
-   if (m_state != 0) return(m_state);
-   return((ENUM_ORDER_STATE)OrderGetInteger(ORDER_STATE));
-}
+ENUM_ORDER_STATE CHistoryOrderInfoV::State() 
+  {
+   return((ENUM_ORDER_STATE)HistoryOrderGetInteger(m_ticket,ORDER_STATE));
+  }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_STATE" as string.                  |
 //| INPUT:  no.                                                      |
 //| OUTPUT: the property value "ORDER_STATE" as string.              |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-string COrderInfoV::StateDescription()
+string CHistoryOrderInfoV::StateDescription() 
   {
-   CheckTicket();
    string str;
 //---
    return(FormatStatus(str,State()));
@@ -169,30 +127,29 @@ string COrderInfoV::StateDescription()
 //| OUTPUT: the property value "ORDER_TIME_EXPIRATION".              |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-datetime COrderInfoV::TimeExpiration()
-{
-   return(m_expiration!=0 ? m_expiration : (CheckTicket()?m_expiration=(datetime)OrderGetInteger(ORDER_TIME_EXPIRATION):m_expiration)); 
-}
+datetime CHistoryOrderInfoV::TimeExpiration() 
+  {
+   return((datetime)HistoryOrderGetInteger(m_ticket,ORDER_TIME_EXPIRATION));
+  }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_TIME_DONE".                        |
 //| INPUT:  no.                                                      |
 //| OUTPUT: the property value "ORDER_TIME_DONE".                    |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-datetime COrderInfoV::TimeDone()
-{
-   return(m_timedone!=0 ? m_timedone : (CheckTicket()?m_timedone=(datetime)OrderGetInteger(ORDER_TIME_DONE):m_timedone)); 
-}
+datetime CHistoryOrderInfoV::TimeDone() 
+  {
+   return((datetime)HistoryOrderGetInteger(m_ticket,ORDER_TIME_DONE));
+  }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_TYPE_FILLING".                     |
 //| INPUT:  no.                                                      |
 //| OUTPUT: the property value "ORDER_TYPE_FILLING".                 |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-ENUM_ORDER_TYPE_FILLING COrderInfoV::TypeFilling()
+ENUM_ORDER_TYPE_FILLING CHistoryOrderInfoV::TypeFilling() 
   {
-   CheckTicket();
-   return((ENUM_ORDER_TYPE_FILLING)OrderGetInteger(ORDER_TYPE_FILLING));
+   return((ENUM_ORDER_TYPE_FILLING)HistoryOrderGetInteger(m_ticket,ORDER_TYPE_FILLING));
   }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_TYPE_FILLING" as string.           |
@@ -200,9 +157,8 @@ ENUM_ORDER_TYPE_FILLING COrderInfoV::TypeFilling()
 //| OUTPUT: the property value "ORDER_TYPE_FILLING" as string.       |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-string COrderInfoV::TypeFillingDescription()
+string CHistoryOrderInfoV::TypeFillingDescription() 
   {
-   CheckTicket();
    string str;
 //---
    return(FormatTypeFilling(str,TypeFilling()));
@@ -213,40 +169,39 @@ string COrderInfoV::TypeFillingDescription()
 //| OUTPUT: the property value "ORDER_TYPE_TIME".                    |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-ENUM_ORDER_TYPE_TIME COrderInfoV::TypeTime()
-{
-   return(m_typetime!=-1 ? m_typetime : (CheckTicket()?m_typetime=(ENUM_ORDER_TYPE_TIME)OrderGetInteger(ORDER_TYPE_TIME):m_typetime)); 
-}
+ENUM_ORDER_TYPE_TIME CHistoryOrderInfoV::TypeTime() 
+  {
+   return((ENUM_ORDER_TYPE_TIME)HistoryOrderGetInteger(m_ticket,ORDER_TYPE_TIME));
+  }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_TYPE_TIME" as string.              |
 //| INPUT:  no.                                                      |
 //| OUTPUT: the property value "ORDER_TYPE_TIME" as string.          |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-string COrderInfoV::TypeTimeDescription()
+string CHistoryOrderInfoV::TypeTimeDescription() 
   {
-   CheckTicket();
    string str;
 //---
-   return(FormatTypeTime(str,TypeFilling()));
+   return(FormatTypeTime(str,TypeTime()));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_MAGIC".                            |
+//| Get the property value "ORDER_EXPERT".                           |
 //| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_MAGIC".                        |
+//| OUTPUT: the property value "ORDER_EXPERT".                       |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-long COrderInfoV::Magic()
-{
-   return(m_magic!=-1 ? m_magic : (CheckTicket()?m_magic=OrderGetInteger(ORDER_MAGIC):m_magic)); 
-}
+long CHistoryOrderInfoV::Magic() 
+  {
+   return(HistoryOrderGetInteger(m_ticket,ORDER_MAGIC));
+  }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_POSITION_ID".                      |
 //| INPUT:  no.                                                      |
 //| OUTPUT: the property value "ORDER_POSITION_ID".                  |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-long COrderInfoV::PositionId()
+long CHistoryOrderInfoV::PositionId() 
   {
    return(HistoryOrderGetInteger(m_ticket,ORDER_POSITION_ID));
   }
@@ -256,10 +211,9 @@ long COrderInfoV::PositionId()
 //| OUTPUT: the property value "ORDER_VOLUME_INITIAL".               |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-double COrderInfoV::VolumeInitial()
+double CHistoryOrderInfoV::VolumeInitial() 
   {
-   CheckTicket();
-   return(OrderGetDouble(ORDER_VOLUME_INITIAL));
+   return(HistoryOrderGetDouble(m_ticket,ORDER_VOLUME_INITIAL));
   }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_VOLUME_CURRENT".                   |
@@ -267,10 +221,9 @@ double COrderInfoV::VolumeInitial()
 //| OUTPUT: the property value "ORDER_VOLUME_CURRENT".               |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-double COrderInfoV::VolumeCurrent()
+double CHistoryOrderInfoV::VolumeCurrent() 
   {
-   CheckTicket();
-   return(OrderGetDouble(ORDER_VOLUME_CURRENT));
+   return(HistoryOrderGetDouble(m_ticket,ORDER_VOLUME_CURRENT));
   }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_PRICE_OPEN".                       |
@@ -278,20 +231,19 @@ double COrderInfoV::VolumeCurrent()
 //| OUTPUT: the property value "ORDER_PRICE_OPEN".                   |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-double COrderInfoV::PriceOpen()
-{
-   return(m_openprice!=0 ? m_openprice : (CheckTicket()?m_openprice=OrderGetDouble(ORDER_PRICE_OPEN):m_openprice));
-}
+double CHistoryOrderInfoV::PriceOpen() 
+  {
+   return(HistoryOrderGetDouble(m_ticket,ORDER_PRICE_OPEN));
+  }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_SL".                               |
 //| INPUT:  no.                                                      |
 //| OUTPUT: the property value "ORDER_SL".                           |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-double COrderInfoV::StopLoss()
+double CHistoryOrderInfoV::StopLoss() 
   {
-   CheckTicket();
-   return(OrderGetDouble(ORDER_SL));
+   return(HistoryOrderGetDouble(m_ticket,ORDER_SL));
   }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_TP".                               |
@@ -299,10 +251,9 @@ double COrderInfoV::StopLoss()
 //| OUTPUT: the property value "ORDER_TP".                           |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-double COrderInfoV::TakeProfit()
+double CHistoryOrderInfoV::TakeProfit() 
   {
-   CheckTicket();
-   return(OrderGetDouble(ORDER_TP));
+   return(HistoryOrderGetDouble(m_ticket,ORDER_TP));
   }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_PRICE_CURRENT".                    |
@@ -310,20 +261,19 @@ double COrderInfoV::TakeProfit()
 //| OUTPUT: the property value "ORDER_PRICE_CURRENT".                |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-double COrderInfoV::PriceCurrent()
-{
-   return(m_currentprice!=0 ? m_currentprice : (CheckTicket()?m_currentprice=OrderGetDouble(ORDER_PRICE_CURRENT):m_currentprice));  
-}
+double CHistoryOrderInfoV::PriceCurrent() 
+  {
+   return(HistoryOrderGetDouble(m_ticket,ORDER_PRICE_CURRENT));
+  }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_PRICE_STOPLIMIT".                  |
 //| INPUT:  no.                                                      |
 //| OUTPUT: the property value "ORDER_PRICE_STOPLIMIT".              |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-double COrderInfoV::PriceStopLimit()
+double CHistoryOrderInfoV::PriceStopLimit() 
   {
-   CheckTicket();
-   return(OrderGetDouble(ORDER_PRICE_STOPLIMIT));
+   return(HistoryOrderGetDouble(m_ticket,ORDER_PRICE_STOPLIMIT));
   }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_SYMBOL".                           |
@@ -331,55 +281,52 @@ double COrderInfoV::PriceStopLimit()
 //| OUTPUT: the property value "ORDER_SYMBOL".                       |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-string COrderInfoV::Symbol()
-{
-   return(m_symbol!="" ? m_symbol : (CheckTicket()?m_symbol=OrderGetString(ORDER_SYMBOL):m_symbol));
-}
+string CHistoryOrderInfoV::Symbol() 
+  {
+   return(HistoryOrderGetString(m_ticket,ORDER_SYMBOL));
+  }
 //+------------------------------------------------------------------+
 //| Get the property value "ORDER_COMMENT".                          |
 //| INPUT:  no.                                                      |
 //| OUTPUT: the property value "ORDER_COMMENT".                      |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-string COrderInfoV::Comment()
-{
-   if (m_comment!="" || no_comment) return(m_comment); else { if (CheckTicket()) m_comment=OrderGetString(ORDER_COMMENT); no_comment=(m_comment==""); return(m_comment); }
-}
+string CHistoryOrderInfoV::Comment() 
+  {
+   return(HistoryOrderGetString(m_ticket,ORDER_COMMENT));
+  }
 //+------------------------------------------------------------------+
 //| Access functions OrderGetInteger(...).                           |
-//| INPUT:  prop_id -identifier integer properties,                  |
+//| INPUT:  prop_id  -identifier integer properties,                 |
 //|         var     -reference to a variable to value.               |
 //| OUTPUT: true-if successful, false otherwise.                     |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-bool COrderInfoV::InfoInteger(ENUM_ORDER_PROPERTY_INTEGER prop_id,long& var)
+bool CHistoryOrderInfoV::InfoInteger(ENUM_ORDER_PROPERTY_INTEGER prop_id,long& var)
   {
-   CheckTicket();
-   return(OrderGetInteger(prop_id,var));
+   return(HistoryOrderGetInteger(m_ticket,prop_id,var));
   }
 //+------------------------------------------------------------------+
 //| Access functions OrderGetDouble(...).                            |
-//| INPUT:  prop_id -identifier double properties,                   |
+//| INPUT:  prop_id  -identifier double properties,                  |
 //|         var     -reference to a variable to value.               |
 //| OUTPUT: true-if successful, false otherwise.                     |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-bool COrderInfoV::InfoDouble(ENUM_ORDER_PROPERTY_DOUBLE prop_id,double& var)
+bool CHistoryOrderInfoV::InfoDouble(ENUM_ORDER_PROPERTY_DOUBLE prop_id,double& var)
   {
-   CheckTicket();
-   return(OrderGetDouble(prop_id,var));
+   return(HistoryOrderGetDouble(m_ticket,prop_id,var));
   }
 //+------------------------------------------------------------------+
 //| Access functions OrderGetString(...).                            |
-//| INPUT:  prop_id -identifier string properties,                   |
+//| INPUT:  prop_id  -identifier string properties,                  |
 //|         var     -reference to a variable to value.               |
 //| OUTPUT: true-if successful, false otherwise.                     |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-bool COrderInfoV::InfoString(ENUM_ORDER_PROPERTY_STRING prop_id,string& var)
+bool CHistoryOrderInfoV::InfoString(ENUM_ORDER_PROPERTY_STRING prop_id,string& var)
   {
-   CheckTicket();
-   return(OrderGetString(prop_id,var));
+   return(HistoryOrderGetString(m_ticket,prop_id,var));
   }
 //+------------------------------------------------------------------+
 //| Converts the order type to text.                                 |
@@ -388,7 +335,7 @@ bool COrderInfoV::InfoString(ENUM_ORDER_PROPERTY_STRING prop_id,string& var)
 //| OUTPUT: formatted string.                                        |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-string COrderInfoV::FormatType(string& str,const uint type) const
+string CHistoryOrderInfoV::FormatType(string& str,const uint type) const
   {
 //--- clean
    str="";
@@ -418,7 +365,7 @@ string COrderInfoV::FormatType(string& str,const uint type) const
 //| OUTPUT: formatted string.                                        |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-string COrderInfoV::FormatStatus(string& str,const uint status) const
+string CHistoryOrderInfoV::FormatStatus(string& str,const uint status) const
   {
 //--- clean
    str="";
@@ -447,7 +394,7 @@ string COrderInfoV::FormatStatus(string& str,const uint status) const
 //| OUTPUT: formatted string.                                        |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-string COrderInfoV::FormatTypeFilling(string& str,const uint type) const
+string CHistoryOrderInfoV::FormatTypeFilling(string& str,const uint type) const
   {
 //--- clean
    str="";
@@ -472,7 +419,7 @@ string COrderInfoV::FormatTypeFilling(string& str,const uint type) const
 //| OUTPUT: formatted string.                                        |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-string COrderInfoV::FormatTypeTime(string& str,const uint type) const
+string CHistoryOrderInfoV::FormatTypeTime(string& str,const uint type) const
   {
 //--- clean
    str="";
@@ -498,9 +445,8 @@ string COrderInfoV::FormatTypeTime(string& str,const uint type) const
 //| OUTPUT: formatted string.                                        |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-string COrderInfoV::FormatOrder(string& str)
+string CHistoryOrderInfoV::FormatOrder(string& str)
   {
-   CheckTicket();
    string      type,price;
    CSymbolInfo __symbol;
 //--- set up
@@ -531,7 +477,7 @@ string COrderInfoV::FormatOrder(string& str)
 //| OUTPUT: formatted string.                                        |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-string COrderInfoV::FormatPrice(string& str,const double price_order,const double price_trigger,const uint __digits) const
+string CHistoryOrderInfoV::FormatPrice(string& str,const double price_order,const double price_trigger,const uint __digits) const
   {
    string price,trigger;
 //--- clean
@@ -548,98 +494,17 @@ string COrderInfoV::FormatPrice(string& str,const double price_order,const doubl
    return(str);
   }
 //+------------------------------------------------------------------+
-//| Selecting a order to access.                                     |
-//| INPUT:  ticket -order ticket.                                    |
+//| Select a history order on the index.                             |
+//| INPUT:  index - history order index.                             |
 //| OUTPUT: true-if successful, false otherwise.                     |
 //| REMARK: no.                                                      |
 //+------------------------------------------------------------------+
-bool COrderInfoV::Select(ulong ticket)
+bool CHistoryOrderInfoV::SelectByIndex(int index)
   {
-  
-   if (ticket != m_ticket) {
-      m_ticket = ticket;
-      m_magic = -1;
-      m_symbol = "";
-      m_comment = "";
-      no_comment = false;
-   }
-  
-   //if (COrderInfo_SelectedTicket == ticket) return(true);
-   if(OrderSelect(ticket))
-   {
-      m_ticket=ticket;
-      COrderInfo_SelectedTicket = m_ticket;
-
-      m_openprice = 0;
-      m_currentprice = 0;
-      
-      m_laststate = m_state;
-      m_state = 0;
-      State();
-      
-      if (m_state != m_laststate) {
-         //m_opentime = -1;
-         //m_lots = 0;
-         
-         m_expiration = 0;
-         m_timedone = 0;
-         m_timesetup = 0;         
-         m_typetime = -1;
-         
-      }
-      
-      return(true);
-   }
-   
-   m_ticket=ULONG_MAX;
-   COrderInfo_SelectedTicket = m_ticket;
-   
-//---
-   return(false);
-  }
-//+------------------------------------------------------------------+
-//| Select a order on the index.                                     |
-//| INPUT:  index - order index.                                     |
-//| OUTPUT: true-if successful, false otherwise.                     |
-//| REMARK: no.                                                      |
-//+------------------------------------------------------------------+
-bool COrderInfoV::SelectByIndex(int index)
-  {
-   ulong ticket=OrderGetTicket(index);
+   ulong ticket=HistoryOrderGetTicket(index);
    if(ticket==0) return(false);
+   Ticket(ticket);
 //---
-   return(Select(ticket));
-  }
-//+------------------------------------------------------------------+
-//| Stored order's current state.                                    |
-//| INPUT:  no.                                                      |
-//| OUTPUT: no.                                                      |
-//| REMARK: no.                                                      |
-//+------------------------------------------------------------------+
-void COrderInfoV::StoreState()
-  {
-   m_type       =OrderType();
-   m_state      =State();
-   m_expiration =TimeExpiration();
-   m_volume_curr=VolumeCurrent();
-   m_stop_loss  =StopLoss();
-   m_take_profit=TakeProfit();
-  }
-//+------------------------------------------------------------------+
-//| Check order change.                                              |
-//| INPUT:  no.                                                      |
-//| OUTPUT: true - if order changed.                                 |
-//| REMARK: no.                                                      |
-//+------------------------------------------------------------------+
-bool COrderInfoV::CheckState()
-  {
-   if(m_type==OrderType() && m_state==State() &&
-      m_expiration ==TimeExpiration() &&
-      m_volume_curr==VolumeCurrent() &&
-      m_stop_loss==StopLoss() &&
-      m_take_profit==TakeProfit())
-      return(false);
-   else
-      return(true);
+   return(true);
   }
 //+------------------------------------------------------------------+

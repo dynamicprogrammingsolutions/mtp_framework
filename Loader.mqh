@@ -2,6 +2,18 @@
 #include <Arrays\ArrayObj.mqh>
 #include "libraries\commonfunctions.mqh"
 #include "libraries\math.mqh"
+#include "libraries\file.mqh"
+#include "libraries\strfunctions.mqh"
+#include "libraries\objectfunctions.mqh"
+#include "libraries\commonfunctions.mqh"
+
+#ifdef __MQL5__
+#include "mql4to5\constants.mqh"
+#include "mql4to5\timeseries.mqh"
+#include "mql4to5\objects.mqh"
+#include "mql4to5\renamed_functions.mqh"
+#include "mql4to5\accountinfo.mqh"
+#endif
 
 #include "EnumClassNames.mqh"
 #include "EnumApplicationService.mqh"
@@ -69,6 +81,14 @@
 
 #ifdef LOAD_TEST_MANAGER
 #include "TestManager\Loader.mqh"
+#endif
+
+#ifdef __MQL4__
+#include "SymbolInfoMT4\MTPSymbolInfo.mqh"
+#endif
+
+#ifdef __MQL5__
+#include "SymbolInfoMT5\MTPSymbolInfo.mqh"
 #endif
 
 #ifdef LOAD_SYMBOL_LOADER

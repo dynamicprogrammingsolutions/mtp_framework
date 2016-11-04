@@ -6,9 +6,6 @@
 #property copyright "Zoltan Laszlo Ferenci"
 #property link      "http://www.metatraderprogrammer.com"
 
-#include "..\mql4to5\accountinfo.mqh"
-#include "..\libraries\commonfunctions.mqh"
-
 bool addaccountbalance = true;
 double addfixbalance = 0;
 

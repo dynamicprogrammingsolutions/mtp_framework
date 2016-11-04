@@ -1,12 +1,13 @@
 #include "Loader.mqh"
 
+#define ORDER_H
 class COrder : public COrderBase
 {
 public:
    virtual int Type() const { return classMT5Order; }
-   TraitNewObject { return new COrder(); }
+   TraitNewObject(COrder())
    //TraitRefCount
-   
+   /*
    int reference_count;
    
    virtual bool ReferenceCountActive()
@@ -17,14 +18,14 @@ public:
    virtual CAppObject* RefAdd()
    {
       reference_count++;
-      Print("reference count: "+reference_count+" ticket "+this.ticket);
+      Print("reference count: "+(string)reference_count+" ticket "+(string)this.ticket);
       return GetPointer(this);
    }
 
    virtual CAppObject* RefDel()
    {
       reference_count--;
-      Print("reference count: "+reference_count+" ticket "+this.ticket);
+      Print("reference count: "+(string)reference_count+" ticket "+(string)this.ticket);
       return GetPointer(this);
    }
 
@@ -35,7 +36,7 @@ public:
          delete GetPointer(this);
       }
    }
-   
+   */
 protected:
    static string attachedtoticket;
    static string stoploss_name;

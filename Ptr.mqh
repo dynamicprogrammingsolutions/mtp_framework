@@ -113,6 +113,93 @@ public:
             break;
       }
    }
+   template<typename T1>
+   void assign(shared_ptr<T1> &ptr)
+   {
+      T1 *obj = NULL;
+      switch(m_ptrtype) {
+         case ptrShared:
+            if (ptr.isset()) obj = ptr.get();
+            if (obj != NULL) {
+               if (!check_new_object(obj)) obj = NULL;
+               else obj.RefAdd();
+            }
+            if (UISSET(sharedobj)) sharedobj.RefDel().RefClean();
+            sharedobj = obj;
+            break;
+         case ptrUnique:
+            if (ptr.isset()) obj = ptr.get();
+            if (UISSET(sharedobj)) sharedobj.UniqueRelease();
+            if (obj != NULL) {
+               if (!check_new_object(obj)) obj = NULL;
+               else obj.UniqueLock();
+            }
+            if (UISSET(sharedobj)) sharedobj.UniqueDelete();
+            sharedobj = obj;
+            break;
+         case ptrWeak:
+            sharedobj = ptr.get();
+            break;
+      }
+   }
+   template<typename T1>
+   void assign(unique_ptr<T1> &ptr)
+   {
+      T1 *obj = NULL;
+      switch(m_ptrtype) {
+         case ptrShared:
+            if (ptr.isset()) obj = ptr.get();
+            if (obj != NULL) {
+               if (!check_new_object(obj)) obj = NULL;
+               else obj.RefAdd();
+            }
+            if (UISSET(sharedobj)) sharedobj.RefDel().RefClean();
+            sharedobj = obj;
+            break;
+         case ptrUnique:
+            if (ptr.isset()) obj = ptr.get();
+            if (UISSET(sharedobj)) sharedobj.UniqueRelease();
+            if (obj != NULL) {
+               if (!check_new_object(obj)) obj = NULL;
+               else obj.UniqueLock();
+            }
+            if (UISSET(sharedobj)) sharedobj.UniqueDelete();
+            sharedobj = obj;
+            break;
+         case ptrWeak:
+            sharedobj = ptr.get();
+            break;
+      }
+   }
+   template<typename T1>
+   void assign(weak_ptr<T1> &ptr)
+   {
+      T1 *obj = NULL;
+      switch(m_ptrtype) {
+         case ptrShared:
+            if (ptr.isset()) obj = ptr.get();
+            if (obj != NULL) {
+               if (!check_new_object(obj)) obj = NULL;
+               else obj.RefAdd();
+            }
+            if (UISSET(sharedobj)) sharedobj.RefDel().RefClean();
+            sharedobj = obj;
+            break;
+         case ptrUnique:
+            if (ptr.isset()) obj = ptr.get();
+            if (UISSET(sharedobj)) sharedobj.UniqueRelease();
+            if (obj != NULL) {
+               if (!check_new_object(obj)) obj = NULL;
+               else obj.UniqueLock();
+            }
+            if (UISSET(sharedobj)) sharedobj.UniqueDelete();
+            sharedobj = obj;
+            break;
+         case ptrWeak:
+            sharedobj = ptr.get();
+            break;
+      }
+   }
    void reset(T *obj)
    {
       switch(m_ptrtype) {
@@ -302,6 +389,24 @@ public:
 
    template<typename T1>
    static weak_ptr<T> make_weak(base_ptr<T1> &ptr)
+   {
+      return ptr.get();
+   }
+
+   template<typename T1>
+   static weak_ptr<T> make_weak(shared_ptr<T1> &ptr)
+   {
+      return ptr.get();
+   }
+
+   template<typename T1>
+   static weak_ptr<T> make_weak(weak_ptr<T1> &ptr)
+   {
+      return ptr.get();
+   }
+
+   template<typename T1>
+   static weak_ptr<T> make_weak(unique_ptr<T1> &ptr)
    {
       return ptr.get();
    }

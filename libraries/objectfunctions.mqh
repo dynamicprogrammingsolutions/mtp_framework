@@ -2,6 +2,10 @@
 
 #include "strfunctions.mqh"
 
+#ifdef __MQL5__
+#include "objectfunctions_MT5.mqh"
+#else
+
 string recent_objname;
 int window_idx = 0;
 bool obj_force_color = false;
@@ -464,3 +468,5 @@ void change_hline_to_trendline(string name, int bar_start = 5, int bar_end = 0, 
    ObjectSet(name,OBJPROP_RAY_RIGHT,1);
 }
 */
+
+#endif

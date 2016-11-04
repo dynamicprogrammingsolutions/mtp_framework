@@ -9,6 +9,8 @@
 #include "HistoryOrderInfo.mqh"
 #include "PositionInfo.mqh"
 #include "DealInfo.mqh"
+
+#define TRADE_H
 //+------------------------------------------------------------------+
 //| enumerations                                                     |
 //+------------------------------------------------------------------+

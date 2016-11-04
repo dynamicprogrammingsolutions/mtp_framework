@@ -22,6 +22,8 @@ private:
    ENUM_EXECUTE_STATE executestate;
    ENUM_ORDER_STATE state;
    ENUM_ORDER_STATE laststate;
+   bool closed;
+   
    int ticket;
    string symbol;
    ENUM_ORDER_TYPE ordertype;
@@ -63,10 +65,18 @@ public:
    void State(ENUM_ORDER_STATE value) {
       state = value;
       if (laststate != state) {
-         event().Info(StringConcatenate("new state in simulated order id ",Id(),": ",EnumToString(state)," last state: ",EnumToString(laststate)));
+         event().Info(Conc("new state in simulated order id ",Id(),": ",EnumToString(state)," last state: ",EnumToString(laststate)));
          laststate = state;
          OnStateChange();
       }
+   }
+   void SetClosed()
+   {
+      #ifdef __MQL4__
+      State(ORDER_STATE_CLOSED);
+      #else
+      closed = true;
+      #endif
    }
    
    virtual ENUM_EXECUTE_STATE ExecuteState() { return executestate; }
@@ -85,9 +95,21 @@ public:
    virtual bool AddStopLoss(double in_price, double stopvolume = 0, string name = "") { return false; }
    virtual bool AddTakeProfit(double in_price, double stopvolume = 0, string name = "") { return false; } 
 
-   virtual bool Closed() { return state==ORDER_STATE_CLOSED; }
-   virtual bool Deleted() { return state==ORDER_STATE_DELETED; }
-   virtual bool ClosedOrDeleted() { return state==ORDER_STATE_CLOSED||state==ORDER_STATE_DELETED; }   
+   virtual bool Closed() {
+      #ifdef __MQL4__
+      return state==ORDER_STATE_CLOSED;
+      #else
+      return closed;
+      #endif;
+   }
+   virtual bool Deleted() {
+      #ifdef __MQL4__
+      return state==ORDER_STATE_DELETED;
+      #else
+      return state==ORDER_STATE_CANCELED;
+      #endif;
+   }
+   virtual bool ClosedOrDeleted() { return Closed()||Deleted(); }   
          
    virtual long GetTicket() { return ticket; }
    virtual int GetMagicNumber() { return magic; }
@@ -103,7 +125,7 @@ public:
             loadsymbol(symbol);
             if (ordertype_long(ordertype)) return _symbol.Bid();
             if (ordertype_short(ordertype)) return _symbol.Ask();
-         } else if (state == ORDER_STATE_CLOSED) {
+         } else if (Closed()) {
             return closeprice;
          } else {
             return 0;
@@ -118,7 +140,11 @@ public:
    virtual double GetTakeProfit() { return executed_tp; }   
    virtual int GetProfitTicks() {
       if (executestate == ES_EXECUTED) {
-         if (state == ORDER_STATE_FILLED || state == ORDER_STATE_CLOSED) {
+         if (state == ORDER_STATE_FILLED
+         #ifdef __MQL4__
+            || state == ORDER_STATE_CLOSED
+         #endif
+         ) {
             return gettakeprofitticks(this.symbol, this.GetType(), this.GetClosePrice(), this.GetOpenPrice());
          }
       }
@@ -127,7 +153,11 @@ public:
    virtual datetime GetExpiration() { return expiration; }
    virtual double GetProfitMoney() {
       if (executestate == ES_EXECUTED) {
-         if (state == ORDER_STATE_FILLED || state == ORDER_STATE_CLOSED) {
+         if (state == ORDER_STATE_FILLED
+         #ifdef __MQL4__
+            || state == ORDER_STATE_CLOSED
+         #endif
+         ) {
             loadsymbol(symbol);
             return GetProfitTicks()*_symbol.TickValue()*volume;
          }
@@ -252,21 +282,21 @@ const double _stoploss,const double _takeprofit,const string _comment="",const d
 void COrderSimulated::OnTick()
 {
    if (executestate == ES_EXECUTED) {
-      if (state == ORDER_STATE_FILLED) {
+      if (state == ORDER_STATE_FILLED && !Closed()) {
          bool closing = false;
          if (gettakeprofitticks(symbol,ordertype,executed_tp,GetClosePrice()) <= 0) {
             closeprice = executed_tp;
-            event().Info(StringConcatenate("Closing simulated order id ",Id()," by takeprofit ",executed_tp," price=",GetClosePrice()),__FUNCTION__);
+            event().Info(Conc("Closing simulated order id ",Id()," by takeprofit ",executed_tp," price=",GetClosePrice()),__FUNCTION__);
             closing = true;
          }
          if (getstoplossticks(symbol,ordertype,executed_sl,GetClosePrice()) <= 0) {
             closeprice = executed_sl;
-            event().Info(StringConcatenate("Closing simulated order id ",Id()," by stoploss ",executed_sl," price=",GetClosePrice()),__FUNCTION__);
+            event().Info(Conc("Closing simulated order id ",Id()," by stoploss ",executed_sl," price=",GetClosePrice()),__FUNCTION__);
             closing = true;
          }
          if (closing) {
             closetime = TimeCurrent();
-            State(ORDER_STATE_CLOSED);
+            this.SetClosed();
          }
       }
    }
@@ -288,7 +318,7 @@ bool COrderSimulated::Execute()
             gettakeprofitticks(symbol,ordertype,executed_tp,close_price) < _symbol.StopsLevelInTicks() ||
             getstoplossticks(symbol,ordertype,executed_sl,close_price) < _symbol.StopsLevelInTicks()         
          ) {
-            event().Error(StringConcatenate("Invalid SL/TP in simulated order: price=",executed_price," closeprice=",close_price," sl=",executed_sl," tp=",executed_tp),__FUNCTION__);
+            event().Error(Conc("Invalid SL/TP in simulated order: price=",executed_price," closeprice=",close_price," sl=",executed_sl," tp=",executed_tp),__FUNCTION__);
             executestate = ES_NOT_EXECUTED;
             return false;
          }
@@ -298,7 +328,7 @@ bool COrderSimulated::Execute()
          State(ORDER_STATE_FILLED);
          executetime = TimeCurrent();
          filltime = TimeCurrent();
-         event().Info(StringConcatenate("Order Executed. Ticket:",(string)ticket," price=",executed_price," sl=",executed_sl," tp=",executed_tp),__FUNCTION__);
+         event().Info(Conc("Order Executed. Ticket:",(string)ticket," price=",executed_price," sl=",executed_sl," tp=",executed_tp),__FUNCTION__);
          return true;
       } else {
          executestate = ES_CANCELED;
@@ -312,12 +342,13 @@ bool COrderSimulated::Execute()
 
 bool COrderSimulated::Close(double _closevolume = 0, double _closeprice = 0) {
    if (executestate == ES_EXECUTED) {
-      if (state == ORDER_STATE_FILLED) {
+      if (state == ORDER_STATE_FILLED && !Closed()) {
          if (_closevolume > 0 && !q(_closevolume,volume)) event().Warning("Simulation does not support partial close",__FUNCTION__);
-         event().Info(StringConcatenate("Closing simulated order id ",Id()),__FUNCTION__);
+         event().Info(Conc("Closing simulated order id ",Id()),__FUNCTION__);
          closetime = TimeCurrent();
          closeprice = GetClosePrice();
-         State(ORDER_STATE_CLOSED);
+         this.SetClosed();
+         //State(ORDER_STATE_CLOSED);
          return true;
       } else if (state == ORDER_STATE_PLACED) {
          Cancel();
@@ -341,7 +372,7 @@ bool COrderSimulated::Modify() {
    }
    if (sl_set || tp_set) {
       if (executestate == ES_EXECUTED) {
-         if (state == ORDER_STATE_FILLED) {
+         if (state == ORDER_STATE_FILLED && !Closed()) {
             bool modify_sl_ok = true;
             bool modify_tp_ok = true;
             double close_price;

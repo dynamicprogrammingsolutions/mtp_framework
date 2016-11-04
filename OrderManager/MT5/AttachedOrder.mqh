@@ -1,9 +1,11 @@
-//
+#include "Loader.mqh"
+
+#define ATTACHED_ORDER_H
 class CAttachedOrder : public COrderBase
 {
 public:
-   virtual int Type() const { return classMT5AttachedOrder; }
-   TraitNewObject { return new CAttachedOrder(); }
+   TraitGetType(classMT5AttachedOrder)
+   TraitNewObject(CAttachedOrder())
 public:
    string name;
    bool filling_updated;

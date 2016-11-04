@@ -1,7 +1,8 @@
 //
 
-#include "..\Loader.mqh"
-#include "..\libraries\file.mqh"
+#include "Loader.mqh"
+
+#define ORDER_BASE_H
 
 class COrderBase : public COrderInterface
 {

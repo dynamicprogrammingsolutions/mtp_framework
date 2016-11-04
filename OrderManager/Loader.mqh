@@ -11,7 +11,7 @@
 #endif
 
 #ifdef __MQL5__
-   #include "..\OrderManagerMT5\Loader.mqh"
+   #include "MT5\Loader.mqh"
 #endif
 #endif
 

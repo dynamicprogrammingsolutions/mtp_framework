@@ -1,4 +1,8 @@
 //
+#include "Loader.mqh"
+
+#define MONEY_MANAGEMENT_H
+
 #include "moneymanagement_helper.mqh"
 
 class CMoneyManagement : public CAppObject {

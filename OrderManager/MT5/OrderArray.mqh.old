@@ -1,5 +1,6 @@
-//
+#include "Loader.mqh"
 
+#define ORDER_ARRAY_H
 class COrderArray : public CAppObjectArrayObjManaged
 {
 public:

@@ -1,16 +1,6 @@
-//+------------------------------------------------------------------+
-//|                                                 OrderManager.mqh |
-//|                        Copyright 2011, MetaQuotes Software Corp. |
-//|                                              http://www.mql5.com |
-//+------------------------------------------------------------------+
-#property copyright "Copyright 2011, MetaQuotes Software Corp."
-#property link      "http://www.mql5.com"
-#property version   "1.00"
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-
 #include "Loader.mqh"
+
+#define ORDER_MANAGER_H
 
 class COrderManager : public COrderManagerInterface
 {
@@ -148,11 +138,12 @@ public:
    virtual COrderInterface* NewOrderObject() { return app.NewObject(neworder); }
    virtual COrderInterface* NewAttachedOrderObject() { return app.GetDependency(classOrder,classAttachedOrder); }
 
-   COrder* NewOrder(string in_symbol,ENUM_ORDER_TYPE _ordertype,double _volume,double _price,double _stoploss,double _takeprofit,string _comment="",datetime _expiration=0);
-   COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,double volume,CEntry* _price,
-                                    CStopLoss* _stoploss,CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0);
-   COrder* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagement* _mm,CEntry* _price,
-                                    CStopLoss* _stoploss,CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0);
+   COrderInterface* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,const double _volume,const double _price,
+      const double _stoploss,const double _takeprofit,const string _comment="",const datetime _expiration=0);
+   COrderInterface* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,double volume,CStopsCalcInterface* _price,
+                                    CStopsCalcInterface* _stoploss,CStopsCalcInterface* _takeprofit,const string _comment="",const datetime _expiration=0);
+   COrderInterface* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagementInterface* _mm,CStopsCalcInterface* _price,
+                                    CStopsCalcInterface* _stoploss,CStopsCalcInterface* _takeprofit,const string _comment="",const datetime _expiration=0);
    virtual void OnTick();
    void UpdateState();
    void CleanUp();
@@ -194,7 +185,7 @@ public:
    
 };
 
-COrder* COrderManager::NewOrder(string in_symbol,ENUM_ORDER_TYPE _ordertype,double _volume,double _price,double _stoploss,double _takeprofit,string _comment="",datetime _expiration=0)
+COrderInterface* COrderManager::NewOrder(string in_symbol,ENUM_ORDER_TYPE _ordertype,double _volume,double _price,double _stoploss,double _takeprofit,string _comment="",datetime _expiration=0)
 {
 
    COrder* _order = NewOrderObject();
@@ -221,8 +212,8 @@ COrder* COrderManager::NewOrder(string in_symbol,ENUM_ORDER_TYPE _ordertype,doub
    return(_order);
 }
 
-COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,double _volume,CEntry* _price,
-                                 CStopLoss* _stoploss,CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0)
+COrderInterface* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,double _volume,CStopsCalcInterface* _price,
+                                 CStopsCalcInterface* _stoploss,CStopsCalcInterface* _takeprofit,const string _comment="",const datetime _expiration=0)
 {
    COrder* _order = NewOrderObject();
    
@@ -243,18 +234,14 @@ COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _or
       _comment,_expiration
    );
    
-   if (_price != NULL) COrderBase::DeleteIf(_price);
-   if (_stoploss != NULL) COrderBase::DeleteIf(_stoploss);
-   if (_takeprofit != NULL) COrderBase::DeleteIf(_takeprofit);
-      
    orders.Add(_order); 
 
    return(_order);
 
 }
 
-COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagement* _mm,CEntry* _price,
-                                 CStopLoss* _stoploss,CTakeProfit* _takeprofit,const string _comment="",const datetime _expiration=0)
+COrderInterface* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagementInterface* _mm,CStopsCalcInterface* _price,
+                                 CStopsCalcInterface* _stoploss,CStopsCalcInterface* _takeprofit,const string _comment="",const datetime _expiration=0)
 {
    COrder* _order = NewOrderObject();
    
@@ -276,11 +263,6 @@ COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _or
       _comment,_expiration
    );
    
-   if (_price != NULL) COrderBase::DeleteIf(_price);
-   if (_stoploss != NULL) COrderBase::DeleteIf(_stoploss);
-   if (_takeprofit != NULL) COrderBase::DeleteIf(_takeprofit);
-   COrderBase::DeleteIf(_mm);
-      
    orders.Add(_order); 
 
    return(_order);

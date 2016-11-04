@@ -32,7 +32,7 @@ double CopyBufferMQL4(int handle,int index,int shift)
   }
 
 double iMACD(string in_symbol,
-                 ENUM_TIMEFRAMES timeframe,
+                 ENUM_TIMEFRAMES _timeframe,
                  int fast_ema_period,
                  int slow_ema_period,
                  int signal_period,
@@ -40,7 +40,7 @@ double iMACD(string in_symbol,
                  int mode,
                  int shift)
   {
-   int handle=iMACD(in_symbol,timeframe,
+   int handle=iMACD(in_symbol,_timeframe,
                     fast_ema_period,slow_ema_period,
                     signal_period,applied_price);
    if(handle<0)
@@ -53,12 +53,12 @@ double iMACD(string in_symbol,
   }
   
 double iRSI(string in_symbol,
-                ENUM_TIMEFRAMES timeframe,
+                ENUM_TIMEFRAMES _timeframe,
                 int period,
                 ENUM_APPLIED_PRICE applied_price,
                 int shift)
   {
-   int handle=iRSI(in_symbol,timeframe,period,applied_price);
+   int handle=iRSI(in_symbol,_timeframe,period,applied_price);
    if(handle<0)
      {
       Print("The iRSI object is not created: Error",GetLastError());
@@ -81,7 +81,7 @@ ENUM_STO_PRICE StoFieldMigrate(int field)
 */
   
 double iStochastic(string in_symbol,
-                       ENUM_TIMEFRAMES timeframe,
+                       ENUM_TIMEFRAMES _timeframe,
                        int Kperiod,
                        int Dperiod,
                        int slowing,
@@ -90,7 +90,7 @@ double iStochastic(string in_symbol,
                        int mode,
                        int shift)
   {
-   int handle=iStochastic(in_symbol,timeframe,Kperiod,Dperiod,
+   int handle=iStochastic(in_symbol,_timeframe,Kperiod,Dperiod,
                           slowing,ma_method,price_field);
    if(handle<0)
      {
@@ -102,12 +102,12 @@ double iStochastic(string in_symbol,
   }
 
 double iCCI(string in_symbol,
-                ENUM_TIMEFRAMES timeframe,
+                ENUM_TIMEFRAMES _timeframe,
                 int period,
                 ENUM_APPLIED_PRICE applied_price,
                 int shift)
   {
-   int handle=iCCI(in_symbol,timeframe,period,applied_price);
+   int handle=iCCI(in_symbol,_timeframe,period,applied_price);
    if(handle<0)
      {
       Print("The iCCI object is not created: Error",GetLastError());
@@ -118,14 +118,14 @@ double iCCI(string in_symbol,
   }
   
 double iMA(string in_symbol,
-               ENUM_TIMEFRAMES timeframe,
+               ENUM_TIMEFRAMES _timeframe,
                int period,
                int ma_shift,
                ENUM_MA_METHOD ma_method,
                ENUM_APPLIED_PRICE applied_price,
                int shift)
   {
-   int handle=iMA(in_symbol,timeframe,period,ma_shift,
+   int handle=iMA(in_symbol,_timeframe,period,ma_shift,
                   ma_method,applied_price);
    if(handle<0)
      {
