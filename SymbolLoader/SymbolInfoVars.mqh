@@ -65,6 +65,10 @@ class CSymbolInfoVars : public CServiceProvider
       InitVars(symbol);
       isfirsttick = new CIsFirstTick(symbol,tf);
    }
+   virtual void OnDeinit()
+   {
+      delete isfirsttick;
+   }
    virtual void OnTick()
    {
       InitVarsTick();

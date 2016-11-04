@@ -5,7 +5,7 @@ class CDependencyItem : public CArrayObj
 public:
    ENUM_CLASS_NAMES caller;
    ENUM_CLASS_NAMES dependency;
-   CAppObject* callback;
+   shared_ptr<CAppObject> callback;
    
    CDependencyItem(ENUM_CLASS_NAMES _caller,
    ENUM_CLASS_NAMES _dependency)
@@ -39,7 +39,7 @@ public:
          idx = this.Total()-1;
       }
       CDependencyItem* item = At(idx);
-      item.callback = callback;
+      item.callback.reset(callback);
    }
    
    virtual CAppObject* GetDependency(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency)
@@ -50,7 +50,7 @@ public:
          return NULL;
       }
       CDependencyItem* item = At(idx);
-      CAppObject* callback = item.callback;
+      CAppObject* callback = item.callback.get();
       CAppObject* obj;
       callback.callback(0,obj);
       Prepare(obj);

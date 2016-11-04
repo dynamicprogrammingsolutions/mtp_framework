@@ -448,3 +448,19 @@ void obj_loadbool(string name, bool& var, int ticket = -1)
       var = MathRound(StrToDouble(str));
    return;
 }
+
+/*
+void change_hline_to_trendline(string name, int bar_start = 5, int bar_end = 0, int ticket = -1)
+{
+   if (ticket != -1)
+      name = ordobjname(ticket,name);
+   if (ObjectFind(name) == -1) return(-1);
+   double price = line_get(name);
+   color cl = ObjectGet(name,OBJPROP_COLOR);
+   datetime time1 = iTime(Symbol(),0,bar_start);
+   datetime time2 = iTime(Symbol(),0,bar_end);
+   objdel(name);
+   obj_put(name, OBJ_TREND, time1, price, time2, price, 0, 0, -1, cl);
+   ObjectSet(name,OBJPROP_RAY_RIGHT,1);
+}
+*/

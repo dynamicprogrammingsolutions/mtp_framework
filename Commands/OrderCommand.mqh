@@ -13,6 +13,7 @@ enum ENUM_ORDER_COMMAND{
    commandCloseSell,
    commandCloseAll,
    commandCloseLast,
+   commandCloseFirst,
 };
 
 class COrderCommand : public CAppObject

@@ -158,9 +158,19 @@ private:
       if (arr == NULL) EError_Ret(false)
 
       if (trigger_id == 0 && automatic_trigger_id) {
-         if (arr.Total() == 0) arr.Add(new CArrayObject<CTriggerCB>());
-         arr.Add(new CArrayObject<CTriggerCB>());
-         trigger_id = arr.Total()-1;
+         int i = 0;
+         CArrayObject<CTriggerCB> *item;
+         while(arr.ForEach(item,i)) {
+            if (item == NULL && i != 1) break;
+         }
+         if (i-1 < arr.Total() && i != 0) {
+            trigger_id = i-1;
+            arr.Update(trigger_id,new CArrayObject<CTriggerCB>());
+         } else {
+            if (arr.Total() == 0) arr.Add(new CArrayObject<CTriggerCB>());
+            arr.Add(new CArrayObject<CTriggerCB>());
+            trigger_id = arr.Total()-1;
+         }
       }
       
       int trigger_idx = trigger_id;

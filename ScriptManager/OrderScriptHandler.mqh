@@ -62,11 +62,11 @@ public:
    {
       if (script.id == 112) {
          Print("Script: ",script.id," ",script.sparam);
-         if (script.sparam == "openbuy") App().trigger.Trigger(classOrderCommand,commandOpenOrder,MakeAppObject(new COrderCommand(ORDER_TYPE_BUY)));
-         if (script.sparam == "opensell")  App().trigger.Trigger(classOrderCommand,commandOpenOrder,MakeAppObject(new COrderCommand(ORDER_TYPE_SELL)));
-         if (script.sparam == "closebuy")  App().trigger.Trigger(classOrderCommand,commandCloseAll,MakeAppObject(new COrderCommand(ORDERSELECT_LONG)));
-         if (script.sparam == "closesell")  App().trigger.Trigger(classOrderCommand,commandCloseAll,MakeAppObject(new COrderCommand(ORDERSELECT_SHORT)));
-         if (script.sparam == "closeall")  App().trigger.Trigger(classOrderCommand,commandCloseAll,MakeAppObject(new COrderCommand(ORDERSELECT_ANY)));
+         if (script.sparam == "gow4_openbuy") App().trigger.Trigger(classOrderCommand,commandOpenOrder,MakeAppObject(new COrderCommand(ORDER_TYPE_BUY)));
+         if (script.sparam == "gow4_opensell")  App().trigger.Trigger(classOrderCommand,commandOpenOrder,MakeAppObject(new COrderCommand(ORDER_TYPE_SELL)));
+         if (script.sparam == "gow4_closebuy")  App().trigger.Trigger(classOrderCommand,commandCloseAll,MakeAppObject(new COrderCommand(ORDERSELECT_LONG)));
+         if (script.sparam == "gow4_closesell")  App().trigger.Trigger(classOrderCommand,commandCloseAll,MakeAppObject(new COrderCommand(ORDERSELECT_SHORT)));
+         if (script.sparam == "gow4_closeall")  App().trigger.Trigger(classOrderCommand,commandCloseAll,MakeAppObject(new COrderCommand(ORDERSELECT_ANY)));
          return true;
       }
       return false;

@@ -3,6 +3,9 @@
 #include "Loader.mqh"
 
 #define ORDER_BASE_H
+
+shared_ptr<CTrade> default_ctrade(new CTrade);
+
 class COrderBase : public COrderInterface
 {
 public:
@@ -115,7 +118,7 @@ public:
       maxid = this.id;
       //Print("new orderbase id: "+this.id);
       
-      if (trade_default == NULL) trade_default = new CTrade;
+      if (trade_default == NULL) trade_default = default_ctrade.get();
       
       trade = trade_default;
       
@@ -848,7 +851,8 @@ bool COrderBase::delete_mm_objects = false;
                hline_put(vprice_objname,GetOpenPrice(),vprice_color,this.ticket);
             } else if (line_price > 0) {
                if (!line_beingdragged(vprice_objname,this.ticket)) {
-                  if (GetOpenPrice() != line_price) {
+                  loadsymbol(this.symbol);
+                  if (!q(GetOpenPrice(),_symbol.PriceRound(line_price))) {
                      SetPrice(line_price);
                      Modify();
                      hline_put(vprice_objname,GetOpenPrice(),vprice_color,this.ticket);
@@ -894,7 +898,8 @@ bool COrderBase::delete_mm_objects = false;
                hline_put(vsl_objname,GetStopLoss(),vsl_color,this.ticket);
             } else if (line_sl > 0) {
                //if (!line_beingdragged(vsl_objname,this.ticket)) {
-                  if (GetStopLoss() != line_sl) {
+                  loadsymbol(this.symbol);
+                  if (!q(GetStopLoss(),_symbol.PriceRound(line_sl))) {
                      SetStopLoss(line_sl);
                      Modify();
                      hline_put(vsl_objname,GetStopLoss(),vsl_color,this.ticket);
@@ -909,7 +914,8 @@ bool COrderBase::delete_mm_objects = false;
                hline_put(vtp_objname,GetTakeProfit(),vtp_color,this.ticket);
             else if (line_tp > 0) {
                //if (!line_beingdragged(vtp_objname,this.ticket)) {
-                  if (GetTakeProfit() != line_tp) {
+                  loadsymbol(this.symbol);
+                  if (!q(GetTakeProfit(),_symbol.PriceRound(line_tp))) {
                      SetTakeProfit(line_tp);
                      Modify();
                      hline_put(vtp_objname,GetTakeProfit(),vtp_color,this.ticket);

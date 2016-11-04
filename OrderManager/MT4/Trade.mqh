@@ -20,7 +20,7 @@ enum ENUM_TRADE_ACTION
    TRADE_ACTION_DELETE
 };
 
-class CTrade : public CObject
+class CTrade : public CAppObject
   {
 public:
    virtual int Type() const { return classMT4Trade; }

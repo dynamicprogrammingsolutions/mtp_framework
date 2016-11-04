@@ -28,15 +28,22 @@ class CButtonManager : public CServiceProvider
 {
 public:
    CAppObjectArrayObj buttons;
-   CActionButton* AddButton(string _name, string text, int x, int y, int w, int h, color cl, CAppObject* callback, int callback_id)
+   CActionButton* AddButton(string _name, string text, int x, int y, int w, int h, color clbg, color clborder, color cltxt, CAppObject* callback, int callback_id)
    {
+      ObjectDelete(_name);
       CActionButton* button = new CActionButton(callback,callback_id);
       button.Create(ChartID(),_name,0,x,y,x+w,y+h);
-      button.Color(cl);
+      button.ColorBackground(clbg);
+      button.ColorBorder(clborder);
+      button.Color(cltxt);
       button.Text(text);
       buttons.Add(button);
       return button;
       
+   }
+   void RemoveAllButtons()
+   {
+      buttons.Clear();
    }
    void RemoveButton(string _name)
    {

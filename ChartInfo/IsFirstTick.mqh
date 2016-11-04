@@ -1,9 +1,11 @@
 //
+#include "..\Loader.mqh"
+
 #ifdef __MQL5__
 #include "..\mql4to5\timeseries.mqh"
 #endif
 
-class CIsFirstTick : CObject
+class CIsFirstTick : public CAppObject
 {
    protected:
       datetime lasttick;

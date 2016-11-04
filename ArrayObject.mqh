@@ -27,6 +27,7 @@ public:
    bool              Shutdown(void);
    //--- methods of filling the array
    bool              Add(T *element);
+   bool              Add(const int pos, T *element);
    
    template<typename T1>
    bool AddArray(const CArrayObject<T1> *src)
@@ -74,63 +75,87 @@ public:
    int               SearchLast(const T *element) const;
    
    template<typename IT>
-   bool ForEach(IT *&item)
+   bool ForEach(IT *&item, const bool ignore_null = false)
    {
       if (foreach_index == 0) {
          foreach_cachemax = Total();
       }
-      if (foreach_index != foreach_cachemax) {
+      while (foreach_index != foreach_cachemax) {
          if (isset(this.At(foreach_index))) {
             item = this.At(foreach_index);
+            foreach_index++;
          } else {
             item = NULL;
+            foreach_index++;
+            if (ignore_null) continue;
          }
-         foreach_index++;
          return true;
-      } else {
-         foreach_index = 0;
-         return false;
       }
+      foreach_index = 0;
+      return false;
    }
    
    template<typename IT>
-   bool ForEachBackward(IT *&item)
+   bool ForEachBackward(IT *&item, const bool ignore_null = false)
    {
       if (foreach_index == 0) {
          foreach_cachemax = Total();
       }
-      if (foreach_index != foreach_cachemax) {
-         if (isset(this.At(foreach_cachemax-foreach_index))) {
-            item = this.At(foreach_cachemax-foreach_index);
+      while (foreach_index != foreach_cachemax) {
+         if (isset(this.At(foreach_cachemax-foreach_index-1))) {
+            item = this.At(foreach_cachemax-foreach_index-1);
             foreach_index++;
-            return true;
          } else {
-            return false;
+            item = NULL;
+            foreach_index++;
+            if (ignore_null) continue;
          }
-      } else {
-         foreach_index = 0;
-         return false;
+         return true;
       }
+      foreach_index = 0;
+      return false;
    }
    
    template<typename IT>
-   bool ForEach(IT *&item, int &index)
+   bool ForEach(IT *&item, int &index, const bool ignore_null = false)
    {
       if (index == 0) {
          foreach_cachemax = Total();
       }
-      if (index != foreach_cachemax) {
+      while (index != foreach_cachemax) {
          if (isset(this.At(index))) {
             item = this.At(index);
             index++;
-            return true;
          } else {
-            return false;
+            item = NULL;
+            index++;
+            if (ignore_null) continue;
          }
-      } else {
-         index = 0;
-         return false;
+         return true;
       }
+      index = 0;
+      return false;
+   }
+
+   template<typename IT>
+   bool ForEachBackward(IT *&item, int &index, const bool ignore_null = false)
+   {
+      if (index == 0) {
+         foreach_cachemax = Total();
+      }
+      while (index != foreach_cachemax) {
+         if (isset(this.At(foreach_cachemax-index-1))) {
+            item = this.At(foreach_cachemax-index-1);
+            index++;
+         } else {
+            item = NULL;
+            index++;
+            if (ignore_null) continue;
+         }
+         return true;
+      }
+      index = 0;
+      return false;
    }
 
 protected:
@@ -302,6 +327,16 @@ bool CArrayObject::Add(T *element)
 //--- successful
    return(true);
   }
+  
+template<typename T>
+bool CArrayObject::Add(const int pos, T *element)
+{
+   if (pos >= m_data_max) {
+      if (!Resize(pos+1)) return false;
+   }
+   return this.Update(pos,element);
+}
+
 //+------------------------------------------------------------------+
 //| Adding an element to the end of the array from another array     |
 //+------------------------------------------------------------------+

@@ -1,6 +1,7 @@
 //
 
-#include <Arrays\ArrayObj.mqh>
+#include "..\Loader.mqh"
+#property strict
 
 enum ENUM_SIGNAL {
    SIGNAL_NONE = -1,
@@ -15,7 +16,7 @@ enum ENUM_SIGNAL_RELATION {
    SIGNAL_RELATION_OR
 };
 
-class CSignal : public CAppObjectArrayObj {
+class CSignal : public CArrayObject<CAppObject> {
 
 public:
    CSignal* signalcontainer;
@@ -49,7 +50,7 @@ public:
    bool Add(CObject* element)
    {
       ((CSignal*)element).signalcontainer = GetPointer(this);
-      return CAppObjectArrayObj::Add(element);      
+      return CArrayObject<CAppObject>::Add(element);      
    }
       
    CSignal* Subsignal(int i)
@@ -58,7 +59,6 @@ public:
    }
       
    void Run(int current_bar = -1) {
-      if (current_bar >= 0) this.bar = current_bar;
       BeforeExecute();
       if (execute_enabled) {
          GetSignal(current_bar);
@@ -69,22 +69,24 @@ public:
       
    virtual void GetSignal(int current_bar = -1) {
       if (current_bar >= 0) this.bar = current_bar;  
+
+      if (subsignal_enabled)
+         GetSubSignals();
+
       if (localsignal_enabled)
          CalculateValues();
-   
-      if (subsignal_enabled)
-         RunSubSignals();
    
       if (opensignal_enabled) GetOpenSignal();
       if (closesignal_enabled) GetCloseSignal();
 
    }
    
-   virtual void RunSubSignals()
+   virtual void GetSubSignals()
    {
       for (int i = 0; i < Total(); i++ ) {
-         CSignal* subsignal = At(i);   
-         subsignal.Run(bar);
+         CSignal* subsignal = At(i);  
+         if (subsignal != NULL) 
+            subsignal.GetSignal(bar);
       }   
    }
    
@@ -99,7 +101,7 @@ public:
       if (subsignal_enabled) {
          for (int i = 0; i < Total(); i++ ) {
             CSignal* subsignal = At(i);         
-            if (subsignal.opensignal_enabled) {
+            if (subsignal != NULL && subsignal.opensignal_enabled) {
                AddSubOpenSignal(subsignal);
             }       
          }
@@ -118,7 +120,7 @@ public:
       if (subsignal_enabled) {
          for (int i = 0; i < Total(); i++ ) {
             CSignal* subsignal = At(i);
-            if (subsignal.closesignal_enabled) {
+            if (subsignal != NULL && subsignal.closesignal_enabled) {
                AddSubCloseSignal(subsignal);
             }            
          }
@@ -145,6 +147,13 @@ public:
       valid = true;
       closesignal_valid = true;
       execute_enabled = true;
+      
+      for (int i = 0; i < Total(); i++ ) {
+         CSignal* subsignal = At(i);  
+         if (subsignal != NULL) 
+            subsignal.BeforeExecute();
+      }
+      
       if (!BeforeFilter()) {
          valid = false;
          closesignal_valid = false;
@@ -153,6 +162,11 @@ public:
    }
    
    virtual void AfterExecute() {
+      for (int i = 0; i < Total(); i++ ) {
+         CSignal* subsignal = At(i);  
+         if (subsignal != NULL) 
+            subsignal.AfterExecute();
+      }
       if (!AfterFilter()) {
          valid = false;
       }
@@ -231,7 +245,8 @@ public:
       if (subsignal_enabled) {
          for (int i = 0; i < Total(); i++ ) {
             CSignal* subsignal = At(i);
-            subsignal.OnTick();
+            if (subsignal != NULL)
+               subsignal.OnTick();
          }
       }
    }
@@ -248,7 +263,7 @@ public:
    
 };
 
-class COpenSignal : public CSignal {
+class    COpenSignal : public CSignal {
 public:
    COpenSignal() {
       localsignal_enabled = true;
