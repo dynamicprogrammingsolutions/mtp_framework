@@ -60,6 +60,13 @@ public:
          button.Check();
       }*/
    }
+   virtual void OnTick()
+   {
+      CActionButton* button;
+      while(buttons.ForEach(button)) {
+         button.Check();
+      }
+   }
    virtual void OnChartEvent(int id,long lparam,double dparam,string sparam)
    {
       CActionButton* button;

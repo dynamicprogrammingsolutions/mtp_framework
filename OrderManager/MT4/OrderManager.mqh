@@ -69,9 +69,9 @@ public:
    virtual COrderInterface* NewOrder(COrderInterface* _order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagementInterface* mm, CStopsCalcInterface* _price,
                                     CStopsCalcInterface* _stoploss, CStopsCalcInterface* _takeprofit,const string _comment="",const datetime _expiration=0);
 
-   virtual POrder NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,PMoneyManagement &mm, PStopsCalc &_price,
+   virtual COrderInterface* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,PMoneyManagement &mm, PStopsCalc &_price,
                                     PStopsCalc &_stoploss, PStopsCalc &_takeprofit,const string _comment="",const datetime _expiration=0);
-   virtual POrder NewOrder(POrder &_order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,PMoneyManagement &mm, PStopsCalc &_price,
+   virtual COrderInterface* NewOrder(POrder &_order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,PMoneyManagement &mm, PStopsCalc &_price,
                                     PStopsCalc &_stoploss, PStopsCalc &_takeprofit,const string _comment="",const datetime _expiration=0);
   
    virtual COrderInterface* NewOrderObject() { return this.App().NewObject(neworder); }
@@ -160,7 +160,7 @@ COrderInterface* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER
    return(_order);
 }
 
-POrder COrderManager::NewOrder(POrder &_order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,PMoneyManagement &_mm,PStopsCalc &_price,
+COrderInterface* COrderManager::NewOrder(POrder &_order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,PMoneyManagement &_mm,PStopsCalc &_price,
                                  PStopsCalc &_stoploss,PStopsCalc &_takeprofit,const string _comment="",const datetime _expiration=0)
 {
    App().symbolloader.LoadSymbol(in_symbol).RefreshRates();
@@ -192,17 +192,17 @@ POrder COrderManager::NewOrder(POrder &_order, const string in_symbol,const ENUM
       
    App().orderrepository.Add(_order.get());
 
-   return(_order);
+   return(_order.get());
 }
 
-POrder COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,PMoneyManagement &_mm,PStopsCalc &_price,
+COrderInterface* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,PMoneyManagement &_mm,PStopsCalc &_price,
                                  PStopsCalc &_stoploss,PStopsCalc &_takeprofit,const string _comment="",const datetime _expiration=0)
 {
    loadsymbol(in_symbol);
    _symbol.RefreshRates();
    POrder _order = NewOrderObject();
    NewOrder(_order, in_symbol, _ordertype,_mm,_price,_stoploss,_takeprofit,_comment,_expiration);
-   return(_order);
+   return(_order.get());
 }
 
 

@@ -354,9 +354,25 @@ public:
    }
    weak_ptr(const base_ptr<T> &ptr)
    {
+      //Print("construct weak_ptr from base_ptr");
       m_ptrtype = ptrWeak;
       sharedobj = ptr.get();            
    }
+   /*weak_ptr(const weak_ptr<T> &ptr)
+   {
+      m_ptrtype = ptrWeak;
+      sharedobj = ptr.get();            
+   }
+   weak_ptr(const shared_ptr<T> &ptr)
+   {
+      m_ptrtype = ptrWeak;
+      sharedobj = ptr.get();            
+   }
+   weak_ptr(const unique_ptr<T> &ptr)
+   {
+      m_ptrtype = ptrWeak;
+      sharedobj = ptr.get();            
+   }*/
    weak_ptr(T *obj)
    {
       m_ptrtype = ptrWeak;

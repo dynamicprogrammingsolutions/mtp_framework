@@ -41,9 +41,9 @@ public:
    }
 
    template <typename T>
-   PAppObject CallbackObj(T &p)
+   CObject* CallbackObj(T &p)
    {
-      return callbackobj.get().callback_obj(handler_id,p).get();
+      return callbackobj.get().callback_obj(handler_id,p);
    }
    
    void Callback()
@@ -66,7 +66,7 @@ public:
       return callbackobj.get().callback_int(handler_id);
    }
 
-   PAppObject CallbackObj()
+   CObject* CallbackObj()
    {
       return callbackobj.get().callback_obj(handler_id);
    }
@@ -306,7 +306,7 @@ public:
       return 0;
    }
    
-   PAppObject TriggerObj(const int classtype, const int trigger_id, BAppObject &p)
+   CObject* TriggerObj(const int classtype, const int trigger_id, BAppObject &p)
    {
       CArrayObject<CTriggerCB> *callbacks = GetCallbacks(classtype,trigger_id);
       if (callbacks == NULL) return NULL;
@@ -390,7 +390,7 @@ public:
    }
    
    template<typename T>
-   PAppObject TriggerObj(const int classtype, const int trigger_id, T p)
+   CObject* TriggerObj(const int classtype, const int trigger_id, T p)
    {
       CArrayObject<CTriggerCB> *callbacks = GetCallbacks(classtype,trigger_id);
       if (callbacks == NULL) return NULL;

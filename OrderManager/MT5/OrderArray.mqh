@@ -48,6 +48,8 @@ public:
             //_order.Update();
             if (isset(_order)) {
                if (!state_select(stateselect,_order.State())) { continue; }
+               // Temporarily exluding all Closed orders as it cannot be exluded by state select
+               if (_order.Closed()) { continue; }
                if (!ordertype_select(orderselect,_order.GetType())) { continue; }
                if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
                if (in_magic != -1 && _order.GetMagicNumber() != in_magic) { continue; }
@@ -69,6 +71,8 @@ public:
             //_order.Update();
             if (isset(_order)) {
                if (!state_select(stateselect,_order.State())) { continue; }
+               // Temporarily exluding all Closed orders as it cannot be exluded by state select
+               if (_order.Closed()) { continue; }
                if (!ordertype_select(orderselect,_order.GetType())) { continue; }
                if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
                if (in_magic != -1 && _order.GetMagicNumber()  != in_magic) { continue; }
@@ -114,6 +118,8 @@ public:
             _order = this.At(i);
             if (isset(_order)) {
                if (!state_select(stateselect,_order.State())) { continue; }
+               // Temporarily exluding all Closed orders as it cannot be exluded by state select
+               if (_order.Closed()) { continue; }
                if (!ordertype_select(orderselect,_order.GetType())) { continue; }
                if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
                if (in_magic != -1 && _order.GetMagicNumber()  != in_magic) { continue; }
@@ -135,6 +141,8 @@ public:
             //_order.Update();
             if (isset(_order)) {
                if (!state_select(stateselect,_order.State())) { continue; }
+               // Temporarily exluding all Closed orders as it cannot be exluded by state select
+               if (_order.Closed()) { continue; }
                if (!ordertype_select(orderselect,_order.GetType())) { continue; }
                if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
                if (in_magic != -1 && _order.GetMagicNumber()  != in_magic) { continue; }
@@ -170,6 +178,8 @@ public:
             //_order.Update();
             if (isset(_order)) {
                if (!state_select(stateselect,_order.State())) { continue; }
+               // Temporarily exluding all Closed orders as it cannot be exluded by state select
+               if (_order.Closed()) { continue; }
                if (!ordertype_select(orderselect,_order.GetType())) { continue; }
                if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
                if (in_magic != -1 && _order.GetMagicNumber() != in_magic) { continue; }
@@ -196,6 +206,8 @@ public:
             //_order.Update();
             if (isset(_order)) {
                if (!state_select(stateselect,_order.State())) { continue; }
+               // Temporarily exluding all Closed orders as it cannot be exluded by state select
+               if (_order.Closed()) { continue; }
                if (in_symbol != "" && _order.GetSymbol() != in_symbol) { continue; }
                if (in_magic != -1 && _order.GetMagicNumber()  != in_magic) { continue; }
                if (!ordertype_select(orderselect,_order.GetType())) { continue; }

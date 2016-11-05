@@ -548,14 +548,17 @@ void COrder::OnTick()
             }
          }
          if (!has_open_attached) {
-            if (NormalizeDouble(volume-closedvolume,8) == 0) this.closed = true;
-            else if (volume-closedvolume < 0) {
+            if (NormalizeDouble(volume-closedvolume,8) == 0) {
+               this.closed = true;
+               event.Info("Order Closed: "+(string)this.Id(),__FUNCTION__);
+            } else if (volume-closedvolume < 0) {
                loadsymbol(symbol);
                if (_symbol.LotRound(closedvolume-volume) == closedvolume-volume) {
                   event.Warning("Too many attached order triggered, opening balance order",__FUNCTION__);
                   ENUM_ORDER_TYPE balancetype = ordertype_long(this.ordertype)?ORDER_TYPE_BUY:ORDER_TYPE_SELL;
                   CreateAttached(balancetype,closedvolume-volume,0,0,"balance","");
                   closed = true;
+                  event.Info("Order Closed: "+(string)this.Id(),__FUNCTION__);
                }
             }
          }

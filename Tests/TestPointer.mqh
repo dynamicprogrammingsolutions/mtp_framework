@@ -67,7 +67,7 @@ bool AssertObject(const CAppObject *obj, const bool is_set, const int ref_count 
 bool AssertObjectNULL(const CAppObject *obj)
 {
    bool ret = true;
-   ret &= AssertEqual(obj,(CAppObject*)NULL,"obj",false);
+   ret &= Assert(obj==NULL,"obj","is NULL",NULL,false);
    if (isset(obj)) {
       ret &= AssertEqual(obj.RefCount(),0,"refcount",false);
       ret &= AssertEqual(obj.Owned(),false,"owned",false);
@@ -1049,6 +1049,8 @@ virtual bool OnBegin()
    // Test shared pointer
    _DisableReportingError = true;
    _DisableReportingWarning = true;
+   
+   //logall = true;
    
    TestSharedPtrConstructors();
    TestUniquePtrConstructors();

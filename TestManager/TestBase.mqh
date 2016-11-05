@@ -12,6 +12,8 @@ private:
    bool failed;
    string test_name;
 public:
+   bool logall;
+
    virtual bool IsStarted()
    {
       return started;
@@ -74,6 +76,7 @@ public:
       AssertNoError();
       Check();
       test_name = name;
+      if (logall) Print("Test: "+name);
    }
    
    bool Check()
@@ -113,7 +116,7 @@ public:
    }
 
    
-   bool Assert(bool assertion, string name, string info = NULL, bool print_on_success = true, bool print_on_fail = true)
+   bool Assert(bool assertion, string name, string info = NULL, bool print_on_success = false, bool print_on_fail = true)
    {
       if (assertion) {
          if (print_on_success) Print("success: Assertion '"+name+"' "+(info!=NULL?(" ("+info+")"):""));

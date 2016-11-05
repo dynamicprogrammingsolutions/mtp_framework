@@ -69,7 +69,7 @@ public:
    virtual bool OnBeginOnTick()
    {
       Print("TestOrder Started");
-      this.order.assign(om.NewOrder(symbol,ordertype,mm,entry,sl,tp,comment));
+      this.order.reset(om.NewOrder(symbol,ordertype,mm,entry,sl,tp,comment));
       COrderInterface* p_order = this.order.get();
       
       timeopened = TimeCurrent();

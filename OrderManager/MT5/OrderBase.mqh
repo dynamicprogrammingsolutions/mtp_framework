@@ -54,6 +54,8 @@ public:
 
 public:
    int id;
+   
+   virtual int Id() { return id; }
    string comment;
    int magic; // magic is not sent to server, if "restore orders from server" is developed, it will be needed
 
@@ -216,6 +218,8 @@ public:
    
    ENUM_ORDER_STATE State();
    //void State(ENUM_ORDER_STATE newstate);
+   virtual ENUM_EXECUTE_STATE ExecuteState() { return this.executestate; }
+
    
    double Price();
    double CurrentPrice();

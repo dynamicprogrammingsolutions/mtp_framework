@@ -129,8 +129,8 @@ public:
       {
          TestName("Trigger using dynamic trigger id");
          
-         int trigger1;
-         int trigger2;
+         int trigger1 = 0;
+         int trigger2 = 0;
          
          App().trigger.Register(classid,trigger1,cb,called_id+1);
          App().trigger.Register(classid,trigger2,cb,called_id+2);
@@ -227,7 +227,7 @@ public:
             App().trigger.Trigger(classid,trigger,param);
             AssertCallback(++funcid,called_id);
 
-            CAppObject *retobj = App().trigger.TriggerObj(classid,trigger,param).get();
+            CAppObject *retobj = App().trigger.TriggerObj(classid,trigger,param);
             AssertCallback(++funcid,called_id);
             AssertEqual(((CTestCallbackObject*)cb.get()).retobj.get().Id(),retobj.Id(),"return object",false);
    
@@ -252,7 +252,7 @@ public:
             App().trigger.Trigger(classid,trigger,param);
             AssertCallback(++funcid,called_id);
 
-            CAppObject *retobj = App().trigger.TriggerObj(classid,trigger,param).get();
+            CAppObject *retobj = App().trigger.TriggerObj(classid,trigger,param);
             AssertCallback(++funcid,called_id);
             AssertEqual(((CTestCallbackObject*)cb.get()).retobj.get().Id(),retobj.Id(),"return object",false);
    
@@ -277,7 +277,7 @@ public:
             App().trigger.Trigger(classid,trigger,param);
             AssertCallback(++funcid,called_id);
 
-            CAppObject *retobj = App().trigger.TriggerObj(classid,trigger,param).get();
+            CAppObject *retobj = App().trigger.TriggerObj(classid,trigger,param);
             AssertCallback(++funcid,called_id);
             AssertEqual(((CTestCallbackObject*)cb.get()).retobj.get().Id(),retobj.Id(),"return object",false);
    
@@ -302,7 +302,7 @@ public:
             App().trigger.Trigger(classid,trigger,param);
             AssertCallback(++funcid,called_id);
 
-            CAppObject *retobj = App().trigger.TriggerObj(classid,trigger,param).get();
+            CAppObject *retobj = App().trigger.TriggerObj(classid,trigger,param);
             AssertCallback(++funcid,called_id);
             AssertEqual(((CTestCallbackObject*)cb.get()).retobj.get().Id(),retobj.Id(),"return object",false);
    
@@ -492,6 +492,7 @@ public:
    {
       _DisableReportingInfo = true;
       Reset();
+      //logall = true;
       TestRegister();
       TestTrigger();
       TestMacros();
@@ -532,31 +533,31 @@ public:
    }
    
    virtual void callback(const int id, bool obj) { TEST_CALLBACK(1) return; }
-   virtual PAppObject callback_obj(const int id, bool obj) { TEST_CALLBACK(2) return MakeAppObject(retobj.get()); }
+   virtual CObject* callback_obj(const int id, bool obj) { TEST_CALLBACK(2) return retobj.get(); }
    virtual bool callback_bool(const int id, bool obj) { TEST_CALLBACK(3) TEST_CALLBACK_BOOL return retbool; }
    virtual double callback_double(const int id, bool obj) { TEST_CALLBACK(4) return retdouble; }
    virtual int callback_int(const int id, bool obj) { TEST_CALLBACK(5) return retint; }
 
    virtual void callback(const int id, int obj) { TEST_CALLBACK(6) return; }
-   virtual PAppObject callback_obj(const int id, int obj) { TEST_CALLBACK(7) return MakeAppObject(retobj.get()); }
+   virtual CObject* callback_obj(const int id, int obj) { TEST_CALLBACK(7) return retobj.get(); }
    virtual bool callback_bool(const int id, int obj) { TEST_CALLBACK(8) TEST_CALLBACK_BOOL return retbool; }
    virtual double callback_double(const int id, int obj) { TEST_CALLBACK(9) return retdouble; }
    virtual int callback_int(const int id, int obj) { TEST_CALLBACK(10) return retint; }
 
    virtual void callback(const int id, double obj) { TEST_CALLBACK(11) return; }
-   virtual PAppObject callback_obj(const int id, double obj) { TEST_CALLBACK(12) return MakeAppObject(retobj.get()); }
+   virtual CObject* callback_obj(const int id, double obj) { TEST_CALLBACK(12) return retobj.get(); }
    virtual bool callback_bool(const int id, double obj) { TEST_CALLBACK(13) TEST_CALLBACK_BOOL return retbool; }
    virtual double callback_double(const int id, double obj) { TEST_CALLBACK(14) return retdouble; }
    virtual int callback_int(const int id, double obj) { TEST_CALLBACK(15) return retint; }
 
    virtual void callback(const int id, BAppObject &obj) { TEST_CALLBACK(16) return; }
-   virtual PAppObject callback_obj(const int id, BAppObject &obj) { TEST_CALLBACK(17) return MakeAppObject(retobj.get()); }
+   virtual CObject* callback_obj(const int id, BAppObject &obj) { TEST_CALLBACK(17) return retobj.get(); }
    virtual bool callback_bool(const int id, BAppObject &obj) { TEST_CALLBACK(18) TEST_CALLBACK_BOOL return retbool; }
    virtual double callback_double(const int id, BAppObject &obj) { TEST_CALLBACK(19) return retdouble; }
    virtual int callback_int(const int id, BAppObject &obj) { TEST_CALLBACK(20) return retint; }
 
    virtual void callback(const int id) { TEST_CALLBACK(21) return; }
-   virtual PAppObject callback_obj(const int id) { TEST_CALLBACK(22) return MakeAppObject(retobj.get()); }
+   virtual CObject* callback_obj(const int id) { TEST_CALLBACK(22) return retobj.get(); }
    virtual bool callback_bool(const int id) { TEST_CALLBACK(23) TEST_CALLBACK_BOOL return retbool; }
    virtual double callback_double(const int id) { TEST_CALLBACK(24) return retdouble; }
    virtual int callback_int(const int id) { TEST_CALLBACK(25) return retint; }
