@@ -29,16 +29,16 @@
 #define TRIGGER_OBJ_P(__class__,__trigger__,__param__) App().trigger.TriggerObj(__class__,__trigger__,__param__)
 
 #define CALLBACK_VOID(__functions__) virtual void callback(const int id) { switch(id) { __functions__ } return; }
-#define CALLBACK_BOOL(__functions__) virtual bool callback(const int id) { switch(id) { __functions__ } return false; }
-#define CALLBACK_INT(__functions__) virtual int callback(const int id) { switch(id) { __functions__ } return 0; }
-#define CALLBACK_DOUBLE(__functions__) virtual double callback(const int id) { switch(id) { __functions__ } return 0; }
-#define CALLBACK_OBJ(__functions__) virtual PAppObject callback(const int id) { switch(id) { __functions__ } return MakeAppObject(); }
+#define CALLBACK_BOOL(__functions__) virtual bool callback_bool(const int id) { switch(id) { __functions__ } return false; }
+#define CALLBACK_INT(__functions__) virtual int callback_int(const int id) { switch(id) { __functions__ } return 0; }
+#define CALLBACK_DOUBLE(__functions__) virtual double callback_double(const int id) { switch(id) { __functions__ } return 0; }
+#define CALLBACK_OBJ(__functions__) virtual PAppObject callback_obj(const int id) { switch(id) { __functions__ } return MakeAppObject(); }
 
 #define CALLBACK_VOID_P(__parameter__,__functions__) virtual void callback(const int id, __parameter__) { switch(id) { __functions__ } return; }
-#define CALLBACK_BOOL_P(__parameter__,__functions__) virtual bool callback(const int id, __parameter__) { switch(id) { __functions__ } return false; }
-#define CALLBACK_INT_P(__parameter__,__functions__) virtual int callback(const int id, __parameter__) { switch(id) { __functions__ } return 0; }
-#define CALLBACK_DOUBLE_P(__parameter__,__functions__) virtual double callback(const int id, __parameter__) { switch(id) { __functions__ } return 0; }
-#define CALLBACK_OBJ_P(__parameter__,__functions__) virtual PAppObject callback(const int id, __parameter__) { switch(id) { __functions__ } return MakeAppObject(); }
+#define CALLBACK_BOOL_P(__parameter__,__functions__) virtual bool callback_bool(const int id, __parameter__) { switch(id) { __functions__ } return false; }
+#define CALLBACK_INT_P(__parameter__,__functions__) virtual int callback_int(const int id, __parameter__) { switch(id) { __functions__ } return 0; }
+#define CALLBACK_DOUBLE_P(__parameter__,__functions__) virtual double callback_double(const int id, __parameter__) { switch(id) { __functions__ } return 0; }
+#define CALLBACK_OBJ_P(__parameter__,__functions__) virtual PAppObject callback_obj(const int id, __parameter__) { switch(id) { __functions__ } return MakeAppObject(); }
 
 #define CBFUNC_VOID(__id__,__call__) case __id__: __call__(); break;
 #define CBFUNC_BOOL(__id__,__call__) case __id__: return __call__(); break;

@@ -39,24 +39,31 @@ public:
    virtual bool OnOrder(COrderInterface* in_order)
    {
       if (!isset(in_order)) return false;
-      CStopsCalcInterface* newsl = Calc(in_order);
-      if (isset(newsl)) {
-         //in_order.PrepareSLForModify(newsl);
-         //Print("new sl: "+newsl.GetPrice()+" ticks: "+newsl.GetTicks());
+      shared_ptr<CStopsCalcInterface> newsl = Calc(in_order);
+      if (newsl.isset()) {
          if (checkhigher) {
-            if (newsl.SetEntryPrice(in_order.GetOpenPrice()).SetSymbol(in_order.GetSymbol()).SetOrderType(in_order.GetType()).GetTicks() >= in_order.GetStopLossTicks()) {
-               delete newsl;
+            if (newsl.get().SetEntryPrice(in_order.GetOpenPrice()).SetSymbol(in_order.GetSymbol()).SetOrderType(in_order.GetType()).GetTicks() >= in_order.GetStopLossTicks()) {
                return false;
             }
          }
-         in_order.SetStopLoss(newsl,true);
+         in_order.SetStopLoss(newsl.get(),true);
          bool ret = in_order.Modify();
-         delete newsl;
          return ret;
       }
       return false;
    }
 
+};
+
+class CTrailingSLStopsCalc : public CTrailingSL
+{
+public:
+   shared_ptr<CStopsCalcInterface> slcalc;
+   CTrailingSLStopsCalc(CStopsCalcInterface* _slcalc, bool _checkhigher) : slcalc(_slcalc) { checkhigher = _checkhigher; }
+   virtual CStopsCalcInterface* Calc(COrderInterface* in_order)
+   {
+      return slcalc.get();
+   }
 };
 
 class CTrailingSLTicks : public CTrailingSL

@@ -1,35 +1,33 @@
 //
+#include "Loader.mqh"
 #include "OrderSet.mqh"
 #include "..\libraries\file.mqh"
 
-class COrderSetArray : public CServiceProviderArrayObj {
+class COrderSetArray : public CArrayObject<COrderSet> {
 public:
-   CAppObject* newobjectcallback;
+   shared_ptr<CAppObject> newobjectcallback;
 
 public:
    virtual int Type() const { return classMT4OrderSetArray; }
 
 public:
-   virtual bool  CreateElement(const int index) {
-      Print("create new set element");
-      m_data[index] = NewSetObject();
-      return(true);
-   }
 
    COrderSetArray()
    {
-      newobjectcallback = new COrderSet();
+      newobjectcallback.reset(new COrderSet());
+      NewElement(newobjectcallback.get());
    }
    
    COrderSetArray(CAppObject* newobj)
    {
-      newobjectcallback = newobj;
+      newobjectcallback.reset(newobj);
+      NewElement(newobj);
    }
 
    virtual COrderSet* NewSetObject()
    {
       CAppObject* obj;
-      newobjectcallback.callback(0,obj);
+      newobjectcallback.get().callback(0,obj);
       return obj;
    }
 
@@ -70,7 +68,7 @@ public:
    {
       if (set.closed) {
       	 //set.FreeMode(false);
-      	 Print("delete set "+set.id);
+      	 //Print("delete set "+set.id);
       	 this.Delete(idx);
       }
    }

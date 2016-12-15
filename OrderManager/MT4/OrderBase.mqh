@@ -259,9 +259,9 @@ public:
    virtual bool SetStopLoss(CStopsCalcInterface* _sl, bool checkchange = false, bool checkhigher = false);
    virtual bool SetTakeProfit(CStopsCalcInterface* _tp, bool check = false);
    
-   static void DeleteIf(CStopsCalc* obj) {
+   /*static void DeleteIf(CStopsCalc* obj) {
       if (obj.DeleteAfterUse()) delete obj;
-   }
+   }*/
 /*
    static void DeleteIf(CTakeProfit* obj) {
       if (obj.DeleteAfterUse()) delete obj;
@@ -271,9 +271,9 @@ public:
       if (obj.DeleteAfterUse()) delete obj;
    }
    */
-   static void DeleteIf(CMoneyManagement* obj) {
+   /*static void DeleteIf(CMoneyManagement* obj) {
       if (obj.DeleteAfterUse()) delete obj;
-   }
+   }*/
 
    virtual bool Save(const int handle)
    {
@@ -671,6 +671,7 @@ bool COrderBase::delete_mm_objects = false;
    
    bool COrderBase::Modify()
    {      
+      if (!price_set && !sl_set && !tp_set && !expiration_set) return false;
       activity = activity | (ushort)ACTIVITY_MODIFY;
       if (Select()) {
          double real_sl = 0, real_tp = 0;
@@ -935,10 +936,10 @@ bool COrderBase::delete_mm_objects = false;
       double thissl = _symbol.PriceRound(_sl.GetPrice());
       double thisslticks = _sl.GetTicks();
       if (
-         (checkchange && thissl == _symbol.PriceRound(this.GetStopLoss())) ||
-         (checkhigher && thisslticks >= this.GetStopLossTicks())
+         (checkchange && q(thissl,_symbol.PriceRound(this.GetStopLoss()))) ||
+         (checkhigher && lq(thisslticks,this.GetStopLossTicks()))
       ) {
-         DeleteIf(_sl);
+         //DeleteIf(_sl);
          return false;
       }
       SetStopLoss(thissl);
@@ -949,17 +950,17 @@ bool COrderBase::delete_mm_objects = false;
    {
       if (!check) {
          SetTakeProfit(_tp.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice()).GetPrice());
-         DeleteIf(_tp);
+         //DeleteIf(_tp);
          return true;
       } else {
          loadsymbol(this.symbol);
          double thistp = _symbol.PriceRound(_tp.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice()).GetPrice());
          if (thistp != _symbol.PriceRound(this.GetTakeProfit())) {
             SetTakeProfit(thistp);
-            DeleteIf(_tp);
+            //DeleteIf(_tp);
             return true;
          } else {
-            DeleteIf(_tp);
+            //DeleteIf(_tp);
             return false;
          }
       }

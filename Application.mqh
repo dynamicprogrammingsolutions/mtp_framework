@@ -131,6 +131,13 @@ public:
    {
       services.OnTick();
    }
+
+   int OnCalculate (const int rates_total,      // size of input time series
+                 const int prev_calculated,  // bars handled in previous call
+   )
+   {
+      return services.OnCalculate(rates_total,prev_calculated);
+   }
    
    void OnDeinit()
    {

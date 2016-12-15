@@ -63,7 +63,7 @@ public:
    {
       if (IsExpired()) {
          if (comment_enabled) addcomment("EA Expired\n");
-         if (this.App().ServiceIsRegistered(srvMain)) application.DeregisterService(srvMain);
+         if (this.App().ServiceIsRegistered(srvMain)) App().DeregisterService(srvMain);
       } else {
          if (comment_enabled) addcomment("This is a test version. EA will work until "+TimeToStr(GetExpirationTime()-1,TIME_DATE)+"\n");
       }

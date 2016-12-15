@@ -117,6 +117,21 @@ public:
       }
    }
    
+   int OnCalculate (const int rates_total,      // size of input time series
+                 const int prev_calculated,  // bars handled in previous call
+   )
+   {
+      int ret = -1;
+      for (int i = 0; i < Total(); i++) {
+         CServiceProvider* service = ServiceProvider(i);
+         if (service.use_oncalculate) {
+            service.OnCalculate(rates_total,prev_calculated);
+            if (ret >= 0) return ret;
+         }
+      }
+      return 0;
+   }
+   
    void OnTick()
    {
       //int count = Total();

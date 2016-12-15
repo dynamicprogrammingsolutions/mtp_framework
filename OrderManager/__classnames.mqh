@@ -6,6 +6,7 @@ classOrderDataSaver,
 classAttachedOrder,
 classOrder,
 classOrderSimulated,
+classOrderManager,
 #ifdef __MQL4__
 #include "MT4\__classnames.mqh"
 #endif

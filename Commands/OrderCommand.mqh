@@ -90,6 +90,7 @@ public:
       return defaultselect;
    }
    
+   /*
    template<typename T>
    static shared_ptr<CStopsCalcInterface> GetEntry(CObject* commandobj, shared_ptr<T> &defaultentry)
    {
@@ -133,6 +134,7 @@ public:
       def.Assign(defaultmm);
       return def;
    }
+   */
    
 };
 

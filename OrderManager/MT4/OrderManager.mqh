@@ -140,11 +140,11 @@ COrderInterface* COrderManager::NewOrder(COrderInterface* _order, const string i
       
    App().orderrepository.Add(_order);
 
-   if (_price != NULL) COrderBase::DeleteIf(_price);
+   /*if (_price != NULL) COrderBase::DeleteIf(_price);
    if (_stoploss != NULL) COrderBase::DeleteIf(_stoploss);
-   if (_takeprofit != NULL) COrderBase::DeleteIf(_takeprofit);
+   if (_takeprofit != NULL) COrderBase::DeleteIf(_takeprofit);*/
    
-   COrderBase::DeleteIf(_mm);
+   //COrderBase::DeleteIf(_mm);
 
    return(_order);
 }

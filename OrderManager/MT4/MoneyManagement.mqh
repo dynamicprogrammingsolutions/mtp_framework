@@ -5,16 +5,16 @@
 #define MONEY_MANAGEMENT_H
 class CMoneyManagement : public CMoneyManagementInterface {
 private:
-   bool delete_after_use;   
+   //bool delete_after_use;   
 
 public:
    TraitAppAccess
    TraitLoadSymbolFunction
 
    virtual int Type() const { return classMT4MoneyManagement; }
-   virtual bool DeleteAfterUse() { return delete_after_use; }
-   void DeleteAfterUse(bool value) { delete_after_use = value; }
-   CMoneyManagement* UseOnce() { this.delete_after_use = true; return GetPointer(this); }
+   /*virtual bool DeleteAfterUse() { return delete_after_use; }
+   void DeleteAfterUse(bool value) { delete_after_use = value; }*/
+   //CMoneyManagement* UseOnce() { this.delete_after_use = true; return GetPointer(this); }
 
 public:
    string symbol;
@@ -43,18 +43,18 @@ public:
    virtual double GetLotsize() { return 0; }
 };
 
-class CLotsize : public CMoneyManagement
+/*class CLotsize : public CMoneyManagement
 {
 public:
    double lotsize;
    CLotsize(double _lotsize) {
       lotsize = _lotsize;
-      DeleteAfterUse(true);
+      //DeleteAfterUse(true);
    }
    virtual double GetLotsize() {
       return lotsize;
    }
-};
+};*/
 
 class CMoneyManagementFixed : public CMoneyManagement
 {
@@ -98,13 +98,15 @@ public:
    {
       
    }
-   CMoneyManagementExponential(CMoneyManagement* _mm, double _multiplier) {
+   CMoneyManagementExponential(CMoneyManagement* _mm, double _multiplier, double in_maximum_lotsize = 0) {
       mm = _mm;
       multiplier = _multiplier;
+      maximum_lotsize = in_maximum_lotsize;
    }
-   CMoneyManagementExponential(double _lotsize, double _multiplier) {
+   CMoneyManagementExponential(double _lotsize, double _multiplier, double in_maximum_lotsize = 0) {
       lotsize = _lotsize;
       multiplier = _multiplier;
+      maximum_lotsize = in_maximum_lotsize;
    }
    virtual double GetLotsize() {
       if (mm != NULL && (lotsize == 0 || level == 0)) lotsize = mm.SetStopLoss(this.stoploss).SetSymbol(this.symbol).GetLotsize();

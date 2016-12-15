@@ -3,14 +3,8 @@
 
 class COrderSet : public COrderArray {
 public:
-   virtual int Type() const { return classMT4OrderSet; }
-
-public:
-   bool callback(const int _id,CObject *&obj)
-   {
-      obj = new COrderSet();
-      return true;
-   }
+   TraitGetType(classMT4OrderSet)
+   TraitNewObject(COrderSet)
 
    int id;
    static int highest_id;
@@ -58,12 +52,11 @@ public:
       
       int total;
       file.ReadInteger(total);
-      COrderManager* om = APP.GetService(srvOrderManager);
       for (int i = 0; i < total; i++) {
          int _id;
          file.ReadInteger(_id);
          Print("finding order id "+_id);
-         COrder* order = om.GetById(_id);
+         COrder* order = App().orderrepository.GetById(_id);
          if (isset(order)) {
             Print("adding order "+order.ticket);
             this.Add(order);

@@ -302,7 +302,8 @@ void removecomment_(int id)
 void writecomment_noformat()
 {
    if (!comments_enabled) return;
-   Comment(commentstring[0]);
+   if (ArraySize(commentstring) >= 1)
+      Comment(commentstring[0]);
 }
 
 void writecomment()
@@ -331,7 +332,8 @@ void printcomment()
 void delcomment_(int id)
 {
    if (!comments_enabled) return;
-   commentstring[id] = "";   
+   if (ArraySize(commentstring) >= 1)
+      commentstring[id] = "";   
 }
 
 void delcomment()

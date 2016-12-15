@@ -11,7 +11,7 @@ class CMoneyManagementInterface : public CAppObject {
 
 public:
 
-   virtual bool DeleteAfterUse() { return false; }
+   //virtual bool DeleteAfterUse() { return false; }
 
    virtual CMoneyManagementInterface* SetSymbol(string __symbol)
    {

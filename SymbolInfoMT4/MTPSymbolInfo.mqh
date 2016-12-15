@@ -51,7 +51,7 @@ public:
       double LotValue() { return(TickValue()/TickSize()); }
       bool IsFractional(double treshold = FRACTIONAL_TRESHOLD);
       virtual double ConvertFractional(double pips) { return IsFractional()?pips*10:pips; }
-      double PriceRound(double price) { return(InTicks(price)*TickSizeR()); }
+      double PriceRound(double price) { return(NormalizeDouble(InTicks(price)*TickSizeR(),8)); }
       double LotRound(double lotreq, bool close = false);
       double LotRoundUp() { return(lotroundup); }
       void LotRoundUp(double _lotroundup, bool _roundup_to_minlot) { lotroundup = _lotroundup; roundup_to_minlot = _roundup_to_minlot; }

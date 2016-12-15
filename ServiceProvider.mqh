@@ -10,6 +10,7 @@ public:
    
    bool use_oninit;
    bool use_ontick;
+   bool use_oncalculate;
    bool use_ondeinit;
    bool use_ondeinit_reason;
    bool use_onchartevent;
@@ -19,6 +20,7 @@ public:
    {
       use_oninit = true;
       use_ontick = true;
+      use_oncalculate = true;
       use_ondeinit = true;
       use_ondeinit_reason = true;
       use_onchartevent = true;
@@ -33,6 +35,14 @@ public:
    virtual void OnTick() {
       use_ontick = false;
       //Print("Disable OnTick on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
+   }
+   
+   virtual int OnCalculate (const int rates_total,      // size of input time series
+                 const int prev_calculated,  // bars handled in previous call
+   )
+   {
+      use_oncalculate = false;
+      return -1;
    }
    
    virtual void OnDeinit() {

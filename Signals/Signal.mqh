@@ -58,17 +58,17 @@ public:
       return(At(i));
    }
       
-   void Run(int current_bar = -1) {
-      BeforeExecute();
+   void Run(int current_bar) {
+      BeforeExecute(current_bar);
       if (execute_enabled) {
          GetSignal(current_bar);
       }
-      AfterExecute();
+      AfterExecute(current_bar);
             
    }  
       
-   virtual void GetSignal(int current_bar = -1) {
-      if (current_bar >= 0) this.bar = current_bar;  
+   virtual void GetSignal(int current_bar) {
+      this.bar = current_bar;  
 
       if (subsignal_enabled)
          GetSubSignals();
@@ -139,7 +139,9 @@ public:
       closesignal = signaladd_or(closesignal,subsignal.closesignal);
    }
    
-   virtual void BeforeExecute() {
+   virtual void BeforeExecute(int current_bar) {
+      bar = current_bar;
+      
       if (execute_enabled) {
          lastsignal = signal;  
          lastclosesignal = closesignal;
@@ -151,7 +153,7 @@ public:
       for (int i = 0; i < Total(); i++ ) {
          CSignal* subsignal = At(i);  
          if (subsignal != NULL) 
-            subsignal.BeforeExecute();
+            subsignal.BeforeExecute(current_bar);
       }
       
       if (!BeforeFilter()) {
@@ -161,11 +163,13 @@ public:
       }
    }
    
-   virtual void AfterExecute() {
+   virtual void AfterExecute(int current_bar) {
+      bar = current_bar;
+      
       for (int i = 0; i < Total(); i++ ) {
          CSignal* subsignal = At(i);  
          if (subsignal != NULL) 
-            subsignal.AfterExecute();
+            subsignal.AfterExecute(current_bar);
       }
       if (!AfterFilter()) {
          valid = false;

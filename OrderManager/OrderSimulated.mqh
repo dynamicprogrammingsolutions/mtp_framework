@@ -179,9 +179,9 @@ public:
    virtual bool SetStopLoss(CStopsCalcInterface* _sl, bool checkchange = false, bool checkhigher = false);
    virtual bool SetTakeProfit(CStopsCalcInterface* _tp, bool check = false);
    
-   static void DeleteIf(CStopsCalcInterface* obj) {
+   /*static void DeleteIf(CStopsCalcInterface* obj) {
       if (obj.DeleteAfterUse()) delete obj;
-   }
+   }*/
    
 };
 int COrderSimulated::max_virtual_ticket = 1000000000;
@@ -418,7 +418,7 @@ bool COrderSimulated::SetStopLoss(CStopsCalcInterface* _sl, bool checkchange = f
       (checkchange && thissl == _symbol.PriceRound(this.GetStopLoss())) ||
       (checkhigher && thisslticks >= this.GetStopLossTicks())
    ) {
-      DeleteIf(_sl);
+      //DeleteIf(_sl);
       return false;
    }
    SetStopLoss(thissl);
@@ -429,17 +429,17 @@ bool COrderSimulated::SetTakeProfit(CStopsCalcInterface* _tp, bool check = false
 {
    if (!check) {
       SetTakeProfit(_tp.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice()).GetPrice());
-      DeleteIf(_tp);
+      //DeleteIf(_tp);
       return true;
    } else {
       loadsymbol(this.symbol);
       double thistp = _symbol.PriceRound(_tp.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice()).GetPrice());
       if (thistp != _symbol.PriceRound(this.GetTakeProfit())) {
          SetTakeProfit(thistp);
-         DeleteIf(_tp);
+         //DeleteIf(_tp);
          return true;
       } else {
-         DeleteIf(_tp);
+         //DeleteIf(_tp);
          return false;
       }
    }
