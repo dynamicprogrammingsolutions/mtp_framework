@@ -11,6 +11,8 @@ class CAppObject : public CObject
 private:
    CObject* appbase;
    int refcount;
+   static int maxid;
+   int object_id;
    
 protected:
 
@@ -34,6 +36,15 @@ protected:
    }
    
 public:
+
+   CAppObject() : refcount(0), object_id(maxid+1)
+   {
+      maxid = this.object_id;
+      //Print("constructing object "+this.object_id);
+   
+   }
+   
+   int Id() const { return this.object_id; }
 
    CObject* AppBase() {
       if (CheckPointer(appbase) == POINTER_INVALID) {
@@ -144,6 +155,7 @@ CAppObject* ref_add(CAppObject* obj)
    else return obj;
 }
 
+int CAppObject::maxid = 0;
 
 // this is just for protection
 CObject* global_application_object;

@@ -51,9 +51,9 @@ public:
       }
       CDependencyItem* item = At(idx);
       CAppObject* callback = item.callback;
-      CAppObject* obj;
+      CObject* obj;
       callback.callback(0,obj);
-      Prepare(obj);
+      Prepare((CAppObject*)obj);
       return obj;
    }
    

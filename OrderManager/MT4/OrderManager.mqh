@@ -183,14 +183,14 @@ POrder COrderManager::NewOrder(POrder &_order, const string in_symbol,const ENUM
    
    _mm.get().SetSymbol(in_symbol).SetStopLoss(_stoploss).SetOrderType(_ordertype);
 
+   App().orderrepository.Add(_order.get());
+
    _order.get().NewOrder(
       in_symbol,_ordertype,_mm.get().GetLotsize(),
       !_price.isset() ? 0 : _price.get().GetPrice(),
       !_stoploss.isset() ? 0 : _stoploss.get().GetPrice(),
       !_takeprofit.isset() ? 0 : _takeprofit.get().GetPrice(),
       _comment,_expiration);
-      
-   App().orderrepository.Add(_order.get());
 
    return(_order);
 }
@@ -228,16 +228,17 @@ COrder* COrderManager::ExistingOrder(int ticket, bool add = true)
 {
    COrderBase* _order = this.Prepare(new COrderBase());
 
-   COrder* mainorder = NewOrderObject();
-   CAttachedOrder* attachedorder = NewAttachedOrderObject();
+   COrderBase* mainorder = NewOrderObject();
+   COrderBase* attachedorder = NewAttachedOrderObject();
    
    if (!ExistingOrder(ticket,_order,mainorder,attachedorder)) {
       delete _order;
       return(NULL);
    }
+   
    delete _order;
    if (CheckPointer(attachedorder) != POINTER_INVALID) {
-      attachedorders.Add(attachedorder);
+      attachedorders.Add((CAttachedOrder*)attachedorder);
       return(NULL);
    } else if (CheckPointer(mainorder) != POINTER_INVALID) {
       bool found = false;
@@ -250,8 +251,8 @@ COrder* COrderManager::ExistingOrder(int ticket, bool add = true)
          }
       }
       if (!found) {
-         App().orderrepository.Add(mainorder);
-         return(mainorder);
+         App().orderrepository.Add((COrder*)mainorder);
+         return((COrder*)mainorder);
       } else {
          delete mainorder;
          return(NULL);

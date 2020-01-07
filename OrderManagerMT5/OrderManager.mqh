@@ -235,6 +235,8 @@ COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _or
    if (_stoploss != NULL) _stoploss.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price != NULL ? _price.GetPrice() : 0);
    if (_takeprofit != NULL) _takeprofit.SetOrderType(_ordertype).SetSymbol(in_symbol).SetEntryPrice(_price != NULL ? _price.GetPrice() : 0);
 
+   orders.Add(_order); 
+
    _order.NewOrder(
       in_symbol,_ordertype,_volume,
       _price == NULL ? 0 : _price.GetPrice(),
@@ -247,8 +249,6 @@ COrder* COrderManager::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _or
    if (_stoploss != NULL) COrderBase::DeleteIf(_stoploss);
    if (_takeprofit != NULL) COrderBase::DeleteIf(_takeprofit);
       
-   orders.Add(_order); 
-
    return(_order);
 
 }

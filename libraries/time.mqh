@@ -147,7 +147,7 @@ bool AtTime(datetime& lasttime, int hour, int min = 0, int sec = 0, int dow = -1
    }
    datetime at = NextGivenTime(lasttime+1,hour,min,sec,dow);      
    lasttime = time;
-   return(time >= at && time-at < maxdelay);
+   return(time >= at && (maxdelay <= 0 || time-at < maxdelay));
 }   
 
 bool AtTimeGMT(datetime& lasttime, int hour, int min = 0, int sec = 0, int dow = -1, int maxdelay = 1800)
@@ -159,7 +159,7 @@ bool AtTimeGMT(datetime& lasttime, int hour, int min = 0, int sec = 0, int dow =
    }
    datetime at = NextGivenTime(lasttime+1,hour,min,sec,dow);      
    lasttime = time;
-   return(time >= at && time-at < maxdelay);
+   return(time >= at && (maxdelay <= 0 || time-at < maxdelay));
 }   
 
 

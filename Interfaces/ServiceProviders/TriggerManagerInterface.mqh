@@ -11,6 +11,11 @@ public:
    {
       AbstractFunctionWarning(__FUNCTION__);
    }
+   virtual void Unregister(int trigger_id, int obj_id)
+   {
+      AbstractFunctionWarning(__FUNCTION__);
+   }
+   
    
    virtual bool Send(const int id)
    {

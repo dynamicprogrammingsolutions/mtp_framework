@@ -368,7 +368,7 @@ bool obj_getdesc_bool(string name, int ticket = -1)
 {
    string str = obj_getdesc(name,ticket);
    if (str == NULL)
-      return(EMPTY_VALUE);
+      return((bool)EMPTY_VALUE);
    else
       return(MathRound(StrToDouble(str)));
 }
