@@ -3,51 +3,98 @@
 class COrderCommandHandlerBase : public CServiceProvider
 {
 public:
-   virtual int Type() const { return classOrderCommandHandlerBase; }
-
    TraitAppAccess
+   TraitGetType(classOrderCommandHandler)
 
-   virtual void Initalize()
-   {
-      LISTEN(COrderCommand::CommandOpenBuy,1);
-      LISTEN(COrderCommand::CommandOpenSell,2);
-      LISTEN(COrderCommand::CommandCloseBuy,3);
-      LISTEN(COrderCommand::CommandCloseSell,4);
-      LISTEN(COrderCommand::CommandCloseAll,5);
+protected:
+   shared_ptr<CStopsCalcInterface> sl;
+   shared_ptr<CStopsCalcInterface> tp;
+   shared_ptr<CMoneyManagementInterface> mm;
+   shared_ptr<CStopsCalcInterface> entry;   
+   ENUM_ORDER_TYPE buy_cmd;
+   ENUM_ORDER_TYPE sell_cmd;
+
+public:
+   COrderCommandHandlerBase() {
+      buy_cmd = ORDER_TYPE_BUY;
+      sell_cmd = ORDER_TYPE_SELL;
+      entry.reset(NULL);
    }
    
-   CALLBACK(
-      CBFUNC(1,CommandOpenBuy)
-      CBFUNC(2,CommandOpenSell)
-      CBFUNC(3,CommandCloseBuy)
-      CBFUNC(4,CommandCloseSell)
-      CBFUNC(5,CommandCloseAll)
-   )
+   virtual void Initalize() {
+      COrderCommandDispatcher* ordercommanddispatcher = App().GetService(srvOrderCommandDispatcher);
+      ordercommanddispatcher.AddObserver(GetPointer(this));      
+   }
+
+   virtual void EventCallback(const int event_id, CObject* event) {
+      switch(event_id) {
+         case commandOpenOrder: CommandOpenOrder(event); break;
+         case commandCloseAll:
+            if (event == NULL) CommandCloseAll(ORDERSELECT_ANY);
+            else CommandCloseAll(event);
+            break;
+         case commandCloseLast: CommandCloseLast(event); break;
+         case commandOpenBuy: CommandOpenBuy(); break;
+         case commandOpenSell: CommandOpenSell(); break;
+         case commandCloseBuy: CommandCloseAll(ORDERSELECT_LONG); break;
+         case commandCloseSell: CommandCloseAll(ORDERSELECT_SHORT); break;
+      }
+   }
    
-   virtual bool CommandCloseAll(CObject*& obj)
+   virtual void OnInit()
    {
+
+   }
+
+   virtual bool CommandCloseAll(COrderCommand *obj)
+   {
+      App().orderrepository.CloseAll(COrderCommand::GetSelect(obj,ORDERSELECT_ANY),STATESELECT_ONGOING);
+      return true;
+   }
+   
+   virtual bool CommandCloseAll(ENUM_ORDERSELECT orderselect, ENUM_STATESELECT stateselect = STATESELECT_ONGOING)
+   {
+      App().orderrepository.CloseAll(orderselect,stateselect);
+      return true;
+   }
+   
+   virtual bool CommandCloseLast(COrderCommand *command)
+   {
+      COrderInterface* order;
+      while(App().orderrepository.Orders().ForEachBackward(order)) {
+         if (state_ongoing(order.State())) order.Close();
+      }
       return true;
    }
 
-   virtual bool CommandCloseBuy(CObject*& obj)
+   virtual bool CommandOpenOrder(COrderCommand *command)
    {
+      PStopsCalc thisentry = entry;
+      PStopsCalc thissl = sl;
+      PStopsCalc thistp = tp;
+      PMoneyManagement thismm = mm;
+      
+      ENUM_ORDER_TYPE cmd = command.cmd;
+      if (isset(command.entry)) thisentry.reset(command.entry);
+      if (isset(command.sl)) thissl.reset(command.sl);
+      if (isset(command.tp)) thistp.reset(command.tp);
+      if (isset(command.mm)) thismm.reset(command.mm);
+      
+      COrderInterface* order = App().ordermanager.NewOrder(symbol,cmd,thismm,thisentry,thissl,thistp);
+      this._callback_result = order;
       return true;
    }
    
-   virtual bool CommandCloseSell(CObject*& obj)
+   virtual void CommandOpenBuy()
    {
-      return true;
+      COrderInterface* order = App().ordermanager.NewOrder(symbol,buy_cmd,mm,entry,sl,tp);
+      this._callback_result = order;   
    }
-   
-   virtual bool CommandOpenBuy(CObject*& obj)
+
+   virtual void CommandOpenSell()
    {
-      return true;
+      COrderInterface* order = App().ordermanager.NewOrder(symbol,sell_cmd,mm,entry,sl,tp);
+      this._callback_result = order;
    }
-   
-   virtual bool CommandOpenSell(CObject*& obj)
-   {
-      return true;
-   }
-   
    
 };

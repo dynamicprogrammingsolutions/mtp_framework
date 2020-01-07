@@ -159,35 +159,49 @@ public:
    
    virtual bool AddStopLoss(double _price, double stopvolume = 0);
    virtual bool AddTakeProfit(double _price, double stopvolume = 0);
-   
    bool AddStopLoss(CStopLoss* _stoploss, double stopvolume = 0);
-   
-   bool ModifyStopLoss(double _price);
-   bool ModifyTakeProfit(double _price);
-   bool RemoveStopLoss(); // TODO: not suitable for removing and then replacing the SL
-   
-   virtual void SetStopLoss(const double value) { sl_set = true; if (executestate != ES_CANCELED) sl = value; else Print("Cannot change canceled order data (sl)"); }
-   virtual void SetTakeProfit(const double value) { tp_set = true; if (executestate != ES_CANCELED) tp = value; else Print("Cannot change canceled order data (tp)"); }
    
    virtual bool Closed() { return State()==ORDER_STATE_FILLED && this.closed; }
    virtual bool Deleted() { return State()==ORDER_STATE_CANCELED && this.closed; }
    virtual bool ClosedOrDeleted() { return Closed() || Deleted(); }
 
-   
-   virtual bool Modify();
-   
    // This doesn't result the same as in MT4 for partially closed orders
    virtual double GetLots() { return(volume); }
 
-   bool RemoveTakeProfit();
-   virtual int GetStopLossTicks();
-   virtual double GetStopLoss();
-   CAttachedOrder* GetStopLossOrder();
-   virtual int GetTakeProfitTicks();
-   virtual double GetTakeProfit();
-   CAttachedOrder *GetTakeProfitOrder();
    virtual bool Close(double closevolume = 0, double closeprice = 0);
    virtual void OnTick();
+   
+   virtual void OnTradeTransaction(
+      const MqlTradeTransaction&    trans,     // trade transaction structure 
+      const MqlTradeRequest&        request,   // request structure 
+      const MqlTradeResult&         result     // response structure 
+   ) {
+      CDealInfo deal;
+      if (trans.type == TRADE_TRANSACTION_DEAL_ADD) {
+         if (HistoryDealSelect(trans.deal)) {
+            deal.Ticket(trans.deal);
+            string str;
+            long positionId;
+            ENUM_ORDER_TYPE orderType;
+            if (GetOrderInfoB()) {
+               positionId = orderinfo.PositionId();
+               orderType = orderinfo.OrderType();
+            }
+            CHistoryOrderInfo dealOrderInfo;
+            if (HistoryOrderSelect(deal.Order())) {
+               dealOrderInfo.Ticket(deal.Order());
+               if (dealOrderInfo.PositionId() == positionId) {
+                  if ((ordertype_long(orderType) && ordertype_short(dealOrderInfo.OrderType())) || (ordertype_short(orderType) && ordertype_long(dealOrderInfo.OrderType()))) {
+                     Print("ticket ",this.ticket," closed by deal: ",deal.Ticket()," volume: ",deal.Volume());
+                     this.lastclosetime = TimeCurrent();
+                     this.lastcloseprice = deal.Price();
+                     this.closedvolume+=deal.Volume();
+                  }
+               }
+            }
+         }
+      }
+   }
    
    
 };
@@ -206,6 +220,8 @@ bool COrder::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,co
    SetPrice(_price);
    SetComment(_comment);
    SetExpiration(_expiration);
+   SetStopLoss(_stoploss);
+   SetTakeProfit(_takeprofit);
 
    //if (event.Info ()) event.Info ("Execute New Order",__FUNCTION__);
    if (!Execute()) {
@@ -213,8 +229,8 @@ bool COrder::NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,co
       return(false);
    }
    
-   if (_stoploss > 0) AddStopLoss(_stoploss);
-   if (_takeprofit > 0) AddTakeProfit(_takeprofit);
+   //if (_stoploss > 0) AddStopLoss(_stoploss);
+   //if (_takeprofit > 0) AddTakeProfit(_takeprofit);
    
    if (COrderBase::waitforexecute) {
       WaitForExecute();
@@ -306,107 +322,6 @@ bool COrder::AddStopLoss(CStopLoss* _stoploss, double stopvolume = 0)
    return(true);
 }*/
 
-bool COrder::ModifyStopLoss(double _price)
-{
-   COrderBase* slorder = GetStopLossOrder();
-   if (slorder != NULL) return(slorder.ModifyPrice(_price));
-   else return(AddStopLoss(_price));
-}
-
-bool COrder::ModifyTakeProfit(double _price)
-{
-   COrderBase* tporder = GetTakeProfitOrder();
-   if (tporder != NULL) return(tporder.ModifyPrice(_price));
-   else return(AddTakeProfit(_price));
-}
-
-bool COrder::RemoveStopLoss() // TODO: not suitable for removing and then replacing the SL
-{
-   CAttachedOrder *attachedorder;
-   for (int i = 0; i < attachedorders.Total(); i++) {
-      attachedorder = attachedorders.AttachedOrder(i);
-      if (attachedorder.name == stoploss_name) {
-         attachedorder.Cancel();
-         attachedorders.Delete(i);
-         return(true);
-      }
-   }
-   return(false);
-}
-
-bool COrder::RemoveTakeProfit()
-{
-   CAttachedOrder *attachedorder;
-   for (int i = 0; i < attachedorders.Total(); i++) {
-      attachedorder = attachedorders.AttachedOrder(i);
-      if (attachedorder.name == takeprofit_name) {
-         attachedorder.Cancel();
-         attachedorders.Delete(i);
-         return(true);
-      }
-   }
-   return(false); 
-}
-
-bool COrder::Modify()
-{
-   bool ret = true;
-   ret &= COrderBase::Modify();
-   if (sl_set) {
-      if (sl == 0) this.RemoveStopLoss();
-      else this.ModifyStopLoss(sl);
-   }
-   if (tp_set) {
-      if (tp == 0) this.RemoveTakeProfit();
-      else this.ModifyTakeProfit(tp);
-   }
-   return false;
-}
-
-int COrder::GetStopLossTicks()
-{
-   return(getstoplossticks(this.symbol, this.ordertype, this.GetStopLoss(), this.Price()));
-}
-
-double COrder::GetStopLoss()
-{
-   CAttachedOrder *attachedorder = GetStopLossOrder();
-   if (attachedorder != NULL && attachedorder.Isset()) return(attachedorder.Price());
-   return(0);
-}
-
-CAttachedOrder* COrder::GetStopLossOrder()
-{
-   CAttachedOrder *attachedorder;
-   for (int i = 0; i < attachedorders.Total(); i++) {
-      attachedorder = attachedorders.AttachedOrder(i);
-      //Print("sl ticket:"+attachedorder.ticket);
-      if (attachedorder.name == stoploss_name) return(attachedorder);
-   }
-   return(NULL);
-}
-int COrder::GetTakeProfitTicks()
-{
-   return(gettakeprofitticks(this.symbol, this.ordertype, this.GetTakeProfit(), this.Price()));
-}
-
-double COrder::GetTakeProfit()
-{
-   CAttachedOrder *attachedorder = GetTakeProfitOrder();
-   if (isset(attachedorder) && attachedorder.Isset()) return(attachedorder.Price());
-   return(0);
-}
-
-CAttachedOrder* COrder::GetTakeProfitOrder()
-{
-   CAttachedOrder *attachedorder;
-   for (int i = 0; i < attachedorders.Total(); i++) {
-      attachedorder = attachedorders.AttachedOrder(i);
-      //Print("tp ticket:"+attachedorder.ticket);
-      if (attachedorder.name == takeprofit_name) return(attachedorder);
-   }
-   return(NULL);
-}
 
 bool COrder::Close(double closevolume = 0, double closeprice = 0)
 {

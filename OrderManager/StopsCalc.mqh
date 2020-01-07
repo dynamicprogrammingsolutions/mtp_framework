@@ -94,7 +94,7 @@ public:
 
    virtual CStopsCalcInterface* SetStopLoss(PStopsCalc &sl)
    {
-      return SetTakeProfit(sl.get());
+      return SetStopLoss(sl.get());
    }
    
    virtual void Calculate() { }
@@ -206,6 +206,9 @@ public:
 class CEntryPrice : public CEntry {
 public:
    bool addspread;
+   CEntryPrice() {
+   
+   }
    CEntryPrice(double _price, bool _addspread = false) {
       addspread = _addspread;
       this.SetPrice(_price);
@@ -220,6 +223,19 @@ public:
       return _price;
    }
 };
+
+class CEntryCalculate : public CEntryPrice {
+public:
+   CEntryCalculate()
+   {
+      addspread = true;
+   }
+   virtual void Reset()
+   {
+      price_set = false;
+   } 
+};
+
 
 class CStopLossTicks : public CStopLoss {
 public:

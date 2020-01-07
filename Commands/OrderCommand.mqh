@@ -14,6 +14,7 @@ enum ENUM_ORDER_COMMAND{
    commandCloseAll,
    commandCloseLast,
    commandCloseFirst,
+   commandModifyOrder
 };
 
 class COrderCommand : public CAppObject
@@ -35,8 +36,11 @@ public:
    static int CommandCloseLast;
    */
    
+   bool modify_entry;
    CStopsCalcInterface* entry;
+   bool modify_sl;
    CStopsCalcInterface* sl;
+   bool modify_tp;
    CStopsCalcInterface* tp;
    CMoneyManagementInterface* mm;
    string comment;

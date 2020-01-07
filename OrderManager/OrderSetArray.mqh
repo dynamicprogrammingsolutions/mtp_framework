@@ -8,7 +8,7 @@ public:
    shared_ptr<CAppObject> newobjectcallback;
 
 public:
-   virtual int Type() const { return classMT4OrderSetArray; }
+   virtual int Type() const { return classOrderSetArray; }
 
 public:
 

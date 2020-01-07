@@ -5,335 +5,289 @@ class CDealInfo : public CObject
   {
 protected:
    ulong             m_ticket;             // ticket of history order
+
 public:
+                     CDealInfo(void);
+                    ~CDealInfo(void);
    //--- methods of access to protected data
-   bool              Ticket(ulong ticket)     { long result; if (HistoryDealGetInteger(ticket,DEAL_TYPE,result)) { m_ticket=ticket; return(true); } else { return(false); } }
-   ulong             Ticket()           const { return(m_ticket); }
+   void              Ticket(const ulong ticket)   { m_ticket=ticket;  }
+   ulong             Ticket(void)           const { return(m_ticket); }
    //--- fast access methods to the integer position propertyes
-   long              Order()            const;
-   datetime          Time()             const;
-   ENUM_DEAL_TYPE    DealType()         const;
-   string            TypeDescription()  const;
-   ENUM_DEAL_ENTRY   Entry()            const;
-   string            EntryDescription() const;
-   long              Magic()            const;
-   long              PositionId()       const;
+   long              Order(void) const;
+   datetime          Time(void) const;
+   ulong             TimeMsc(void) const;
+   ENUM_DEAL_TYPE    DealType(void) const;
+   string            TypeDescription(void) const;
+   ENUM_DEAL_ENTRY   Entry(void) const;
+   string            EntryDescription(void) const;
+   long              Magic(void) const;
+   long              PositionId(void) const;
    //--- fast access methods to the double position propertyes
-   double            Volume()           const;
-   double            Price()            const;
-   double            Commission()       const;
-   double            Swap()             const;
-   double            Profit()           const;
+   double            Volume(void) const;
+   double            Price(void) const;
+   double            Commission(void) const;
+   double            Swap(void) const;
+   double            Profit(void) const;
    //--- fast access methods to the string position propertyes
-   string            Symbol()           const;
-   string            Comment()          const;
+   string            Symbol(void) const;
+   string            Comment(void) const;
+   string            ExternalId(void) const;
    //--- access methods to the API MQL5 functions
-   bool              InfoInteger(ENUM_DEAL_PROPERTY_INTEGER prop_id,long& var) const;
-   bool              InfoDouble(ENUM_DEAL_PROPERTY_DOUBLE prop_id,double& var) const;
-   bool              InfoString(ENUM_DEAL_PROPERTY_STRING prop_id,string& var) const;
+   bool              InfoInteger(ENUM_DEAL_PROPERTY_INTEGER prop_id,long &var) const;
+   bool              InfoDouble(ENUM_DEAL_PROPERTY_DOUBLE prop_id,double &var) const;
+   bool              InfoString(ENUM_DEAL_PROPERTY_STRING prop_id,string &var) const;
    //--- info methods
-   string            FormatAction(string& str,const uint action)               const;
-   string            FormatEntry(string& str,const uint entry)                 const;
-   string            FormatDeal(string& str)                                   const;
+   string            FormatAction(string &str,const uint action) const;
+   string            FormatEntry(string &str,const uint entry) const;
+   string            FormatDeal(string &str) const;
    //--- method for select deal
-   bool              SelectByIndex(int index);
+   bool              SelectByIndex(const int index);
   };
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_ORDER".                             |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_ORDER".                         |
-//| REMARK: no.                                                      |
+//| Constructor                                                      |
 //+------------------------------------------------------------------+
-long CDealInfo::Order() const
+CDealInfo::CDealInfo(void)
+  {
+  }
+//+------------------------------------------------------------------+
+//| Destructor                                                       |
+//+------------------------------------------------------------------+
+CDealInfo::~CDealInfo(void)
+  {
+  }
+//+------------------------------------------------------------------+
+//| Get the property value "DEAL_ORDER"                              |
+//+------------------------------------------------------------------+
+long CDealInfo::Order(void) const
   {
    return(HistoryDealGetInteger(m_ticket,DEAL_ORDER));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_TIME".                              |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_TIME".                          |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_TIME"                               |
 //+------------------------------------------------------------------+
-datetime CDealInfo::Time() const
+datetime CDealInfo::Time(void) const
   {
    return((datetime)HistoryDealGetInteger(m_ticket,DEAL_TIME));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_TYPE".                              |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_TYPE".                          |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_TIME_MSC"                           |
 //+------------------------------------------------------------------+
-ENUM_DEAL_TYPE CDealInfo::DealType() const
+ulong CDealInfo::TimeMsc(void) const
+  {
+   return(HistoryDealGetInteger(m_ticket,DEAL_TIME_MSC));
+  }
+//+------------------------------------------------------------------+
+//| Get the property value "DEAL_TYPE"                               |
+//+------------------------------------------------------------------+
+ENUM_DEAL_TYPE CDealInfo::DealType(void) const
   {
    return((ENUM_DEAL_TYPE)HistoryDealGetInteger(m_ticket,DEAL_TYPE));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_TYPE" as string.                    |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_TYPE" as string.                |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_TYPE" as string                     |
 //+------------------------------------------------------------------+
-string CDealInfo::TypeDescription() const
+string CDealInfo::TypeDescription(void) const
   {
    string str;
 //---
    switch(DealType())
      {
-      case DEAL_TYPE_BUY:
-         str="Buy type";
-         break;
-      case DEAL_TYPE_SELL:
-         str="Sell type";
-         break;
-      case DEAL_TYPE_BALANCE:
-         str="Balance type";
-         break;
-      case DEAL_TYPE_CREDIT:
-         str="Credit type";
-         break;
-      case DEAL_TYPE_CHARGE:
-         str="Charge type";
-         break;
-      case DEAL_TYPE_CORRECTION:
-         str="Correction type";
-         break;
-      default:
-         str="Unknown type";
+      case DEAL_TYPE_BUY                     : str="Buy type";                      break;
+      case DEAL_TYPE_SELL                    : str="Sell type";                     break;
+      case DEAL_TYPE_BALANCE                 : str="Balance type";                  break;
+      case DEAL_TYPE_CREDIT                  : str="Credit type";                   break;
+      case DEAL_TYPE_CHARGE                  : str="Charge type";                   break;
+      case DEAL_TYPE_CORRECTION              : str="Correction type";               break;
+      case DEAL_TYPE_BONUS                   : str="Bonus type";                    break;
+      case DEAL_TYPE_COMMISSION              : str="Commission type";               break;
+      case DEAL_TYPE_COMMISSION_DAILY        : str="Daily Commission type";         break;
+      case DEAL_TYPE_COMMISSION_MONTHLY      : str="Monthly Commission type";       break;
+      case DEAL_TYPE_COMMISSION_AGENT_DAILY  : str="Daily Agent Commission type";   break;
+      case DEAL_TYPE_COMMISSION_AGENT_MONTHLY: str="Monthly Agent Commission type"; break;
+      case DEAL_TYPE_INTEREST                : str="Interest Rate type";            break;
+      case DEAL_TYPE_BUY_CANCELED            : str="Canceled Buy type";             break;
+      case DEAL_TYPE_SELL_CANCELED           : str="Canceled Sell type";            break;
+      default                                : str="Unknown type";
      }
 //---
    return(str);
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_ENTRY".                             |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_ENTRY".                         |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_ENTRY"                              |
 //+------------------------------------------------------------------+
-ENUM_DEAL_ENTRY CDealInfo::Entry() const
+ENUM_DEAL_ENTRY CDealInfo::Entry(void) const
   {
    return((ENUM_DEAL_ENTRY)HistoryDealGetInteger(m_ticket,DEAL_ENTRY));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_ENTRY" as string.                   |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_ENTRY" as string.               |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_ENTRY" as string                    |
 //+------------------------------------------------------------------+
-string CDealInfo::EntryDescription() const
+string CDealInfo::EntryDescription(void) const
   {
    string str;
 //---
-   switch(Entry())
+   switch(CDealInfo::Entry())
      {
-      case DEAL_ENTRY_IN:
-         str="In entry";
-         break;
-      case DEAL_ENTRY_OUT:
-         str="Out entry";
-         break;
-      case DEAL_ENTRY_INOUT:
-         str="InOut entry";
-         break;
-      case DEAL_ENTRY_STATE:
-         str="Status record";
-         break;
-      default:
-         str="Unknown entry";
+      case DEAL_ENTRY_IN     : str="In entry";      break;
+      case DEAL_ENTRY_OUT    : str="Out entry";     break;
+      case DEAL_ENTRY_INOUT  : str="InOut entry";   break;
+      case DEAL_ENTRY_STATE  : str="Status record"; break;
+      case DEAL_ENTRY_OUT_BY : str="Out By entry";  break;
+      default                : str="Unknown entry";
      }
 //---
    return(str);
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_MAGIC".                             |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_MAGIC".                         |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_MAGIC"                              |
 //+------------------------------------------------------------------+
-long CDealInfo::Magic() const
+long CDealInfo::Magic(void) const
   {
    return(HistoryDealGetInteger(m_ticket,DEAL_MAGIC));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_POSITION_ID".                       |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_POSITION_ID".                   |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_POSITION_ID"                        |
 //+------------------------------------------------------------------+
-long CDealInfo::PositionId() const
+long CDealInfo::PositionId(void) const
   {
    return(HistoryDealGetInteger(m_ticket,DEAL_POSITION_ID));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_VOLUME".                            |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_VOLUME".                        |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_VOLUME"                             |
 //+------------------------------------------------------------------+
-double CDealInfo::Volume() const
+double CDealInfo::Volume(void) const
   {
    return(HistoryDealGetDouble(m_ticket,DEAL_VOLUME));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_PRICE_OPEN".                        |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_PRICE_OPEN".                    |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_PRICE_OPEN"                         |
 //+------------------------------------------------------------------+
-double CDealInfo::Price() const
+double CDealInfo::Price(void) const
   {
    return(HistoryDealGetDouble(m_ticket,DEAL_PRICE));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_COMMISSION".                        |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_COMMISSION".                    |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_COMMISSION"                         |
 //+------------------------------------------------------------------+
-double CDealInfo::Commission() const
+double CDealInfo::Commission(void) const
   {
    return(HistoryDealGetDouble(m_ticket,DEAL_COMMISSION));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_SWAP".                              |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_SWAP".                          |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_SWAP"                               |
 //+------------------------------------------------------------------+
-double CDealInfo::Swap() const
+double CDealInfo::Swap(void) const
   {
    return(HistoryDealGetDouble(m_ticket,DEAL_SWAP));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_PROFIT".                            |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_PROFIT".                        |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_PROFIT"                             |
 //+------------------------------------------------------------------+
-double CDealInfo::Profit() const
+double CDealInfo::Profit(void) const
   {
    return(HistoryDealGetDouble(m_ticket,DEAL_PROFIT));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_SYMBOL".                            |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_SYMBOL".                        |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_SYMBOL"                             |
 //+------------------------------------------------------------------+
-string CDealInfo::Symbol() const
+string CDealInfo::Symbol(void) const
   {
    return(HistoryDealGetString(m_ticket,DEAL_SYMBOL));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "DEAL_COMMENT".                           |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "DEAL_COMMENT".                       |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_COMMENT"                            |
 //+------------------------------------------------------------------+
-string CDealInfo::Comment() const
+string CDealInfo::Comment(void) const
   {
    return(HistoryDealGetString(m_ticket,DEAL_COMMENT));
   }
 //+------------------------------------------------------------------+
-//| Access functions HistoryDealGetInteger(...).                     |
-//| INPUT:  prop_id  -identifier integer properties,                 |
-//|         var     -reference to a variable to value.               |
-//| OUTPUT: true-if successful, false otherwise.                     |
-//| REMARK: no.                                                      |
+//| Get the property value "DEAL_EXTERNAL_ID"                        |
 //+------------------------------------------------------------------+
-bool CDealInfo::InfoInteger(ENUM_DEAL_PROPERTY_INTEGER prop_id,long& var) const
+string CDealInfo::ExternalId(void) const
+  {
+   return(HistoryDealGetString(m_ticket,DEAL_EXTERNAL_ID));
+  }
+//+------------------------------------------------------------------+
+//| Access functions HistoryDealGetInteger(...)                      |
+//+------------------------------------------------------------------+
+bool CDealInfo::InfoInteger(ENUM_DEAL_PROPERTY_INTEGER prop_id,long &var) const
   {
    return(HistoryDealGetInteger(m_ticket,prop_id,var));
   }
 //+------------------------------------------------------------------+
-//| Access functions HistoryDealGetDouble(...).                      |
-//| INPUT:  prop_id  -identifier double properties,                  |
-//|         var     -reference to a variable to value.               |
-//| OUTPUT: true-if successful, false otherwise.                     |
-//| REMARK: no.                                                      |
+//| Access functions HistoryDealGetDouble(...)                       |
 //+------------------------------------------------------------------+
-bool CDealInfo::InfoDouble(ENUM_DEAL_PROPERTY_DOUBLE prop_id,double& var) const
+bool CDealInfo::InfoDouble(ENUM_DEAL_PROPERTY_DOUBLE prop_id,double &var) const
   {
    return(HistoryDealGetDouble(m_ticket,prop_id,var));
   }
 //+------------------------------------------------------------------+
-//| Access functions HistoryDealGetString(...).                      |
-//| INPUT:  prop_id  -identifier string properties,                  |
-//|         var     -reference to a variable to value.               |
-//| OUTPUT: true-if successful, false otherwise.                     |
-//| REMARK: no.                                                      |
+//| Access functions HistoryDealGetString(...)                       |
 //+------------------------------------------------------------------+
-bool CDealInfo::InfoString(ENUM_DEAL_PROPERTY_STRING prop_id,string& var) const
+bool CDealInfo::InfoString(ENUM_DEAL_PROPERTY_STRING prop_id,string &var) const
   {
    return(HistoryDealGetString(m_ticket,prop_id,var));
   }
 //+------------------------------------------------------------------+
-//| Converths the type of a  deal to text.                           |
-//| INPUT:  str    - receiving string,                               |
-//|         action - type of deal.                                   |
-//| OUTPUT: formatted string.                                        |
-//| REMARK: no.                                                      |
+//| Converths the type of a  deal to text                            |
 //+------------------------------------------------------------------+
-string CDealInfo::FormatAction(string& str,const uint action) const
+string CDealInfo::FormatAction(string &str,const uint action) const
   {
 //--- clean
    str="";
 //--- see the type  
    switch(action)
      {
-      case DEAL_TYPE_BUY       : str="buy";        break;
-      case DEAL_TYPE_SELL      : str="sell";       break;
-      case DEAL_TYPE_BALANCE   : str="balance";    break;
-      case DEAL_TYPE_CREDIT    : str="credit";     break;
-      case DEAL_TYPE_CHARGE    : str="charge";     break;
-      case DEAL_TYPE_CORRECTION: str="correction"; break;
-
-      default:
-         str="unknown deal type "+(string)action;
-         break;
+      case DEAL_TYPE_BUY                     : str="buy";                      break;
+      case DEAL_TYPE_SELL                    : str="sell";                     break;
+      case DEAL_TYPE_BALANCE                 : str="balance";                  break;
+      case DEAL_TYPE_CREDIT                  : str="credit";                   break;
+      case DEAL_TYPE_CHARGE                  : str="charge";                   break;
+      case DEAL_TYPE_CORRECTION              : str="correction";               break;
+      case DEAL_TYPE_BONUS                   : str="bonus";                    break;
+      case DEAL_TYPE_COMMISSION              : str="commission";               break;
+      case DEAL_TYPE_COMMISSION_DAILY        : str="daily commission";         break;
+      case DEAL_TYPE_COMMISSION_MONTHLY      : str="monthly commission";       break;
+      case DEAL_TYPE_COMMISSION_AGENT_DAILY  : str="daily agent commission";   break;
+      case DEAL_TYPE_COMMISSION_AGENT_MONTHLY: str="monthly agent commission"; break;
+      case DEAL_TYPE_INTEREST                : str="interest rate";            break;
+      case DEAL_TYPE_BUY_CANCELED            : str="canceled buy";             break;
+      case DEAL_TYPE_SELL_CANCELED           : str="canceled sell";            break;
+      default                                : str="unknown deal type "+(string)action;
      }
 //--- return the result
    return(str);
   }
 //+------------------------------------------------------------------+
-//| Converts the deal direction to text.                             |
-//| INPUT:  str   - receiving string,                                |
-//|         entry - direction of the deal.                           |
-//| OUTPUT: formatted string.                                        |
-//| REMARK: no.                                                      |
+//| Converts the deal direction to text                              |
 //+------------------------------------------------------------------+
-string CDealInfo::FormatEntry(string& str,const uint entry) const
+string CDealInfo::FormatEntry(string &str,const uint entry) const
   {
 //--- clean
    str="";
 //--- see the type
    switch(entry)
      {
-      case DEAL_ENTRY_IN   : str="in";     break;
-      case DEAL_ENTRY_OUT  : str="out";    break;
-      case DEAL_ENTRY_INOUT: str="in/out"; break;
-
-      default:
-         str="unknown deal entry "+(string)entry;
-         break;
+      case DEAL_ENTRY_IN    : str="in";     break;
+      case DEAL_ENTRY_OUT   : str="out";    break;
+      case DEAL_ENTRY_INOUT : str="in/out"; break;
+      case DEAL_ENTRY_OUT_BY: str="out by"; break;
+      default               : str="unknown deal entry "+(string)entry;
      }
 //--- return the result
    return(str);
   }
 //+------------------------------------------------------------------+
-//| Converts the deal parameters to text.                            |
-//| INPUT:  str  - receiving string,                                 |
-//|         deal - pointer at the class instance.                    |
-//| OUTPUT: formatted string.                                        |
-//| REMARK: no.                                                      |
+//| Converts the deal parameters to text                             |
 //+------------------------------------------------------------------+
-string CDealInfo::FormatDeal(string& str) const
+string CDealInfo::FormatDeal(string &str) const
   {
    string      type;
-   CSymbolInfo __symbol;
+   CSymbolInfo symbol;
 //--- set up
-   __symbol.Name(Symbol());
-   int __digits=__symbol.Digits();
+   symbol.Name(Symbol());
+   int digits=symbol.Digits();
 //--- form the description of the deal
    switch(DealType())
      {
@@ -345,7 +299,7 @@ string CDealInfo::FormatDeal(string& str) const
                           FormatAction(type,DealType()),
                           DoubleToString(Volume(),2),
                           Symbol(),
-                          DoubleToString(Price(),__digits));
+                          DoubleToString(Price(),digits));
       break;
 
       //--- balance operations
@@ -353,6 +307,13 @@ string CDealInfo::FormatDeal(string& str) const
       case DEAL_TYPE_CREDIT    :
       case DEAL_TYPE_CHARGE    :
       case DEAL_TYPE_CORRECTION:
+      case DEAL_TYPE_BONUS     :
+      case DEAL_TYPE_COMMISSION:
+      case DEAL_TYPE_COMMISSION_DAILY:
+      case DEAL_TYPE_COMMISSION_MONTHLY:
+      case DEAL_TYPE_COMMISSION_AGENT_DAILY:
+      case DEAL_TYPE_COMMISSION_AGENT_MONTHLY:
+      case DEAL_TYPE_INTEREST:
          str=StringFormat("#%I64u %s %s [%s]",
                           Ticket(),
                           FormatAction(type,DealType()),
@@ -368,15 +329,13 @@ string CDealInfo::FormatDeal(string& str) const
    return(str);
   }
 //+------------------------------------------------------------------+
-//| Select a deal on the index.                                      |
-//| INPUT:  index - deal index.                                      |
-//| OUTPUT: true-if successful, false otherwise.                     |
-//| REMARK: no.                                                      |
+//| Select a deal on the index                                       |
 //+------------------------------------------------------------------+
-bool CDealInfo::SelectByIndex(int index)
+bool CDealInfo::SelectByIndex(const int index)
   {
    ulong ticket=HistoryDealGetTicket(index);
-   if(ticket==0) return(false);
+   if(ticket==0)
+      return(false);
    Ticket(ticket);
 //---
    return(true);

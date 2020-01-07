@@ -12,3 +12,8 @@ ToDo:
 10. Remove old trailing stop
 11. Create weak and base versions of pointers in all interfaces
 12. Remove Dependency handler ? Or use it for every other dependency
+
+
+For 1.6:
+
+Remove AppObjectArray, AppObjectArrayObj, ServiceProviderArray/Obj, DependencyManager, EventHandler, TrailingStop, unused traits

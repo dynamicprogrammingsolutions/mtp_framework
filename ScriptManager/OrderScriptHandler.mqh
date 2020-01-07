@@ -48,6 +48,8 @@ public:
 
 class COrderScriptHandler : public CServiceProvider
 {
+private:
+   COrderCommandDispatcher* ordercommanddispatcher;
 public:
     virtual int Type() const { return classOrderScriptHandler; }
    
@@ -58,15 +60,22 @@ public:
       if (id == 0) HandleCommand(obj.get());
    }
    
+   virtual void EventCallback(const int event_id, CObject* event) {
+      if (event_id == CScript::Command && event.Type() == classScript) {
+         HandleCommand(event);
+      }
+   }
+   
+   
    virtual bool HandleCommand(CScript* script)
    {
       if (script.id == 112) {
          Print("Script: ",script.id," ",script.sparam);
-         if (script.sparam == "gow4_openbuy") App().trigger.Trigger(classOrderCommand,commandOpenOrder,MakeAppObject(new COrderCommand(ORDER_TYPE_BUY)));
-         if (script.sparam == "gow4_opensell")  App().trigger.Trigger(classOrderCommand,commandOpenOrder,MakeAppObject(new COrderCommand(ORDER_TYPE_SELL)));
-         if (script.sparam == "gow4_closebuy")  App().trigger.Trigger(classOrderCommand,commandCloseAll,MakeAppObject(new COrderCommand(ORDERSELECT_LONG)));
-         if (script.sparam == "gow4_closesell")  App().trigger.Trigger(classOrderCommand,commandCloseAll,MakeAppObject(new COrderCommand(ORDERSELECT_SHORT)));
-         if (script.sparam == "gow4_closeall")  App().trigger.Trigger(classOrderCommand,commandCloseAll,MakeAppObject(new COrderCommand(ORDERSELECT_ANY)));
+         if (script.sparam == "gow4_openbuy") ordercommanddispatcher.Dispatch(commandOpenOrder,new COrderCommand(ORDER_TYPE_BUY),true);
+         if (script.sparam == "gow4_opensell") ordercommanddispatcher.Dispatch(commandOpenOrder,new COrderCommand(ORDER_TYPE_SELL),true);
+         if (script.sparam == "gow4_closebuy") ordercommanddispatcher.Dispatch(commandCloseAll,new COrderCommand(ORDERSELECT_LONG),true);
+         if (script.sparam == "gow4_closesell") ordercommanddispatcher.Dispatch(commandCloseAll,new COrderCommand(ORDERSELECT_SHORT),true);
+         if (script.sparam == "gow4_closeall") ordercommanddispatcher.Dispatch(commandCloseAll,new COrderCommand(ORDERSELECT_ANY),true);
          return true;
       }
       return false;
@@ -77,8 +86,9 @@ public:
       if (AppBase() != NULL) {
          CScriptManagerInterface* sm = this.App().GetService(srvScriptManager);
          sm.RegisterScript(112); 
-
-         LISTEN(classScript,CScript::Command,0);
+         ordercommanddispatcher = this.App().GetService(srvOrderCommandDispatcher);
+         ((CScriptDispatcher*)this.App().GetService(srvScriptDispatcher)).AddObserver(GetPointer(this));
+         //LISTEN(classScript,CScript::Command,0);
       }  
    }
 };

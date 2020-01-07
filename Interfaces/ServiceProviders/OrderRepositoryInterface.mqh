@@ -5,7 +5,7 @@
 #define NewPOrderRepository(__obj__) POrderRepository::make_shared(__obj__)
 
 #define ORDER_REPOSITORY_INTERFACE_H
-class COrderRepositoryInterface : public CServiceProvider
+class COrderRepositoryInterface : public CObservableServiceProvider
 {
 public:
    virtual void Clear() { AbstractFunctionWarning(__FUNCTION__); }
@@ -33,6 +33,13 @@ public:
    virtual bool SelectByIdxOrder(int idx) { AbstractFunctionWarning(__FUNCTION__); return false; }
    virtual bool SelectByIdxHistory(int idx) { AbstractFunctionWarning(__FUNCTION__); return false; }   
    virtual bool SelectByTicketOrder(uint ticket) { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool SelectByTicketHistory(uint ticket) { AbstractFunctionWarning(__FUNCTION__); return false; }
+
+   virtual bool SelectOrderByIdx(int idx) { return this.SelectByIdxOrder(idx); }
+   virtual bool SelectHistoryOrderByIdx(int idx) { return this.SelectByIdxHistory(idx); }   
+   virtual bool SelectOrderByTicket(uint ticket) { return this.SelectByTicketOrder(ticket); }
+   virtual bool SelectHistoryOrderByTicket(uint ticket) { return this.SelectByTicketOrder(ticket); }
+
    
    virtual bool GetOrders(ENUM_ORDERSELECT type = ORDERSELECT_ANY, ENUM_STATESELECT state = STATESELECT_ANY, string in_symbol = "", int in_magic = -1)
    {

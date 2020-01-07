@@ -1,13 +1,12 @@
 //
-#define MTP_FRAMEWORK_VERSION "1.4"
+#define MTP_FRAMEWORK_VERSION "1.6"
 
 #include "Loader.mqh"
 
 #define APPLICATION_H
 class CApplication : public CAppObject
 {
-private:
-
+public:
    CServiceContainer services;
 
    //bool initalized;
@@ -38,10 +37,10 @@ public:
          service.AppBase(GetPointer(this));
          services.ReRegister(service);
       } else {
-         Print("Registering Service type:",EnumToString(service.srv)," name:'",service.name,"' class:",EnumToString((ENUM_CLASS_NAMES)service.Type()));
+         if (services.report_services) Print("Registering Service type:",EnumToString(service.srv)," name:'",service.name,"' class:",EnumToString((ENUM_CLASS_NAMES)service.Type()));
                
          service.AppBase(GetPointer(this));
-         services.Add(service);
+         services.Register(service);
       }
 
       switch(service.srv) {
@@ -81,7 +80,7 @@ public:
    }
 
    virtual CServiceProvider* GetService(string name) {
-      return (CObject*)services.GetService(name);
+      return services.GetService(name);
    }
    
    virtual CServiceProvider* GetService(ENUM_APPLICATION_SERVICE srv) {
@@ -131,9 +130,19 @@ public:
    {
       services.OnTick();
    }
+   
+   #ifdef __MQL5__
+   void  OnTradeTransaction(
+      const MqlTradeTransaction&    trans,     // trade transaction structure 
+      const MqlTradeRequest&        request,   // request structure 
+      const MqlTradeResult&         result     // response structure 
+   ) {
+      services.OnTradeTransaction(trans,request,result);
+   }
+   #endif   
 
    int OnCalculate (const int rates_total,      // size of input time series
-                 const int prev_calculated,  // bars handled in previous call
+                 const int prev_calculated  // bars handled in previous call
    )
    {
       return services.OnCalculate(rates_total,prev_calculated);

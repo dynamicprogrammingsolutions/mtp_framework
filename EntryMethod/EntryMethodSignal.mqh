@@ -2,89 +2,112 @@
 
 class CEntryMethodSignal : public CServiceProvider
 {
+protected:
+   COrderCommandDispatcher* ordercommanddispatcher;
+   bool close_opposite_order;
+   int maxorders;
+   int maxspread;
 public:
-   virtual int Type() const { return classEntryMethodSignal; }
+   bool enableopen;
+   bool long_enabled;
+   bool short_enabled;
 
+   TraitGetType(classEntryMethod)
    TraitAppAccess
+   TraitLoadSymbolFunction
    
-   CSignal* mainsignal;
-   int bar;
+   CEntryMethodSignal() {
+      close_opposite_order = false;
+      long_enabled = true;
+      short_enabled = true;
+      maxorders = 1;
+      maxspread = -1;
+   }
+
+   virtual void OnInit() {
+      ((CSignalServiceProviderBase*)App().GetService(srvSignalServiceProvider)).AddObserver(GetPointer(this));
+      this.ordercommanddispatcher = App().GetService(srvOrderCommandDispatcher);     
+   }
+
+   virtual void EventCallback(const int event_id, CObject* event) {
+      if (event_id == CSignalServiceProviderBase::OpenSignal) OpenSignal(event);
+      if (event_id == CSignalServiceProviderBase::CloseSignal) CloseSignal(event);
+   }
+   
+   void OpenSignal(CSignal* signal)
+   {
+      Print("Processing open signal: "+signal.signal);
+      switch (signal.signal) {
+         case SIGNAL_BUY:
+            if (close_opposite_order) ordercommanddispatcher.Dispatch(commandCloseSell);
+            if (BuySignalFilter()) {
+              ordercommanddispatcher.Dispatch(commandOpenBuy);
+            }
+         break;
+         case SIGNAL_SELL:
+            if (close_opposite_order) ordercommanddispatcher.Dispatch(commandCloseBuy);
+            if (SellSignalFilter()) {
+               ordercommanddispatcher.Dispatch(commandOpenSell);
+            }
+         break;
+         case SIGNAL_BOTH: break;
+      }
+   }
+   
+   void CloseSignal(CSignal* signal)
+   {
+      switch (signal.closesignal) {
+         case SIGNAL_BUY: ordercommanddispatcher.Dispatch(commandCloseSell); break;
+         case SIGNAL_SELL: ordercommanddispatcher.Dispatch(commandCloseBuy); break;
+         case SIGNAL_BOTH: ordercommanddispatcher.Dispatch(commandCloseAll); break;
+      }
+   }
 
    virtual void OnTick()
    {
-      mainsignal.Run(bar);
-      
-      switch (mainsignal.closesignal) {
-         case SIGNAL_BUY: OnCloseSellSignal(mainsignal.closesignal_valid); break;
-         case SIGNAL_SELL: OnCloseBuySignal(mainsignal.closesignal_valid); break;
-         case SIGNAL_BOTH: OnCloseAllSignal(mainsignal.closesignal_valid); break;
+      if (app.testmanager.IsRunning()) return;
+      enableopen = true;     
+  }
+   
+   virtual bool BuySignalFilter()
+   {
+      if (!enableopen) {
+         Print("open not enabled");
+         return false;
       }
-      switch (mainsignal.signal) {
-         case SIGNAL_BUY: OnBuySignal(mainsignal.valid); break;
-         case SIGNAL_SELL: OnSellSignal(mainsignal.valid); break;
-         case SIGNAL_BOTH: OnBothSignal(mainsignal.valid); break;
+      if (!long_enabled) {
+         Print("long orders not enabled");
+         return false;
       }
-      
-      mainsignal.OnTick();
-   }
-   
-   virtual void OnCloseSellSignal(bool valid)
-   {
-      if (valid) TRIGGER_VOID(classOrderCommand,commandCloseSell);
-   }
-   
-   virtual void OnCloseBuySignal(bool valid)
-   {
-      if (valid) TRIGGER_VOID(classOrderCommand,commandCloseBuy);
-   }
-   
-   virtual void OnCloseAllSignal(bool valid)
-   {
-      if (valid) TRIGGER_VOID(classOrderCommand,commandCloseAll);
-   }
-   
-   virtual void OnCloseBuyOpposite(bool valid)
-   {
-      if (valid) TRIGGER_VOID(classOrderCommand,commandCloseSell);
-   }
-   
-   virtual void OnCloseSellOpposite(bool valid)
-   {
-      if (valid) TRIGGER_VOID(classOrderCommand,commandCloseBuy);
-   }
-   
-   virtual void OnBuySignal(bool valid)
-   {
-      if (CloseOpposite()) OnCloseBuyOpposite(valid);
-      if (BuySignalFilter(valid)) {
-         TRIGGER_VOID(classOrderCommand,commandOpenBuy);
+      if (maxspread >= 0) {
+         loadsymbol(symbol);
+         if (_symbol.SpreadInTicks() > maxspread) {
+            Print("max spread exceeded");
+            return false;
+         }
       }
-   }
-   virtual void OnSellSignal(bool valid)
-   {   
-      if (CloseOpposite()) OnCloseSellOpposite(valid);
-      if (SellSignalFilter(valid)) {
-         TRIGGER_VOID(classOrderCommand,commandOpenSell);
+      int cnt = App().orderrepository.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED);
+      if (cnt >= maxorders) {
+         Print("orders count ("+cnt+") is more than allowed ("+maxorders);
+         return false;
       }
-   }
-   virtual void OnBothSignal(bool valid)
-   {
-      
+      return true;
    }
    
-   virtual bool CloseOpposite()
+   virtual bool SellSignalFilter()
    {
-      return false;
+      if (!enableopen) return false;
+      if (!short_enabled) return false;
+      if (maxspread >= 0) {
+         loadsymbol(symbol);
+         if (_symbol.SpreadInTicks() > maxspread) {
+            Print("max spread exceeded");
+            return false;
+         }
+      }
+      if (App().orderrepository.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED) >= maxorders) {
+         return false;
+      }
+      return true;
    }
-   
-   virtual bool BuySignalFilter(bool valid)
-   {
-      return valid;
-   }
-   
-   virtual bool SellSignalFilter(bool valid)
-   {
-      return valid;
-   }
-
 };

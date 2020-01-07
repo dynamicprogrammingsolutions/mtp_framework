@@ -38,7 +38,7 @@ public:
    }
    
    virtual int OnCalculate (const int rates_total,      // size of input time series
-                 const int prev_calculated,  // bars handled in previous call
+                 const int prev_calculated  // bars handled in previous call
    )
    {
       use_oncalculate = false;
@@ -64,5 +64,15 @@ public:
       use_ontimer = false;
       //Print("Disable OnDeinit on class ",EnumToString((ENUM_CLASS_NAMES)Type()));     
    }
+   
+   #ifdef __MQL5__
+   virtual void  OnTradeTransaction(
+      const MqlTradeTransaction&    trans,     // trade transaction structure 
+      const MqlTradeRequest&        request,   // request structure 
+      const MqlTradeResult&         result     // response structure 
+   ) {
+      
+   }
+   #endif
    
 };

@@ -8,3 +8,4 @@
 #include "TraitServiceAlias.mqh"
 #include "TraitInitEvent.mqh"
 #include "TraitEvent.mqh"
+#include "TraitServiceAccess.mqh"

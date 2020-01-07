@@ -40,7 +40,6 @@
 #ifdef ARRAY_OBJECT_H
 #include "Triggers.mqh"
 #endif
-
 #ifdef TRIGGERS_H
 #include "ServiceProvider.mqh"
 #endif
@@ -52,6 +51,10 @@
 #endif
 
 #ifdef SERVICE_PROVIDER_ARRAY_OBJ_H
+#include "Observable.mqh"
+#endif
+
+#ifdef OBSERVABLE_H
 #include "Interfaces\Loader.mqh"
 #endif
 #ifdef INTERFACES_LOADER_H
@@ -99,6 +102,10 @@
 #include "ScriptManager\ScriptManagerBase.mqh"
 #endif
 
+#ifdef LOAD_ORDER_COMMAND_DISPATCHER
+#include "Commands\OrderCommandDispatcher.mqh"
+#endif
+
 #ifdef EXPIRATION_DAYS
 #include "Modules\Expiration.mqh"
 #endif
@@ -126,6 +133,10 @@ void loadservices(CApplication* _application)
 #endif
 #ifdef LOAD_SCRIPT_MANAGER
    _application.RegisterService(new CScriptManagerBase(),srvScriptManager,"scriptmanager");
+   _application.RegisterService(new CScriptDispatcher(),srvScriptDispatcher,"scriptdispatcher");
+#endif
+#ifdef LOAD_ORDER_COMMAND_DISPATCHER
+   _application.RegisterService(new COrderCommandDispatcher(),srvOrderCommandDispatcher,"ordercommanddispatcher");
 #endif
 #ifdef EXPIRATION_DAYS
    app.RegisterService(new CExpiration(EXPIRATION_DAYS),srvNone,"expiration");

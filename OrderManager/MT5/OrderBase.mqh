@@ -50,7 +50,12 @@ public:
    ENUM_ORDER_TYPE ordertype;
    double volume;
    double price;
+   double sl;
+   double tp;
    datetime expiration;
+
+   bool sl_set;
+   bool tp_set;
 
 public:
    int id;
@@ -219,12 +224,33 @@ public:
    ENUM_ORDER_STATE State();
    //void State(ENUM_ORDER_STATE newstate);
    virtual ENUM_EXECUTE_STATE ExecuteState() { return this.executestate; }
-
    
+   CPositionInfo positionInfo;
+   
+   CPositionInfo* GetPosition() {
+      if (GetOrderInfoB()) {
+         long positionId = orderinfo.PositionId();
+         int total = PositionsTotal();
+         for (int i = 0; i < total; i++) {
+            if (positionInfo.SelectByIndex(i)) {
+               if (positionInfo.Identifier() == orderinfo.PositionId()) {
+                  return GetPointer(positionInfo);
+               }
+            }
+         }
+      }
+      return NULL;
+   }
+
    double Price();
    double CurrentPrice();
    virtual datetime GetOpenTime() { return(MathMax(this.executetime,this.filltime)); }
    virtual double GetOpenPrice() { return(this.price); }
+   
+   virtual int GetStopLossTicks() { double _sl = this.GetStopLoss(); return(_sl==0?EMPTY_VALUE:getstoplossticks(this.symbol, this.GetType(), _sl, this.GetOpenPrice())); }   
+   virtual double GetStopLoss() { if (!CheckOrderInfo()) return(0); return(this.orderinfo.StopLoss()); }   
+   virtual int GetTakeProfitTicks() { double _tp = this.GetTakeProfit(); return(_tp==0?EMPTY_VALUE:gettakeprofitticks(this.symbol, this.GetType(), _tp, this.GetOpenPrice())); }
+   virtual double GetTakeProfit() { if (!CheckOrderInfo()) return(0); return(this.orderinfo.TakeProfit()); }   
    
    virtual void SetOrderType(const ENUM_ORDER_TYPE value) { if (executestate == ES_NOT_EXECUTED) ordertype=value; else Print("Cannot change executed order data (ordertype)"); }
    virtual void SetMagic(const int value) { if (executestate == ES_NOT_EXECUTED) magic=value; else Print("Cannot change executed order data (magic)"); }
@@ -234,7 +260,9 @@ public:
    virtual void SetExpiration(const datetime value) { expiration_set = true; if (executestate != ES_CANCELED) expiration = value; else Print("Cannot change canceled order data (expiration)"); }
    
    virtual void SetPrice(const double value) { price_set = true; if (executestate != ES_CANCELED) price = value; else Print("Cannot change canceled order data (price)"); }
-   
+   virtual void SetStopLoss(const double value) { sl_set = true; if (executestate != ES_CANCELED) sl = value; else Print("Cannot change canceled order data (sl)"); }
+   virtual void SetTakeProfit(const double value) { tp_set = true; if (executestate != ES_CANCELED) tp = value; else Print("Cannot change canceled order data (tp)"); }
+
    void SetTypeTime(const ENUM_ORDER_TYPE_TIME value) { typetime_set = true; if (executestate != ES_CANCELED) type_time = value; else Print("Cannot change canceled order data (typetime)"); }
    
 };
@@ -348,10 +376,10 @@ bool COrderBase::Execute()
             if (ordertype == ORDER_TYPE_SELL) { price = _symbol.Bid(); }
             else if (ordertype == ORDER_TYPE_BUY) { price = _symbol.Ask(); }
          }
-         success = trade.PositionOpen(symbol,ordertype,_symbol.LotRound(volume),_symbol.PriceRound(price),0,0,comment);
+         success = trade.PositionOpen(symbol,ordertype,_symbol.LotRound(volume),_symbol.PriceRound(price),sl,tp,comment);
       } else if (ordertype_pending(ordertype)) {
          if (price > 0) {
-            success = trade.OrderOpen(symbol,ordertype,_symbol.LotRound(volume),limit_price,_symbol.PriceRound(price),0,0,type_time,expiration,comment);
+            success = trade.OrderOpen(symbol,ordertype,_symbol.LotRound(volume),limit_price,_symbol.PriceRound(price),sl,tp,type_time,expiration,comment);
          } else {
             if (event.Warning ()) event.Warning ("No Price",__FUNCTION__);
          }
@@ -388,7 +416,7 @@ bool COrderBase::WaitForExecute()
    if (executestate == ES_EXECUTED && ordertype_market(this.ordertype)) {
       for (int i = 0; i < waitforexecute_max; i++) {
          this.State();
-         if (event.Info ()) event.Info ("Waiting for execute: "+(string)this.id,__FUNCTION__);
+         if (event.Info ()) event.Info ("Waiting for execute: "+(string)this.id+" state: "+EnumToString(state),__FUNCTION__);
          if (state_filled(state)) return(true);
          if (state_canceled(state)) return(false);
          Sleep(waitforexecute_sleep);
@@ -439,16 +467,20 @@ bool COrderBase::Modify()
       else price = _symbol.PriceRound(price);
       if (!expiration_set) expiration = orderinfo.TimeExpiration();
       if (!typetime_set) type_time = orderinfo.TypeTime();
-      if ((price_set && price != this.Price()) || (expiration_set && expiration != orderinfo.TimeExpiration()) || (typetime_set && type_time != orderinfo.TypeTime())) {
+      if ((price_set && price != this.Price()) || (sl_set && sl != this.GetStopLoss()) || (tp_set && tp != this.GetTakeProfit()) || (expiration_set && expiration != orderinfo.TimeExpiration()) || (typetime_set && type_time != orderinfo.TypeTime())) {
          price_set = false;
+         sl_set = false;
+         tp_set = false;
          expiration_set = false;
          typetime_set = false;
-         if (trade.OrderModify(ticket,price,0,0,type_time,expiration)) {
+         if (trade.OrderModify(ticket,price,sl,tp,type_time,expiration)) {
             Update();
             return(true);
          } else return(false);
       } else {
          price_set = false;
+         sl_set = false;
+         tp_set = false;
          expiration_set = false;
          typetime_set = false;
          return false;
@@ -476,6 +508,13 @@ bool COrderBase::Update()
       if (GetOrderInfoB()) {      
          //if (event.Verbose ()) event.Verbose ("order info got: ticket:"+this.ticket,__FUNCTION__);
          this.State();
+         CPositionInfo* position = GetPosition();
+         if (position != NULL) {
+            Print(position.Volume());
+         }  
+         
+         Print("historyOrders: ",HistoryOrdersTotal()," Orders: ",OrdersTotal()," Deals: ",HistoryDealsTotal()," Positions: ",PositionsTotal());
+         
          //this.state = this.orderinfo.State();
          if (executetime == 0 && state != ORDER_STATE_STARTED && state != ORDER_STATE_REJECTED) executetime = orderinfo.TimeSetup();
          if (filltime == 0 && state == ORDER_STATE_FILLED) {

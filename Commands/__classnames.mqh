@@ -1,3 +1,5 @@
 classOrderCommand,
-classOrderCommandHandlerBase,
+classOrderCommandHandler,
 classScript,
+classOrderCommandDispatcher,
+classScriptDispatcher,

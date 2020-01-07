@@ -6,6 +6,18 @@
 #property copyright "Copyright 2011, MetaQuotes Software Corp."
 #property link      "http://www.mql5.com"
 
+ushort StringGetChar(const string string_value, int pos_index)
+{
+   return StringGetCharacter(string_value,pos_index);
+}
+
+string StringSetChar(const string text,int pos,ushort value)
+{
+   string returnstring = text;
+   StringSetCharacter(returnstring,pos,value);
+   return returnstring;
+}
+
 double StrToDouble(const string number_string)
 {
    return(StringToDouble(number_string));

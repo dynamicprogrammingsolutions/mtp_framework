@@ -6,12 +6,18 @@
 #property copyright "Copyright 2011, MetaQuotes Software Corp."
 #property link      "http://www.mql5.com"
 
-#include "..\ordermanager\OrderManager.mqh"
+#include "..\OrderManager\Loader.mqh"
+
+COrderManagerInterface* om;
+COrderRepositoryInterface* or;
 
 #define MODE_TRADES 0
 #define MODE_HISTORY 1
 #define SELECT_BY_POS 0
 #define SELECT_BY_TICKET 1
+
+#define OM_RETCODE_INVALID_STOPLOSS 10101
+#define OM_RETCODE_INVALID_TAKEPROFIT 10101
 
 void ordersontick()
 {
@@ -23,18 +29,18 @@ bool OrderSelect(int idx, int select, int mode = MODE_TRADES)
    //Print("OrderSelect");
    if (select == SELECT_BY_POS) {
       if (mode == MODE_TRADES) {
-         return(om.SelectOrderByIdx(idx));
+         return(or.SelectOrderByIdx(idx));
       }
       if (mode == MODE_HISTORY) {
-         return(om.SelectHistoryOrderByIdx(idx));         
+         return(or.SelectHistoryOrderByIdx(idx));         
       } 
    }
    if (select == SELECT_BY_TICKET) {
       if (mode == MODE_TRADES) {
-         return(om.SelectOrderByTicket(idx));         
+         return(or.SelectOrderByTicket(idx));         
       }
       if (mode == MODE_HISTORY) {
-         return(om.SelectHistoryOrderByTicket(idx));                  
+         return(or.SelectHistoryOrderByTicket(idx));                  
       } 
    }
    return(false);
@@ -43,134 +49,106 @@ bool OrderSelect(int idx, int select, int mode = MODE_TRADES)
 int OrdersTotalOM()
 {
    //Print("OrdersTotalOM");
-   return(om.OrdersTotal());
+   return(or.Total());
 }
 
 
 int OrdersHistoryTotal()
 {
    //Print("HistoryOrdersTotalOM");
-   return(om.HistoryOrdersTotal());
+   return(or.HistoryTotal());
 }
 
 string OrderSymbol()
 {
-   return(om.OrderSymbol());
+   return(or.Selected().GetSymbol());
 }
 
 int OrderMagicNumber()
 {
-   return(om.OrderMagicNumber());
+   return(or.Selected().GetMagicNumber());
 }
 
 ENUM_ORDER_TYPE OrderType()
 {
-   if (om.selectedorder == NULL) return(-1);
-   if (state_filled(om.OrderState())) {
-      if (ordertype_pendinglong(om.selectedorder.ordertype)) return(ORDER_TYPE_BUY);
-      if (ordertype_pendingshort(om.selectedorder.ordertype)) return(ORDER_TYPE_SELL);
+   if (or.Selected() == NULL) return(-1);
+   if (state_filled(or.Selected().State())) {
+      if (ordertype_pendinglong(or.Selected().GetType())) return(ORDER_TYPE_BUY);
+      if (ordertype_pendingshort(or.Selected().GetType())) return(ORDER_TYPE_SELL);
    }
-   return(om.selectedorder.ordertype);
+   return(or.Selected().GetType());
 }
 
 double OrderOpenPrice()
 {
-   if (om.selectedorder == NULL) return(0);   
-   return(om.selectedorder.Price());
+   if (or.Selected() == NULL) return(0);   
+   return(or.Selected().GetOpenPrice());
 }
 
 double OrderLots()
 {
-   if (om.selectedorder == NULL) return(0);
-   return(om.selectedorder.Lots());
+   if (or.Selected() == NULL) return(0);
+   return(or.Selected().GetLots());
 }
 
 ulong OrderTicket()
 {
-   if (om.selectedorder == NULL) return(0);
-   return(om.selectedorder.ticket);
+   if (or.Selected() == NULL) return(0);
+   return(or.Selected().GetTicket());
 }
 
 double OrderStopLoss()
 {
-   double _price = om.OrderStopLoss();
-   return(_price);
+   if (or.Selected() == NULL) return(0);
+   return(or.Selected().GetStopLoss());
 }
 
 double OrderTakeProfit()
 {
-   double _price = om.OrderTakeProfit();
-   return(_price);
+   if (or.Selected() == NULL) return(0);
+   return(or.Selected().GetTakeProfit());
 }
 
 datetime OrderCloseTime()
 {
-   return(om.OrderCloseTime());
+   if (or.Selected() == NULL) return(0);
+   return(or.Selected().GetCloseTime());
 }
 
 double OrderClosePrice()
 {
-   return(om.OrderClosePrice());
+   if (or.Selected() == NULL) return(0);
+   return(or.Selected().GetClosePrice());
 }
 
 datetime OrderOpenTime()
 {
-   return(om.OrderOpenTime());
+   if (or.Selected() == NULL) return(0);
+   return(or.Selected().GetOpenTime());
 }
 
 string OrderComment()
 {
-   return(om.OrderComment());
+   if (or.Selected() == NULL) return(0);
+   return(or.Selected().GetComment());
 }
 
 double OrderCommission()
 {
-   if (om.selectedorder==NULL) return(0);
-   COrderInfoBase* orderinfo;
-   if (om.selectedorder.GetOrderInfoB()) {
-      orderinfo = om.selectedorder.orderinfo;
-      CPositionInfo positioninfo;
-      positioninfo.SelectByIndex((uint)orderinfo.PositionId());
-      return(positioninfo.Commission());
-   } else {
-      return(0);
-   }
+   if (or.Selected() == NULL) return(0);
+   return(or.Selected().GetCommission());
 }
 
 double OrderSwap()
 {
-   if (om.selectedorder==NULL) return(0);
-   COrderInfoBase* orderinfo;
-   if (om.selectedorder.GetOrderInfoB()) {
-      orderinfo = om.selectedorder.orderinfo;
-      CPositionInfo positioninfo;
-      positioninfo.SelectByIndex((uint)orderinfo.PositionId());
-      return(positioninfo.Swap());
-   } else {
-      return(0);
-   }
+   if (or.Selected() == NULL) return(0);
+   return(or.Selected().GetSwap());
 }
 
 double OrderProfit()
 {
-   om.SelectOrderInfo();
-   if (om.selectedorder == NULL) return(0);
-   double openprice = om.selectedorder.Price();
-   double closeprice = 0;
-   loadsymbol(om.selectedorder.symbol,__FUNCTION__);
-   if (!om.selectedorder.closed) {
-      if (ordertype_long(om.selectedorder.ordertype)) closeprice = _symbol.Bid();
-      if (ordertype_short(om.selectedorder.ordertype)) closeprice = _symbol.Ask();
-   } else {
-      closeprice = om.selectedorder.lastcloseprice;
-   }
-   if (closeprice > 0) {
-      double move = closeprice-openprice;
-      double profit = 0;
-      if (ordertype_long(om.selectedorder.ordertype)) profit = _symbol.InTicks(move)*om.selectedorder.volume*_symbol.TickValue();
-      return(profit);
-   }
-   return(0);
+   if (or.Selected() == NULL) return(0);
+   return(or.Selected().GetProfitMoney());
 }
 
 COrderBase* lastorder;
@@ -178,14 +156,17 @@ uint lastordererror;
 
 long OrderSend(string symbol,ENUM_ORDER_TYPE cmd,double volume,double price,int slippage,double stoploss,double takeprofit,string comment="",int magic=0,datetime expiration=0,color cl=0)
 {
-   loadsymbol(symbol,__FUNCTION__);
+   CSymbolInfoInterface* _symbol;
+   global_app().symbolloader.LoadSymbol(symbol,_symbol);
+   
+   CEventHandlerInterface* event = global_app().eventhandler;
    
    bool error = false;   
 
    if (stoploss > 0) {
       int slticks = getstoplossticks(symbol,cmd,stoploss,price);
       if (slticks < _symbol.StopsLevelInTicks()) {
-         om.event.Error("Invalid Stoploss ("+(string)slticks+")",__FUNCTION__);
+         event.Error("Invalid Stoploss ("+(string)slticks+")",__FUNCTION__);
          lastordererror = OM_RETCODE_INVALID_STOPLOSS;
          error = true;
       }
@@ -194,18 +175,19 @@ long OrderSend(string symbol,ENUM_ORDER_TYPE cmd,double volume,double price,int 
    if (takeprofit > 0) {   
       int tpticks = gettakeprofitticks(symbol,cmd,takeprofit,price);
       if (tpticks < _symbol.StopsLevelInTicks()) {
-         om.event.Error("Invalid Takerpofit ("+(string)tpticks+")",__FUNCTION__);
+         event.Error("Invalid Takerpofit ("+(string)tpticks+")",__FUNCTION__);
          lastordererror = OM_RETCODE_INVALID_TAKEPROFIT;
          error = true;
       }
    }
          
    if (error) {
-      om.event.Info("ordertype="+(string)cmd+" price="+(string)price+" stoploss="+(string)stoploss+" takeprofit="+(string)takeprofit);
+      event.Info("ordertype="+(string)cmd+" price="+(string)price+" stoploss="+(string)stoploss+" takeprofit="+(string)takeprofit);
       return(-1);
    }
    
-   om.magic = magic;      
+   COrderBase::magic_default = magic;
+   
    COrder* order;            
    order = om.NewOrder(symbol,cmd,volume,price,stoploss,takeprofit,comment,expiration);
    if (order != NULL) {
@@ -222,26 +204,32 @@ long OrderSend(string symbol,ENUM_ORDER_TYPE cmd,double volume,double price,int 
 
 bool OrderClose(ulong ticket, double closevolume, double price_unused=0, double slippage_unused=0, color cl_unused=0)
 {
-   //Print("OrderClose");
-   return(om.CloseOrderByTicket(ticket, closevolume));
+   COrderInterface* order = or.GetByTicketOrder(ticket);
+   if (order != NULL) {
+      return order.Close(closevolume);
+   } else return false;
 }
 
 bool OrderDelete(ulong orderticket, color cl_unused = 0)
 {
-   return(om.CancelOrderByTicket(orderticket));
+   COrderInterface* order = or.GetByTicketOrder(orderticket);
+   return(order.Cancel());
 }
 
 // ONLY FOR TRADES
 bool OrderModify(ulong ticket, double price, double stoploss, double takeprofit, datetime expiration_unused = 0, color cl_unused = 0)
 {
-   int idx = om.GetIdxByTicket(ticket);
-   if (idx < 0) return(false);
+
+   CEventHandlerInterface* event = global_app().eventhandler;
+   
    COrder *order;
    CAttachedOrder *attachedorder;
-   order = om.orders.Order(idx);
+
+   order = or.GetByTicket(ticket);
+   if (order == NULL) return false;
    
    if (order == NULL) {
-      om.event.Info("order not found",__FUNCTION__);
+      event.Info("order not found",__FUNCTION__);
       return(false);
    }
    
@@ -249,8 +237,9 @@ bool OrderModify(ulong ticket, double price, double stoploss, double takeprofit,
       return(false);
    }
 
-   loadsymbol(order.symbol,__FUNCTION__);
-
+   CSymbolInfoInterface* _symbol;
+   global_app().symbolloader.LoadSymbol(order.GetSymbol(),_symbol);
+   
    if (ordertype_market(order.ordertype)) {         
    
       bool error = false;   
@@ -258,7 +247,7 @@ bool OrderModify(ulong ticket, double price, double stoploss, double takeprofit,
       if (stoploss > 0) {
          int slticks = getstoplossticks(order.symbol,order.ordertype,stoploss,0);
          if (slticks < _symbol.StopsLevelInTicks()) {
-            om.event.Error("Invalid Stoploss ("+(string)slticks+") "+"ticket="+(string)ticket+"ordertype="+(string)order.ordertype+" price="+(string)price+" stoploss="+(string)stoploss+" takeprofit="+(string)takeprofit,__FUNCTION__);
+            event.Error("Invalid Stoploss ("+(string)slticks+") "+"ticket="+(string)ticket+"ordertype="+(string)order.ordertype+" price="+(string)price+" stoploss="+(string)stoploss+" takeprofit="+(string)takeprofit,__FUNCTION__);
             error = true;
          }
       }
@@ -266,7 +255,7 @@ bool OrderModify(ulong ticket, double price, double stoploss, double takeprofit,
       if (takeprofit > 0) {   
          int tpticks = gettakeprofitticks(order.symbol,order.ordertype,takeprofit,0);
          if (tpticks < _symbol.StopsLevelInTicks()) {
-            om.event.Error("Invalid Takerpofit ("+(string)tpticks+") "+"ticket="+(string)ticket+"ordertype="+(string)order.ordertype+" price="+(string)price+" stoploss="+(string)stoploss+" takeprofit="+(string)takeprofit,__FUNCTION__);
+            event.Error("Invalid Takerpofit ("+(string)tpticks+") "+"ticket="+(string)ticket+"ordertype="+(string)order.ordertype+" price="+(string)price+" stoploss="+(string)stoploss+" takeprofit="+(string)takeprofit,__FUNCTION__);
             error = true;
          }
       }
@@ -283,7 +272,7 @@ bool OrderModify(ulong ticket, double price, double stoploss, double takeprofit,
    bool successprice = true;
    if (ordertype_pending(order.ordertype) && state_placed(order.state) && !state_canceled(order.state)) {
       if (order.Price() != price) {
-         om.event.Info("Modify EntryPrice of ticket:"+(string)ticket+" new price:"+(string)stoploss,__FUNCTION__);
+         event.Info("Modify EntryPrice of ticket:"+(string)ticket+" new price:"+(string)stoploss,__FUNCTION__);
          successprice = order.ModifyPrice(price);
       }
    }
@@ -292,11 +281,11 @@ bool OrderModify(ulong ticket, double price, double stoploss, double takeprofit,
    attachedorder = order.GetStopLossOrder();
    if (attachedorder != NULL) {
       if (attachedorder.Price() != stoploss) {
-         om.event.Info("Modify StopLoss of ticket:"+(string)ticket+" new stoploss:"+(string)stoploss,__FUNCTION__);
+         event.Info("Modify StopLoss of ticket:"+(string)ticket+" new stoploss:"+(string)stoploss,__FUNCTION__);
          successstoploss = attachedorder.ModifyPrice(stoploss);
       }
    } else {
-      om.event.Info("Add StopLoss to ticket "+(string)ticket+" new stoploss:"+(string)stoploss,__FUNCTION__);
+      event.Info("Add StopLoss to ticket "+(string)ticket+" new stoploss:"+(string)stoploss,__FUNCTION__);
       successstoploss = order.AddStopLoss(stoploss);
    }
    
@@ -304,11 +293,11 @@ bool OrderModify(ulong ticket, double price, double stoploss, double takeprofit,
    attachedorder = order.GetTakeProfitOrder();
    if (attachedorder != NULL) {
       if (attachedorder.Price() != takeprofit) {
-         om.event.Info("Modify TakeProfit of ticket:"+(string)ticket+" new takeprofit:"+(string)takeprofit,__FUNCTION__);
+         event.Info("Modify TakeProfit of ticket:"+(string)ticket+" new takeprofit:"+(string)takeprofit,__FUNCTION__);
          successtakeprofit = attachedorder.ModifyPrice(takeprofit);
       }
    } else {
-      om.event.Info("Add TakeProfit to ticket "+(string)ticket+" new takeprofit:"+(string)takeprofit,__FUNCTION__);
+      event.Info("Add TakeProfit to ticket "+(string)ticket+" new takeprofit:"+(string)takeprofit,__FUNCTION__);
       successtakeprofit = order.AddTakeProfit(takeprofit);
    }
    

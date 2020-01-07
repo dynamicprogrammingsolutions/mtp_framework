@@ -11,6 +11,10 @@ public:
    {
    
    }
+   virtual void OnSignal(CSignal* signal)
+   {
+   
+   }
 };
 
 class CSignalValidator : public CAppObject
@@ -34,6 +38,14 @@ public:
       CSignalValidatorRule* rule;
       while(rules.ForEach(rule,i,true)) {
          rule.OnValidSignal(signal);
+      }
+   }
+   virtual void OnSignal(CSignal* signal)
+   {
+      int i = 0;
+      CSignalValidatorRule* rule;
+      while(rules.ForEach(rule,i,true)) {
+         rule.OnSignal(signal);
       }
    }
 };

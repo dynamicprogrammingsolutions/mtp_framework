@@ -1,0 +1,14 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+	"build_systems": [
+		{
+			"name": "Compile",
+			"shell_cmd": "metaeditor4 $file",
+		},
+	],
+}

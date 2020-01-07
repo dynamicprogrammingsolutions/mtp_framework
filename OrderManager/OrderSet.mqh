@@ -3,7 +3,7 @@
 
 class COrderSet : public COrderArray {
 public:
-   TraitGetType(classMT4OrderSet)
+   TraitGetType(classOrderSet)
    TraitNewObject(COrderSet)
 
    int id;

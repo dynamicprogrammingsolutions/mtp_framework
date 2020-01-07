@@ -4,19 +4,19 @@
 #define ORDER_INTERFACE_H
 
 #ifdef __MQL4__
-#include "..\OrderManager\Enums\EnumOrderState.mqh"
+#include "Enums\EnumOrderState.mqh"
 #endif
 
-#include "..\OrderManager\Enums\EnumExecuteState.mqh"
-#include "..\OrderManager\Enums\EnumOrderSelect.mqh"
-#include "..\OrderManager\Enums\EnumStateSelect.mqh"
-#include "..\OrderManager\Enums\EnumActivity.mqh"
+#include "Enums\EnumExecuteState.mqh"
+#include "Enums\EnumOrderSelect.mqh"
+#include "Enums\EnumStateSelect.mqh"
+#include "Enums\EnumActivity.mqh"
 
 #define POrder shared_ptr<COrderInterface>
 #define NewPOrder(__object__) POrder::make_shared(__object__)
 #define MakeOrder(__object__) POrder::make_shared(__object__)
 
-class COrderInterface : public CAppObject
+class COrderInterface : public CObservable
 {
 public:
 
@@ -75,8 +75,17 @@ public:
    virtual void SetPrice(const double value) { AbstractFunctionWarning(__FUNCTION__); }
    virtual void SetStopLoss(const double value) { AbstractFunctionWarning(__FUNCTION__); }
    virtual void SetTakeProfit(const double value) { AbstractFunctionWarning(__FUNCTION__); }
+   virtual bool SetPrice(CStopsCalcInterface* _price, bool check = false) { AbstractFunctionWarning(__FUNCTION__); return false; }
    virtual bool SetStopLoss(CStopsCalcInterface* _sl, bool checkchange = false, bool checkhigher = false) { AbstractFunctionWarning(__FUNCTION__); return false; }
    virtual bool SetTakeProfit(CStopsCalcInterface* _tp, bool check = false)  { AbstractFunctionWarning(__FUNCTION__); return false; }
+   
+#ifdef __MQL5__
+   virtual void OnTradeTransaction(
+      const MqlTradeTransaction&    trans,     // trade transaction structure 
+      const MqlTradeRequest&        request,   // request structure 
+      const MqlTradeResult&         result     // response structure 
+   ) { AbstractFunctionWarning(__FUNCTION__); }
+#endif
    
    
 };

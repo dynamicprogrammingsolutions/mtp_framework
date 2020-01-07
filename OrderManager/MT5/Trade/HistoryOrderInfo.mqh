@@ -6,325 +6,281 @@ class CHistoryOrderInfo : public CObject
 protected:
    ulong             m_ticket;             // ticket of history order
 public:
+                     CHistoryOrderInfo(void);
+                    ~CHistoryOrderInfo(void);
    //--- methods of access to protected data
-   bool              Ticket(ulong ticket) {
-      if (HistoryOrderSelect(ticket))
-      {
-         m_ticket=ticket;
-         return(true);
-      } else {
-         return(false);
-      }
-   }
-   ulong             Ticket() const       { return(m_ticket); }
+   void              Ticket(const ulong ticket) { m_ticket=ticket;  }
+   ulong             Ticket(void)         const { return(m_ticket); }
    //--- fast access methods to the integer order propertyes
-   datetime          TimeSetup() const;
-   ENUM_ORDER_TYPE   OrderType() const;
-   string            TypeDescription() const;
-   ENUM_ORDER_STATE  State() const;
-   string            StateDescription() const;
-   datetime          TimeExpiration() const;
-   datetime          TimeDone() const;
-   ENUM_ORDER_TYPE_FILLING TypeFilling() const;
-   string                  TypeFillingDescription() const;
-   ENUM_ORDER_TYPE_TIME    TypeTime() const;
-   string                  TypeTimeDescription() const;
-   long              Magic() const;
-   long              PositionId() const;
+   datetime          TimeSetup(void) const;
+   ulong             TimeSetupMsc(void) const;
+   datetime          TimeDone(void) const;
+   ulong             TimeDoneMsc(void) const;
+   ENUM_ORDER_TYPE   OrderType(void) const;
+   string            TypeDescription(void) const;
+   ENUM_ORDER_STATE  State(void) const;
+   string            StateDescription(void) const;
+   datetime          TimeExpiration(void) const;
+   ENUM_ORDER_TYPE_FILLING TypeFilling(void) const;
+   string            TypeFillingDescription(void) const;
+   ENUM_ORDER_TYPE_TIME TypeTime(void) const;
+   string            TypeTimeDescription(void) const;
+   long              Magic(void) const;
+   long              PositionId(void) const;
+   long              PositionById(void) const;
    //--- fast access methods to the double order propertyes
-   double            VolumeInitial() const;
-   double            VolumeCurrent() const;
-   double            PriceOpen() const;
-   double            StopLoss() const;
-   double            TakeProfit() const;
-   double            PriceCurrent() const;
-   double            PriceStopLimit() const;
+   double            VolumeInitial(void) const;
+   double            VolumeCurrent(void) const;
+   double            PriceOpen(void) const;
+   double            StopLoss(void) const;
+   double            TakeProfit(void) const;
+   double            PriceCurrent(void) const;
+   double            PriceStopLimit(void) const;
    //--- fast access methods to the string order propertyes
-   string            Symbol() const;
-   string            Comment() const;
+   string            Symbol(void) const;
+   string            Comment(void) const;
+   string            ExternalId(void) const;
    //--- access methods to the API MQL5 functions
-   bool              InfoInteger(ENUM_ORDER_PROPERTY_INTEGER prop_id,long& var) const;
-   bool              InfoDouble(ENUM_ORDER_PROPERTY_DOUBLE prop_id,double& var) const;
-   bool              InfoString(ENUM_ORDER_PROPERTY_STRING prop_id,string& var) const;
+   bool              InfoInteger(const ENUM_ORDER_PROPERTY_INTEGER prop_id,long &var) const;
+   bool              InfoDouble(const ENUM_ORDER_PROPERTY_DOUBLE prop_id,double &var) const;
+   bool              InfoString(const ENUM_ORDER_PROPERTY_STRING prop_id,string &var) const;
    //--- info methods
-   string            FormatType(string& str,const uint type)                    const;
-   string            FormatStatus(string& str,const uint status)                const;
-   string            FormatTypeFilling(string& str,const uint type)             const;
-   string            FormatTypeTime(string& str,const uint type)                const;
-   string            FormatOrder(string& str)                                   const;
-   string            FormatPrice(string& str,const double price_order,const double price_trigger,const uint __digits) const;
+   string            FormatType(string &str,const uint type) const;
+   string            FormatStatus(string &str,const uint status) const;
+   string            FormatTypeFilling(string &str,const uint type) const;
+   string            FormatTypeTime(string &str,const uint type) const;
+   string            FormatOrder(string &str) const;
+   string            FormatPrice(string &str,const double price_order,const double price_trigger,const uint digits) const;
    //--- method for select history order
-   bool              SelectByIndex(int index);
+   bool              SelectByIndex(const int index);
   };
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_TIME_SETUP".                       |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_TIME_SETUP".                   |
-//| REMARK: no.                                                      |
+//| Constructor                                                      |
 //+------------------------------------------------------------------+
-datetime CHistoryOrderInfo::TimeSetup() const
+CHistoryOrderInfo::CHistoryOrderInfo(void) : m_ticket(0)
+  {
+  }
+//+------------------------------------------------------------------+
+//| Destructor                                                       |
+//+------------------------------------------------------------------+
+CHistoryOrderInfo::~CHistoryOrderInfo(void)
+  {
+  }
+//+------------------------------------------------------------------+
+//| Get the property value "ORDER_TIME_SETUP"                        |
+//+------------------------------------------------------------------+
+datetime CHistoryOrderInfo::TimeSetup(void) const
   {
    return((datetime)HistoryOrderGetInteger(m_ticket,ORDER_TIME_SETUP));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_TYPE".                             |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_TYPE".                         |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_TIME_SETUP_MSC"                    |
 //+------------------------------------------------------------------+
-ENUM_ORDER_TYPE CHistoryOrderInfo::OrderType() const
+ulong CHistoryOrderInfo::TimeSetupMsc(void) const
+  {
+   return(HistoryOrderGetInteger(m_ticket,ORDER_TIME_SETUP_MSC));
+  }
+//+------------------------------------------------------------------+
+//| Get the property value "ORDER_TIME_DONE"                         |
+//+------------------------------------------------------------------+
+datetime CHistoryOrderInfo::TimeDone(void) const
+  {
+   return((datetime)HistoryOrderGetInteger(m_ticket,ORDER_TIME_DONE));
+  }
+//+------------------------------------------------------------------+
+//| Get the property value "ORDER_TIME_DONE_MSC"                     |
+//+------------------------------------------------------------------+
+ulong CHistoryOrderInfo::TimeDoneMsc(void) const
+  {
+   return(HistoryOrderGetInteger(m_ticket,ORDER_TIME_DONE_MSC));
+  }
+//+------------------------------------------------------------------+
+//| Get the property value "ORDER_TYPE"                              |
+//+------------------------------------------------------------------+
+ENUM_ORDER_TYPE CHistoryOrderInfo::OrderType(void) const
   {
    return((ENUM_ORDER_TYPE)HistoryOrderGetInteger(m_ticket,ORDER_TYPE));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_TYPE" as string.                   |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_TYPE" as string.               |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_TYPE" as string                    |
 //+------------------------------------------------------------------+
-string CHistoryOrderInfo::TypeDescription() const
+string CHistoryOrderInfo::TypeDescription(void) const
   {
    string str;
 //---
    return(FormatType(str,OrderType()));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_STATE".                            |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_STATE".                        |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_STATE"                             |
 //+------------------------------------------------------------------+
-ENUM_ORDER_STATE CHistoryOrderInfo::State() const
+ENUM_ORDER_STATE CHistoryOrderInfo::State(void) const
   {
    return((ENUM_ORDER_STATE)HistoryOrderGetInteger(m_ticket,ORDER_STATE));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_STATE" as string.                  |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_STATE" as string.              |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_STATE" as string                   |
 //+------------------------------------------------------------------+
-string CHistoryOrderInfo::StateDescription() const
+string CHistoryOrderInfo::StateDescription(void) const
   {
    string str;
 //---
    return(FormatStatus(str,State()));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_TIME_EXPIRATION".                  |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_TIME_EXPIRATION".              |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_TIME_EXPIRATION"                   |
 //+------------------------------------------------------------------+
-datetime CHistoryOrderInfo::TimeExpiration() const
+datetime CHistoryOrderInfo::TimeExpiration(void) const
   {
    return((datetime)HistoryOrderGetInteger(m_ticket,ORDER_TIME_EXPIRATION));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_TIME_DONE".                        |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_TIME_DONE".                    |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_TYPE_FILLING"                      |
 //+------------------------------------------------------------------+
-datetime CHistoryOrderInfo::TimeDone() const
-  {
-   return((datetime)HistoryOrderGetInteger(m_ticket,ORDER_TIME_DONE));
-  }
-//+------------------------------------------------------------------+
-//| Get the property value "ORDER_TYPE_FILLING".                     |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_TYPE_FILLING".                 |
-//| REMARK: no.                                                      |
-//+------------------------------------------------------------------+
-ENUM_ORDER_TYPE_FILLING CHistoryOrderInfo::TypeFilling() const
+ENUM_ORDER_TYPE_FILLING CHistoryOrderInfo::TypeFilling(void) const
   {
    return((ENUM_ORDER_TYPE_FILLING)HistoryOrderGetInteger(m_ticket,ORDER_TYPE_FILLING));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_TYPE_FILLING" as string.           |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_TYPE_FILLING" as string.       |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_TYPE_FILLING" as string            |
 //+------------------------------------------------------------------+
-string CHistoryOrderInfo::TypeFillingDescription() const
+string CHistoryOrderInfo::TypeFillingDescription(void) const
   {
    string str;
 //---
    return(FormatTypeFilling(str,TypeFilling()));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_TYPE_TIME".                        |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_TYPE_TIME".                    |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_TYPE_TIME"                         |
 //+------------------------------------------------------------------+
-ENUM_ORDER_TYPE_TIME CHistoryOrderInfo::TypeTime() const
+ENUM_ORDER_TYPE_TIME CHistoryOrderInfo::TypeTime(void) const
   {
    return((ENUM_ORDER_TYPE_TIME)HistoryOrderGetInteger(m_ticket,ORDER_TYPE_TIME));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_TYPE_TIME" as string.              |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_TYPE_TIME" as string.          |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_TYPE_TIME" as string               |
 //+------------------------------------------------------------------+
-string CHistoryOrderInfo::TypeTimeDescription() const
+string CHistoryOrderInfo::TypeTimeDescription(void) const
   {
    string str;
 //---
    return(FormatTypeTime(str,TypeTime()));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_EXPERT".                           |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_EXPERT".                       |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_EXPERT"                            |
 //+------------------------------------------------------------------+
-long CHistoryOrderInfo::Magic() const
+long CHistoryOrderInfo::Magic(void) const
   {
    return(HistoryOrderGetInteger(m_ticket,ORDER_MAGIC));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_POSITION_ID".                      |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_POSITION_ID".                  |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_POSITION_ID"                       |
 //+------------------------------------------------------------------+
-long CHistoryOrderInfo::PositionId() const
+long CHistoryOrderInfo::PositionId(void) const
   {
    return(HistoryOrderGetInteger(m_ticket,ORDER_POSITION_ID));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_VOLUME_INITIAL".                   |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_VOLUME_INITIAL".               |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_POSITION_BY_ID"                    |
 //+------------------------------------------------------------------+
-double CHistoryOrderInfo::VolumeInitial() const
+long CHistoryOrderInfo::PositionById(void) const
+  {
+   return(HistoryOrderGetInteger(m_ticket,ORDER_POSITION_BY_ID));
+  }
+//+------------------------------------------------------------------+
+//| Get the property value "ORDER_VOLUME_INITIAL"                    |
+//+------------------------------------------------------------------+
+double CHistoryOrderInfo::VolumeInitial(void) const
   {
    return(HistoryOrderGetDouble(m_ticket,ORDER_VOLUME_INITIAL));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_VOLUME_CURRENT".                   |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_VOLUME_CURRENT".               |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_VOLUME_CURRENT"                    |
 //+------------------------------------------------------------------+
-double CHistoryOrderInfo::VolumeCurrent() const
+double CHistoryOrderInfo::VolumeCurrent(void) const
   {
    return(HistoryOrderGetDouble(m_ticket,ORDER_VOLUME_CURRENT));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_PRICE_OPEN".                       |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_PRICE_OPEN".                   |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_PRICE_OPEN"                        |
 //+------------------------------------------------------------------+
-double CHistoryOrderInfo::PriceOpen() const
+double CHistoryOrderInfo::PriceOpen(void) const
   {
    return(HistoryOrderGetDouble(m_ticket,ORDER_PRICE_OPEN));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_SL".                               |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_SL".                           |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_SL"                                |
 //+------------------------------------------------------------------+
-double CHistoryOrderInfo::StopLoss() const
+double CHistoryOrderInfo::StopLoss(void) const
   {
    return(HistoryOrderGetDouble(m_ticket,ORDER_SL));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_TP".                               |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_TP".                           |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_TP"                                |
 //+------------------------------------------------------------------+
-double CHistoryOrderInfo::TakeProfit() const
+double CHistoryOrderInfo::TakeProfit(void) const
   {
    return(HistoryOrderGetDouble(m_ticket,ORDER_TP));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_PRICE_CURRENT".                    |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_PRICE_CURRENT".                |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_PRICE_CURRENT"                     |
 //+------------------------------------------------------------------+
-double CHistoryOrderInfo::PriceCurrent() const
+double CHistoryOrderInfo::PriceCurrent(void) const
   {
    return(HistoryOrderGetDouble(m_ticket,ORDER_PRICE_CURRENT));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_PRICE_STOPLIMIT".                  |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_PRICE_STOPLIMIT".              |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_PRICE_STOPLIMIT"                   |
 //+------------------------------------------------------------------+
-double CHistoryOrderInfo::PriceStopLimit() const
+double CHistoryOrderInfo::PriceStopLimit(void) const
   {
    return(HistoryOrderGetDouble(m_ticket,ORDER_PRICE_STOPLIMIT));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_SYMBOL".                           |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_SYMBOL".                       |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_SYMBOL"                            |
 //+------------------------------------------------------------------+
-string CHistoryOrderInfo::Symbol() const
+string CHistoryOrderInfo::Symbol(void) const
   {
    return(HistoryOrderGetString(m_ticket,ORDER_SYMBOL));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ORDER_COMMENT".                          |
-//| INPUT:  no.                                                      |
-//| OUTPUT: the property value "ORDER_COMMENT".                      |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_COMMENT"                           |
 //+------------------------------------------------------------------+
-string CHistoryOrderInfo::Comment() const
+string CHistoryOrderInfo::Comment(void) const
   {
    return(HistoryOrderGetString(m_ticket,ORDER_COMMENT));
   }
 //+------------------------------------------------------------------+
-//| Access functions OrderGetInteger(...).                           |
-//| INPUT:  prop_id  -identifier integer properties,                 |
-//|         var     -reference to a variable to value.               |
-//| OUTPUT: true-if successful, false otherwise.                     |
-//| REMARK: no.                                                      |
+//| Get the property value "ORDER_EXTERNAL_ID"                       |
 //+------------------------------------------------------------------+
-bool CHistoryOrderInfo::InfoInteger(ENUM_ORDER_PROPERTY_INTEGER prop_id,long& var) const
+string CHistoryOrderInfo::ExternalId(void) const
+  {
+   return(HistoryOrderGetString(m_ticket,ORDER_EXTERNAL_ID));
+  }
+//+------------------------------------------------------------------+
+//| Access functions OrderGetInteger(...)                            |
+//+------------------------------------------------------------------+
+bool CHistoryOrderInfo::InfoInteger(const ENUM_ORDER_PROPERTY_INTEGER prop_id,long &var) const
   {
    return(HistoryOrderGetInteger(m_ticket,prop_id,var));
   }
 //+------------------------------------------------------------------+
-//| Access functions OrderGetDouble(...).                            |
-//| INPUT:  prop_id  -identifier double properties,                  |
-//|         var     -reference to a variable to value.               |
-//| OUTPUT: true-if successful, false otherwise.                     |
-//| REMARK: no.                                                      |
+//| Access functions OrderGetDouble(...)                             |
 //+------------------------------------------------------------------+
-bool CHistoryOrderInfo::InfoDouble(ENUM_ORDER_PROPERTY_DOUBLE prop_id,double& var) const
+bool CHistoryOrderInfo::InfoDouble(const ENUM_ORDER_PROPERTY_DOUBLE prop_id,double &var) const
   {
    return(HistoryOrderGetDouble(m_ticket,prop_id,var));
   }
 //+------------------------------------------------------------------+
-//| Access functions OrderGetString(...).                            |
-//| INPUT:  prop_id  -identifier string properties,                  |
-//|         var     -reference to a variable to value.               |
-//| OUTPUT: true-if successful, false otherwise.                     |
-//| REMARK: no.                                                      |
+//| Access functions OrderGetString(...)                             |
 //+------------------------------------------------------------------+
-bool CHistoryOrderInfo::InfoString(ENUM_ORDER_PROPERTY_STRING prop_id,string& var) const
+bool CHistoryOrderInfo::InfoString(const ENUM_ORDER_PROPERTY_STRING prop_id,string &var) const
   {
    return(HistoryOrderGetString(m_ticket,prop_id,var));
   }
 //+------------------------------------------------------------------+
-//| Converts the order type to text.                                 |
-//| INPUT:  str  - receiving string,                                 |
-//|         type - order type.                                       |
-//| OUTPUT: formatted string.                                        |
-//| REMARK: no.                                                      |
+//| Converts the order type to text                                  |
 //+------------------------------------------------------------------+
-string CHistoryOrderInfo::FormatType(string& str,const uint type) const
+string CHistoryOrderInfo::FormatType(string &str,const uint type) const
   {
 //--- clean
    str="";
@@ -339,6 +295,7 @@ string CHistoryOrderInfo::FormatType(string& str,const uint type) const
       case ORDER_TYPE_SELL_STOP      : str="sell stop";       break;
       case ORDER_TYPE_BUY_STOP_LIMIT : str="buy stop limit";  break;
       case ORDER_TYPE_SELL_STOP_LIMIT: str="sell stop limit"; break;
+      case ORDER_TYPE_CLOSE_BY       : str="close by";        break;
 
       default:
          str="unknown order type "+(string)type;
@@ -348,13 +305,9 @@ string CHistoryOrderInfo::FormatType(string& str,const uint type) const
    return(str);
   }
 //+------------------------------------------------------------------+
-//| Converts the order status to text.                               |
-//| INPUT:  str    - receiving string,                               |
-//|         status - order status.                                   |
-//| OUTPUT: formatted string.                                        |
-//| REMARK: no.                                                      |
+//| Converts the order status to text                                |
 //+------------------------------------------------------------------+
-string CHistoryOrderInfo::FormatStatus(string& str,const uint status) const
+string CHistoryOrderInfo::FormatStatus(string &str,const uint status) const
   {
 //--- clean
    str="";
@@ -377,13 +330,9 @@ string CHistoryOrderInfo::FormatStatus(string& str,const uint status) const
    return(str);
   }
 //+------------------------------------------------------------------+
-//| Converts the order filling type to text.                         |
-//| INPUT:  str  - receiving string,                                 |
-//|         type - order filling type.                               |
-//| OUTPUT: formatted string.                                        |
-//| REMARK: no.                                                      |
+//| Converts the order filling type to text                          |
 //+------------------------------------------------------------------+
-string CHistoryOrderInfo::FormatTypeFilling(string& str,const uint type) const
+string CHistoryOrderInfo::FormatTypeFilling(string &str,const uint type) const
   {
 //--- clean
    str="";
@@ -392,7 +341,7 @@ string CHistoryOrderInfo::FormatTypeFilling(string& str,const uint type) const
      {
       case ORDER_FILLING_RETURN: str="return remainder"; break;
       case ORDER_FILLING_IOC   : str="cancel remainder"; break;
-      case ORDER_FILLING_FOK   : str="all or none";      break;
+      case ORDER_FILLING_FOK   : str="fill or kill";     break;
 
       default:
          str="unknown type filling "+(string)type;
@@ -402,13 +351,9 @@ string CHistoryOrderInfo::FormatTypeFilling(string& str,const uint type) const
    return(str);
   }
 //+------------------------------------------------------------------+
-//| Converts the type of order by expiration to text.                |
-//| INPUT:  str  - receiving string,                                 |
-//|         type - type of order by expiration.                      |
-//| OUTPUT: formatted string.                                        |
-//| REMARK: no.                                                      |
+//| Converts the type of order by expiration to text                 |
 //+------------------------------------------------------------------+
-string CHistoryOrderInfo::FormatTypeTime(string& str,const uint type) const
+string CHistoryOrderInfo::FormatTypeTime(string &str,const uint type) const
   {
 //--- clean
    str="";
@@ -428,27 +373,23 @@ string CHistoryOrderInfo::FormatTypeTime(string& str,const uint type) const
    return(str);
   }
 //+------------------------------------------------------------------+
-//| Converts the order parameters to text.                           |
-//| INPUT:  str      - receiving string,                             |
-//|         position - pointer at the class instance.                |
-//| OUTPUT: formatted string.                                        |
-//| REMARK: no.                                                      |
+//| Converts the order parameters to text                            |
 //+------------------------------------------------------------------+
-string CHistoryOrderInfo::FormatOrder(string& str) const
+string CHistoryOrderInfo::FormatOrder(string &str) const
   {
    string      type,price;
-   CSymbolInfo __symbol;
+   CSymbolInfo symbol;
 //--- set up
-   __symbol.Name(Symbol());
-   int __digits=__symbol.Digits();
+   symbol.Name(Symbol());
+   int digits=symbol.Digits();
 //--- form the order description
-   str = StringFormat("#%I64u %s %s %s",
-                Ticket(),
-                FormatType(type,OrderType()),
-                DoubleToString(VolumeInitial(),2),
-                Symbol());
+   str=StringFormat("#%I64u %s %s %s",
+                    Ticket(),
+                    FormatType(type,OrderType()),
+                    DoubleToString(VolumeInitial(),2),
+                    Symbol());
 //--- receive the price of the order
-   FormatPrice(price,PriceOpen(),PriceStopLimit(),__digits);
+   FormatPrice(price,PriceOpen(),PriceStopLimit(),digits);
 //--- if there is price, write it
    if(price!="")
      {
@@ -459,14 +400,9 @@ string CHistoryOrderInfo::FormatOrder(string& str) const
    return(str);
   }
 //+------------------------------------------------------------------+
-//| Converts the order prices to text.                               |
-//| INPUT:  str           - receiving string,                        |
-//|         price_order   - order price,                             |
-//|         price_trigger - the order trigger price.                 |
-//| OUTPUT: formatted string.                                        |
-//| REMARK: no.                                                      |
+//| Converts the order prices to text                                |
 //+------------------------------------------------------------------+
-string CHistoryOrderInfo::FormatPrice(string& str,const double price_order,const double price_trigger,const uint __digits) const
+string CHistoryOrderInfo::FormatPrice(string &str,const double price_order,const double price_trigger,const uint digits) const
   {
    string price,trigger;
 //--- clean
@@ -474,24 +410,23 @@ string CHistoryOrderInfo::FormatPrice(string& str,const double price_order,const
 //--- Is there its trigger price?
    if(price_trigger)
      {
-      price  =DoubleToString(price_order,__digits);
-      trigger=DoubleToString(price_trigger,__digits);
+      price  =DoubleToString(price_order,digits);
+      trigger=DoubleToString(price_trigger,digits);
       str    =StringFormat("%s (%s)",price,trigger);
      }
-   else str=DoubleToString(price_order,__digits);
+   else
+      str=DoubleToString(price_order,digits);
 //--- return the result
    return(str);
   }
 //+------------------------------------------------------------------+
-//| Select a history order on the index.                             |
-//| INPUT:  index - history order index.                             |
-//| OUTPUT: true-if successful, false otherwise.                     |
-//| REMARK: no.                                                      |
+//| Select a history order on the index                              |
 //+------------------------------------------------------------------+
-bool CHistoryOrderInfo::SelectByIndex(int index)
+bool CHistoryOrderInfo::SelectByIndex(const int index)
   {
    ulong ticket=HistoryOrderGetTicket(index);
-   if(ticket==0) return(false);
+   if(ticket==0)
+      return(false);
    Ticket(ticket);
 //---
    return(true);
