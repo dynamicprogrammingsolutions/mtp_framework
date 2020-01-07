@@ -794,9 +794,19 @@ uint MTPFileBinBase::ReadStruct(T &data)
 bool MTPFileBinBase::ReadObject(CObject *object)
   {
 //--- check handle & object
-   if(m_handle!=INVALID_HANDLE)
-      if(CheckPointer(object))
-         return(object.Load(m_handle));
+   if(m_handle!=INVALID_HANDLE) {
+      if(CheckPointer(object)) {
+         if (object.Load(m_handle)) {
+            return true;
+         } else {
+            Print(__FUNCTION__,": couldn't read object");
+         }
+      } else {
+         Print("invalid pointer");
+      }
+   } else {
+      Print("invalid handle");
+   }
 //--- failure
    return(false);
   }

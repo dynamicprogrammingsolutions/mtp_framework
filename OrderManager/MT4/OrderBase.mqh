@@ -187,8 +187,10 @@ public:
          this.state = CheckOrderInfo()?this.orderinfo.State():ORDER_STATE_UNKNOWN;
       }
       if (laststate != state) {
+         ENUM_ORDER_STATE save_laststate = laststate;
          laststate = state;
          activity = activity | (ushort)ACTIVITY_STATECHANGE;
+         Dispatch(ORDER_EVENT_STATE_CHANGE,new COrderEventStateChange(GetPointer(this),save_laststate),true);
          TRIGGER(EventStateChange);
       }
       return(this.state);
@@ -256,6 +258,7 @@ public:
    virtual void SetStopLoss(const double value) { sl_set = true; if (executestate != ES_CANCELED) sl = value; else Print("Cannot change canceled order data (sl)"); }
    virtual void SetTakeProfit(const double value) { tp_set = true; if (executestate != ES_CANCELED) tp = value; else Print("Cannot change canceled order data (tp)"); }
    
+   virtual bool SetPrice(CStopsCalcInterface* _price, bool check = false);
    virtual bool SetStopLoss(CStopsCalcInterface* _sl, bool checkchange = false, bool checkhigher = false);
    virtual bool SetTakeProfit(CStopsCalcInterface* _tp, bool check = false);
    
@@ -484,7 +487,7 @@ bool COrderBase::delete_mm_objects = false;
          /*if (ordermanager != NULL && ordermanager.simulation_enabled) {         
             return(this.UpdateSimulation());
          } else {*/
-            if ( event().Info ()) event().Info (StringConcatenate("Execute Order: type=",ordertype," volume=",volume," price=",price," tp=",tp," sl=",sl," expiration=",expiration," magic=",this.magic," comment=",comment),__FUNCTION__);
+            if ( event().Info ()) event().Info (StringConcatenate("Execute Order: type=",EnumToString(ordertype)," volume=",volume," price=",price," tp=",tp," sl=",sl," expiration=",expiration," magic=",this.magic," comment=",comment),__FUNCTION__);
             bool success;
             bool isvirtual = false;
             string virtual_error = "";
@@ -774,7 +777,7 @@ bool COrderBase::delete_mm_objects = false;
    
    }
    
-   COrderBase::OnTick(void)
+   void COrderBase::OnTick(void)
    {
       //Print("Order "+ticket+" OnTick");
       if (Update()) {
@@ -926,6 +929,18 @@ bool COrderBase::delete_mm_objects = false;
             last_vtp = GetTakeProfit();
          }
       }
+   }
+   
+   bool COrderBase::SetPrice(CStopsCalcInterface* _price, bool check = false)
+   {
+      loadsymbol(this.symbol);
+      _price.SetSymbol(this.symbol).SetOrderType(this.GetType());
+      _price.Reset();
+      double thisentry = _symbol.PriceRound(_price.GetPrice());
+      double thisetnryticks = _price.GetTicks();
+      //TODO: check
+      SetPrice(thisentry);
+      return true;
    }
    
    bool COrderBase::SetStopLoss(CStopsCalcInterface* _sl, bool checkchange = false, bool checkhigher = false)

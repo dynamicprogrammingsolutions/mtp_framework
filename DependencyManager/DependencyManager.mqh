@@ -51,10 +51,10 @@ public:
       }
       CDependencyItem* item = At(idx);
       CAppObject* callback = item.callback.get();
-      CAppObject* obj;
+      CObject* obj;
       callback.callback(0,obj);
       Prepare(obj);
-      return obj;
+      return (CAppObject*)obj;
    }
    
    virtual bool DependencyIsSet(ENUM_CLASS_NAMES caller, ENUM_CLASS_NAMES dependency)

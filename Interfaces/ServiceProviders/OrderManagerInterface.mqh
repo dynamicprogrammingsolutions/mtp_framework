@@ -17,8 +17,12 @@ public:
 
    virtual COrderInterface* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagementInterface* mm, CStopsCalcInterface* _price,
                                     CStopsCalcInterface* _stoploss, CStopsCalcInterface* _takeprofit,const string _comment="",const datetime _expiration=0)  { AbstractFunctionWarning(__FUNCTION__); return NULL; }
+   virtual COrderInterface* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagementInterface* mm, CMoneyManagementInterface*& _mm_ptp[], CStopsCalcInterface* _price,
+                                    CStopsCalcInterface* _stoploss, CStopsCalcInterface* _takeprofit, CStopsCalcInterface*& _ptps[],const string _comment="",const datetime _expiration=0)  { AbstractFunctionWarning(__FUNCTION__); return NULL; }
    virtual COrderInterface* NewOrder(COrderInterface* _order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagementInterface* mm, CStopsCalcInterface* _price,
                                     CStopsCalcInterface* _stoploss, CStopsCalcInterface* _takeprofit,const string _comment="",const datetime _expiration=0)  { AbstractFunctionWarning(__FUNCTION__); return NULL; }
+   virtual COrderInterface* NewOrder(COrderInterface* _order, const string in_symbol,const ENUM_ORDER_TYPE _ordertype,CMoneyManagementInterface* mm, CMoneyManagementInterface*& _mm_ptp[], CStopsCalcInterface* _price,
+                                    CStopsCalcInterface* _stoploss, CStopsCalcInterface* _takeprofit, CStopsCalcInterface*& _ptps[],const string _comment="",const datetime _expiration=0)  { AbstractFunctionWarning(__FUNCTION__); return NULL; }
 
    virtual COrderInterface* NewOrder(const string in_symbol,const ENUM_ORDER_TYPE _ordertype,PMoneyManagement &mm, PStopsCalc &_price,
                                     PStopsCalc &_stoploss, PStopsCalc &_takeprofit,const string _comment="",const datetime _expiration=0)  { AbstractFunctionWarning(__FUNCTION__); return NULL; }

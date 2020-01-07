@@ -1,1 +1,1 @@
-classEntryMethodSignal,
+classEntryMethod,

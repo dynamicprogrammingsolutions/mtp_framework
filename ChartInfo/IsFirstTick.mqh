@@ -55,7 +55,7 @@ class CIsFirstTick : public CAppObject
       bool isfirsttick()
       {         
          if (this.lasttime != TimeCurrent()) {
-            datetime bartime = iTime(_symbol,timeframe,0);
+            datetime bartime = iTime(_symbol,(ENUM_TIMEFRAMES)timeframe,0);
             if (this.lasttick == 0) this.lasttick = bartime;
             if (bartime == this.lasttick)
             {

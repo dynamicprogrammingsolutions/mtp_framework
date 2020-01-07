@@ -4,7 +4,12 @@
 #define SERVICE_CONTAINER_H
 class CServiceContainer : public CArrayObject<CServiceProvider>
 {
+   CServiceProvider* services[];
+
 public:
+   bool report_services;
+   CServiceContainer(): report_services(true) {}
+   
    CServiceProvider* ServiceProvider(int i)
    {
       CObject* obj = At(i);
@@ -47,10 +52,8 @@ public:
    
    CServiceProvider* GetService(ENUM_APPLICATION_SERVICE srv)
    {
-      int count = Total();
-      for (int i = 0; i < count; i++) {
-         CServiceProvider* service = ServiceProvider(i);
-         if (service.srv == srv) return service;
+      if (ArraySize(services) >= srv+1) {
+         return services[srv];
       }
       Print("not found: ",EnumToString(srv));
       return NULL;
@@ -67,6 +70,21 @@ public:
       return false;
    }
    
+   void AddToFastArray(CServiceProvider* service)
+   {
+      if (ArraySize(services) < service.srv+1) {
+         ArrayResize(services,service.srv+1);
+      }
+      services[service.srv] = service;
+   }
+   
+   void Register(CServiceProvider* service) {
+      if (service.srv != srvNone) {
+         AddToFastArray(service);
+      }
+      this.Add(service);
+   }
+   
    bool ReRegister(CServiceProvider* newservice)
    {
       if (newservice.srv == srvNone) return false;
@@ -76,6 +94,11 @@ public:
          if (service.srv == newservice.srv) {
             //delete service;
             this.m_data[i].reset(newservice);
+            
+            if (service.srv != srvNone) {
+               AddToFastArray(service);
+            }
+            
             return true;
          }
       }
@@ -98,12 +121,12 @@ public:
       for (int i = 0; i < count; i++) {
          CServiceProvider* service = ServiceProvider(i);
          if (!service.Initalized()) {
-            Print("Initalizing Service ",EnumToString(service.srv)," '",service.name,"': ",EnumToString((ENUM_CLASS_NAMES)service.Type()));
+            if (report_services) Print("Initalizing Service ",EnumToString(service.srv)," '",service.name,"': ",EnumToString((ENUM_CLASS_NAMES)service.Type()));
             service.SetInitalized();
             service.Initalize();
             CObject* obj = NULL;
          } else {
-            Print("Service Alread Initalized: ",EnumToString((ENUM_CLASS_NAMES)service.Type()));
+            if (report_services) Print("Service Alread Initalized: ",EnumToString((ENUM_CLASS_NAMES)service.Type()));
          }
       }
    }
@@ -118,14 +141,14 @@ public:
    }
    
    int OnCalculate (const int rates_total,      // size of input time series
-                 const int prev_calculated,  // bars handled in previous call
+                 const int prev_calculated  // bars handled in previous call
    )
    {
       int ret = -1;
       for (int i = 0; i < Total(); i++) {
          CServiceProvider* service = ServiceProvider(i);
          if (service.use_oncalculate) {
-            service.OnCalculate(rates_total,prev_calculated);
+            ret = service.OnCalculate(rates_total,prev_calculated);
             if (ret >= 0) return ret;
          }
       }
@@ -178,4 +201,19 @@ public:
          if (service.use_ontimer) service.OnTimer();
       }
    }
+   
+   #ifdef __MQL5__
+      void OnTradeTransaction(
+         const MqlTradeTransaction&    trans,     // trade transaction structure 
+         const MqlTradeRequest&        request,   // request structure 
+         const MqlTradeResult&         result     // response structure 
+      ) {
+         for (int i = 0; i < Total(); i++) {
+            CServiceProvider* service = ServiceProvider(i);
+            service.OnTradeTransaction(trans,request,result);
+         }
+      
+      }
+   #endif
+   
 };

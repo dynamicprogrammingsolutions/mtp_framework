@@ -54,6 +54,11 @@ bool IsVisualMode()
    return(MQL5InfoInteger(MQL5_VISUAL_MODE));
 }
 
+bool IsOptimization()
+{
+   return(MQL5InfoInteger(MQL5_OPTIMIZATION));
+}
+
 double AccountFreeMargin()
 {
    return(AccountInfoDouble(ACCOUNT_FREEMARGIN));

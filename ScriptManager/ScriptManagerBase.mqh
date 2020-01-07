@@ -7,11 +7,17 @@
 class CScriptManagerBase : public CScriptManagerInterface
 {
    CArrayInt scriptids;
-   
+protected:
+   COrderCommandDispatcher* ordercommanddispatcher;
+   CScriptDispatcher* scriptdispatcher;
 public:
    TraitAppAccess
 
    virtual int Type() const { return classScriptManagerBase; }
+
+   virtual void Initalize() {
+      scriptdispatcher = App().GetService(srvScriptDispatcher);
+   }
 
    virtual void RegisterScript(int id)
    {
@@ -55,7 +61,8 @@ public:
    }
    virtual void HandleScript(int id, long lparam, double dparam, string sparam)
    {
-      App().trigger.Trigger(classScript,CScript::Command,MakeAppObject(new CScript(id,lparam,dparam,sparam)));
+      scriptdispatcher.Dispatch(CScript::Command,new CScript(id,lparam,dparam,sparam),true);
+      //App().trigger.Trigger(classScript,CScript::Command,MakeAppObject(new CScript(id,lparam,dparam,sparam)));
       //TRIGGERCR(CScript::Command,new CScript(id,lparam,dparam,sparam));
    }
    virtual void OnTick()
@@ -72,6 +79,7 @@ public:
 	      if (FindScript(id-CHARTEVENT_CUSTOM)) HandleScript(id-CHARTEVENT_CUSTOM,lparam,dparam,sparam);
       }
    }
+   
    
    
 };

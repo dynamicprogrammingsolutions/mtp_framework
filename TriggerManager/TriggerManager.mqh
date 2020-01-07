@@ -36,6 +36,19 @@ public:
       callbacks.Add(new CTriggerCallback(callback,handler_id));
    }
    
+   
+   virtual void Unregister(int trigger_id, int obj_id)
+   {
+      CArrayObj* callbacks = GetCallBacks(trigger_id);
+      for (int i = callbacks.Total()-1; i >= 0; i--) {
+         CTriggerCallback* cb = callbacks.At(i);
+         if (cb.callbackobj.Id() == obj_id) {
+            //Print("unregistering obj id"+cb.callbackobj.Id());
+            delete callbacks.Detach(i);
+         }
+      }
+   }
+   
    CArrayObj* GetCallBacks(const int id)
    {
       return container.At(id-1);

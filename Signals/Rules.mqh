@@ -27,9 +27,37 @@ public:
 class CSignalValidatorSignalChange : public CSignalValidatorRule
 {
 public:
+   ENUM_SIGNAL currentsignal;
    ENUM_SIGNAL lastsignal;
+   CSignalValidatorSignalChange(): currentsignal(SIGNAL_NONE), lastsignal(SIGNAL_NONE) {}
    virtual bool Validate(CSignal* signal)
    {
+      if (lastsignal == SIGNAL_NONE || currentsignal == lastsignal) {
+         return false;
+      }
+      return true;
+   }
+   virtual void OnSignal(CSignal* signal)
+   {
+      lastsignal = currentsignal;
+      currentsignal = signal.signal;
+   }
+};
+
+class CSignalValidatorSignalChangeOfMainSignal : public CSignalValidatorRule
+{
+   shared_ptr<CSignal> mainsignal;
+
+public:
+   CSignalValidatorSignalChangeOfMainSignal(CSignal* _mainsignal) {
+      this.mainsignal.reset(_mainsignal);
+   }
+   ENUM_SIGNAL lastsignal;
+   virtual bool Validate(CSignal* _signal)
+   {
+      CSignal* signal = mainsignal.get();
+      if (signal == NULL) return false;
+   
       if (this.lastsignal == SIGNAL_NONE) {
          lastsignal = signal.signal;
          return false;
@@ -45,18 +73,20 @@ public:
 class CSignalValidatorSignalChangeClose : public CSignalValidatorRule
 {
 public:
+   ENUM_SIGNAL currentsignal;
    ENUM_SIGNAL lastsignal;
+   CSignalValidatorSignalChangeClose(): currentsignal(SIGNAL_NONE), lastsignal(SIGNAL_NONE) {}
    virtual bool Validate(CSignal* signal)
    {
-      if (this.lastsignal == SIGNAL_NONE) {
-         lastsignal = signal.closesignal;
+      if (lastsignal == SIGNAL_NONE || currentsignal == lastsignal) {
          return false;
       }
-      if (signal.closesignal == lastsignal) {
-         return false;
-      }
-      lastsignal = signal.closesignal;
       return true;
+   }
+   virtual void OnSignal(CSignal* signal)
+   {
+      lastsignal = currentsignal;
+      currentsignal = signal.closesignal;
    }
 };
 
@@ -70,7 +100,7 @@ public:
    CSignalValidatorOneSignalPerBar(string in_symbol, ENUM_TIMEFRAMES in_timeframe) : symbol(in_symbol), tf(in_timeframe) {}
    virtual bool Validate(CSignal* signal)
    {
-      if (iTime(symbol,timeframe,0) == last_valid_signal) {
+      if (iTime(symbol,tf,0) == last_valid_signal) {
          return false;
       }
       return true;

@@ -269,17 +269,39 @@ public:
 
 class    COpenSignal : public CSignal {
 public:
+   string name;
+   bool show_comments;
    COpenSignal() {
       localsignal_enabled = true;
       opensignal_enabled = true;
+   }
+   COpenSignal(string signal_name) {
+      localsignal_enabled = true;
+      opensignal_enabled = true;
+      show_comments = true;
+      name = signal_name;
+   }
+   virtual void OnTick() {
+      if (show_comments && comments_enabled) addcomment(name," Signal: ",signaltext(this.signal),"\n");
    }
 };
 
 class CCloseSignal : public CSignal {
 public:
+   string name;
+   bool show_comments;
    CCloseSignal() {
       localsignal_enabled = true;
       closesignal_enabled = true;
+   }
+   CCloseSignal(string signal_name) {
+      localsignal_enabled = true;
+      closesignal_enabled = true;
+      show_comments = true;
+      name = signal_name;
+   }
+   virtual void OnTick() {
+      if (show_comments && comments_enabled) addcomment(name," Close Signal: ",signaltext_close(this.closesignal),"\n");
    }
 };
 

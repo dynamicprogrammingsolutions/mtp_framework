@@ -9,10 +9,6 @@
 #include "HelperStateselect.mqh"
 
 #ifdef HELPER_STATESELECT_H
-#include "MoneyManagement.mqh"
-#endif
-
-#ifdef MONEY_MANAGEMENT_H
 #include "MT4OrderInfo.mqh"
 #endif
 #ifdef MT4_ORDER_INFO_H
@@ -33,14 +29,5 @@
 #include "Order.mqh"
 #endif
 #ifdef ORDER_H
-#include "OrderArray.mqh"
-#endif
-#ifdef ORDER_ARRAY_H
-#include "OrderManager.mqh"
-#endif
-#ifdef ORDER_MANAGER_H
-#include "OrderRepository.mqh"
-#endif
-#ifdef ORDER_REPOSITORY_H
-#define ORDER_MANAGER_MT4_LOADER_H
+#define ORDER_MANAGER_PLATFORM_LOADER_H
 #endif

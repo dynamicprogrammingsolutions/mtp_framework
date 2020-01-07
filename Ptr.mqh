@@ -200,6 +200,9 @@ public:
             break;
       }
    }
+   void operator=(T *obj) {
+      this.reset(obj);
+   }
    void reset(T *obj)
    {
       switch(m_ptrtype) {

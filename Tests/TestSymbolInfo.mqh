@@ -13,6 +13,10 @@ public:
       symbol = _symbol;
    }
    
+   ~CTestSymbolInfo() {
+      delete symbolinfo;
+   }
+   
    virtual void Initalize()
    {
       Prepare(symbolinfo);

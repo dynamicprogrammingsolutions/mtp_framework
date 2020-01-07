@@ -46,7 +46,7 @@ int iBarShift(string in_symbol,
    else return(-1);
 }
 
-double iClose(string in_symbol,ENUM_TIMEFRAMES __timeframe,int index)
+/*double iClose(string in_symbol,ENUM_TIMEFRAMES __timeframe,int index)
 {
    if (in_symbol == NULL) in_symbol = _Symbol;
    if(index < 0) return(-1);
@@ -107,7 +107,7 @@ datetime iTime(string in_symbol,int __timeframe,int index)
         return(Arr[0]);
    else return(-1);
 }
-
+*/
 
 int iHighest(string in_symbol,
                  ENUM_TIMEFRAMES __timeframe,

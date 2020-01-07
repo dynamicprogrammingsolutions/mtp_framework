@@ -1,0 +1,312 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Experts/Kieran_Peckston_HighLowCountEA/Kieran_Peckston_HighLowCountEA.mq4",
+			"settings":
+			{
+				"buffer_size": 19166,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "inst",
+		"selected_items":
+		[
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"pa",
+				"Package Control: Install Local Dependency"
+			],
+			[
+				"C++",
+				"Set Syntax: C++"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"termin",
+				"Terminal: Open in project folder"
+			],
+			[
+				"git",
+				"Git: Status"
+			],
+			[
+				"Snippet: ",
+				"Snippet: Class"
+			],
+			[
+				"git diff",
+				"Git: Diff All Files"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			],
+			[
+				"package in",
+				"Package Control: Install Package"
+			],
+			[
+				"git stat",
+				"Git: Status"
+			],
+			[
+				"package",
+				"Package Control: List Packages"
+			],
+			[
+				"git check",
+				"Git: Checkout Tag"
+			],
+			[
+				"install ",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 458.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5"
+	],
+	"file_history":
+	[
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/AppObject.mqh",
+		"/var/www/html/flaw/app/Http/App2/Example/ControllerGroup_2.php",
+		"/var/www/html/flaw/flaw.sublime-project",
+		"/var/www/html/flaw/diff_87b6e3",
+		"/var/www/html/flaw/app/Http/App2/Application/Menu.php",
+		"/var/www/html/flaw/app/Http/Classes/Core/Component.php",
+		"/var/www/html/flaw/app/Http/Classes/Core/Services.php",
+		"/var/www/html/flaw/app/Http/Classes/Http/Response.php",
+		"/var/www/html/flaw/app/Http/Classes/Http/Request.php",
+		"/var/www/html/flaw/vendor/laravel/framework/src/Illuminate/Foundation/helpers.php",
+		"/var/www/html/flaw/vendor/laravel/framework/src/Illuminate/Foundation/AliasLoader.php",
+		"/var/www/html/flaw/vendor/composer/ClassLoader.php",
+		"/var/www/html/flaw/app/Http/App2/Application/CheckView.php",
+		"/var/www/html/flaw/app/Http/Classes/Http/Actions.php",
+		"/var/www/html/flaw/app/Http/App2/Http/View.php",
+		"/var/www/html/flaw/app/Http/App2/Platform/LaravelBridge.php",
+		"/var/www/html/flaw/app/Http/App2/Example/ControllerGroup_1.php",
+		"/home/ferenci84/Downloads/theme-1115.xml",
+		"/var/www/html/flaw/app/Http/App2/Application/Layout.php",
+		"/var/www/html/flaw/app/Http/Classes/Core/Loader.php",
+		"/var/www/html/flaw/app/Http/App2/Http/Storage.php",
+		"/var/www/html/flaw/app/Http/App2/Http/GetStorage.php",
+		"/var/www/html/flaw/app/Http/App2/Http/HttpServices.php",
+		"/var/www/html/flaw/app/Http/Classes/Platform/PlatformBridge.php",
+		"/var/www/html/flaw/app/Http/App2/Http/Command.php",
+		"/var/www/html/flaw/app/Http/App2/Application/Application.php",
+		"/var/www/html/js_volumes/app/routes.php",
+		"/var/www/html/js_volumes/app/config/app.php",
+		"/var/tmp/kdecache-ferenci84/krun/19237_0_class.Controller_Ticket.php",
+		"/home/ferenci84/dynamicprogrammingsolutions/mt4600_experts/MQL4/Indicators/FC Line.mq4"
+	],
+	"find":
+	{
+		"height": 25.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"xxx"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Experts/Kieran_Peckston_HighLowCountEA/Kieran_Peckston_HighLowCountEA.mq4",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 19166,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3167,
+								3167
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 3,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 810.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.git":
+	{
+		"height": 112.0
+	},
+	"output.xdebug":
+	{
+		"height": 112.0
+	},
+	"pinned_build_system": "",
+	"project": "mtp_framework.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"Package Control Messages"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+		"xdebug":
+		{
+			"hide_conflict": false
+		}
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 275.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+		"max_columns": 1
+	}
+}
