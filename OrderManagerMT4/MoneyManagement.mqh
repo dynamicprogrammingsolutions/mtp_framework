@@ -69,6 +69,7 @@ class CMoneyManagementRiskPercent : public CMoneyManagement
 public:
    bool use_equity;
    double riskpercent;
+   CMoneyManagementRiskPercent() {}
    CMoneyManagementRiskPercent(double _riskpercent)
    {
       riskpercent = _riskpercent;

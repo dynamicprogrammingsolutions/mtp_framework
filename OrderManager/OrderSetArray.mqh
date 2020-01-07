@@ -21,7 +21,7 @@ public:
 
    virtual COrderSet* NewSetObject()
    {
-      CAppObject* obj;
+      CObject* obj;
       newobjectcallback.callback(0,obj);
       return obj;
    }

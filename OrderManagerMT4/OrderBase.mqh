@@ -158,7 +158,7 @@ public:
       event = App().eventhandler;
    }
    
-   void Copy(COrderBase*& target);
+   void Copy(COrderBase* target);
    bool ExistingOrder(int existing_ticket);
    
    bool Isset() { return(executestate != ES_NOT_EXECUTED); }  
@@ -407,7 +407,7 @@ bool COrderBase::delete_mm_objects = false;
 // |---------------------------------------- COrderBase ------------------------------------------|
 // ********************************************************************************************
    
-   void COrderBase::Copy(COrderBase*& target) {
+   void COrderBase::Copy(COrderBase* target) {
       target.trade = trade;
       target.orderinfo = orderinfo;
       target.executestate = executestate;
