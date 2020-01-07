@@ -553,7 +553,7 @@ int CTrade::CloseBy(ulong ticket1, ulong ticket2, COrderInfo* orderinfo = NULL)
    while (true) {
       
       if (OrderCloseBy(ticket1,ticket2,getcolor(orderinfo.GetType(),true))) {
-         FindNewTicket(orderopentime,orderopenprice,ordersymbol);
+         return FindNewTicket(orderopentime,orderopenprice,ordersymbol);
          /*if(m_log_level>LOG_LEVEL_ERRORS) Print("Order CloseBy Succeed, finding new ticket");
          for (int i = OrdersTotal()-1; i >= 0; i--) {
             if (orderinfo.SelectByIndex(i,MODE_TRADES)) {

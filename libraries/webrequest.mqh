@@ -5,6 +5,7 @@
 
 #import "internet_access.dll"
    string get_webpage(string Address);
+   int post_webpage_async_start(string Address, string Contents);
    int get_webpage_async_start(string Address);
    void get_webpage_async_wait(int id);
    void get_webpage_async_delete(int id);
@@ -31,6 +32,8 @@ protected:
 public:
    static int timeout;
    static bool logging_enabled;
+   bool post;
+   string post_content;
    string url;
    string result;
    bool remove;
@@ -39,6 +42,7 @@ public:
    
    ~CWebRequest()
    {
+      post = false;
       if (status == WR_STATUS_SENT) {
          if (logging_enabled) Print("Delete ongoing request id "+reqid);
          get_webpage_async_delete(reqid);
@@ -184,7 +188,11 @@ void CWebRequest::Send() {
       if (enabled) {
    
          this.sent_at = TimeCurrent();
-         reqid = get_webpage_async_start(url);
+         if (!post) {
+            reqid = get_webpage_async_start(url);
+         } else {
+            reqid = post_webpage_async_start(url,post_content);
+         }
          CheckError();
          
          if (reqid >= 0) {

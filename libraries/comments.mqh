@@ -232,6 +232,8 @@ void clearcomment_(int id)
          cnt_line++;
          name_currentline = objname_comment+"_"+DoubleToStr(id,0)+"_"+DoubleToStr(cnt_line,0);
       }
+   } else {
+      Comment("");
    }
 }
 

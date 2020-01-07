@@ -85,8 +85,8 @@ public:
 
    CObject* NewObject(CAppObject* callback)
    {
-      CObject* obj;
-      callback.callback(0,obj);
+      CObject* obj = callback.NewObject();
+      if (obj == NULL) return NULL;
       return Prepare(obj);
    }
    

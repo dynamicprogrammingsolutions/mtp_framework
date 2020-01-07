@@ -388,14 +388,14 @@ int OriginalOrdersTotal()
       
       _mm.SetSymbol(in_symbol).SetStopLoss(_stoploss).SetOrderType(_ordertype);
 
+      orders.Add(_order);
+
       _order.NewOrder(
          in_symbol,_ordertype,_mm.GetLotsize(),
          _price == NULL ? 0 : _price.GetPrice(),
          _stoploss == NULL ? 0 : _stoploss.GetPrice(),
          _takeprofit == NULL ? 0 : _takeprofit.GetPrice(),
-         _comment,_expiration);
-         
-      orders.Add(_order);
+         _comment,_expiration);         
 
       if (_price != NULL) COrderBase::DeleteIf(_price);
       if (_stoploss != NULL) COrderBase::DeleteIf(_stoploss);

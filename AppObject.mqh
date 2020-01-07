@@ -81,7 +81,9 @@ public:
    //    object parameter is only for input.
    //    return value is used only for events that is called before the action, and false will mean that the action shouln't be done.
    
-   virtual bool callback(const int id, CObject*& obj) { AbstractFunctionWarning(__FUNCTION__); return false; }
+   virtual bool callback(const int id, CObject* obj) { AbstractFunctionWarning(__FUNCTION__); return false; }
+   
+   virtual CObject* NewObject() { AbstractFunctionWarning(__FUNCTION__); return NULL; }
 
 };
 

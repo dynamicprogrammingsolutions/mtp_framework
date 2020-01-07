@@ -73,6 +73,13 @@ public:
          comments_enabled = false;
       }    
    }
+   
+   virtual void OnDeinit() {
+      if (comments_enabled) {
+         clearcomment();
+      }
+   }
+   
 };
 
 /*
