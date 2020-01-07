@@ -774,7 +774,7 @@ bool COrderBase::delete_mm_objects = false;
    
    }
    
-   COrderBase::OnTick(void)
+   void COrderBase::OnTick(void)
    {
       //Print("Order "+ticket+" OnTick");
       if (Update()) {

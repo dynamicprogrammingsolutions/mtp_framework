@@ -42,6 +42,32 @@ public:
    }
 };
 
+class CSignalValidatorSignalChangeOfMainSignal : public CSignalValidatorRule
+{
+   shared_ptr<CSignal> mainsignal;
+
+public:
+   CSignalValidatorSignalChangeOfMainSignal(CSignal* mainsignal) {
+      this.mainsignal.reset(mainsignal);
+   }
+   ENUM_SIGNAL lastsignal;
+   virtual bool Validate(CSignal* _signal)
+   {
+      CSignal* signal = mainsignal.get();
+      if (signal == NULL) return false;
+   
+      if (this.lastsignal == SIGNAL_NONE) {
+         lastsignal = signal.signal;
+         return false;
+      }
+      if (signal.signal == lastsignal) {
+         return false;
+      }
+      lastsignal = signal.signal;
+      return true;
+   }
+};
+
 class CSignalValidatorSignalChangeClose : public CSignalValidatorRule
 {
 public:

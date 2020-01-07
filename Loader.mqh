@@ -40,7 +40,6 @@
 #ifdef ARRAY_OBJECT_H
 #include "Triggers.mqh"
 #endif
-
 #ifdef TRIGGERS_H
 #include "ServiceProvider.mqh"
 #endif
@@ -52,6 +51,10 @@
 #endif
 
 #ifdef SERVICE_PROVIDER_ARRAY_OBJ_H
+#include "Observable.mqh"
+#endif
+
+#ifdef OBSERVABLE_H
 #include "Interfaces\Loader.mqh"
 #endif
 #ifdef INTERFACES_LOADER_H

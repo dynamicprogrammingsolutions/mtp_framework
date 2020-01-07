@@ -17,6 +17,10 @@ bool _DisableReportingInfo = false;
 bool _Error = false;
 bool _Warning = false;
 
+#define GENERATE_RUNTIME_ERROR { CObject* __generate__runtime__ = NULL; __generate__runtime__.Type(); }
+
+#define STOP_SOFTWARE GENERATE_RUNTIME_ERROR
+
 #define NOTIFY_PRINT(__type__,__message__) Print(__type__," at ",__FILE__,",",__LINE__,",",__FUNCTION__,": ",__message__);
 #define NOTIFY_ALERT(__type__,__message__) Alert(__type__," at ",__FILE__,",",__LINE__,",",__FUNCTION__,": ",__message__);
 
@@ -163,12 +167,14 @@ bool check_warning()
 
 // 
 
-#define EFatal(__message__) { PRINT_FATAL("Fatal",__message__); ALERT_FATAL("Fatal",__message__); }
-#define EError(__message__) { GETTING_ERROR if (!_DisableReportingError) { PRINT_ERROR("Error",__message__); ALERT_ERROR("Error",__message__); } }
-#define EWarning(__message__) { GETTING_WARNING if (!_DisableReportingWarning) { PRINT_WARNING("Warning",__message__); ALERT_WARNING("Warning",__message__); } }
-#define ENotice(__message__) { PRINT_NOTICE("Notice",__message__); ALERT_NOTICE("Notice",__message__); }
-#define EInfo(__message__) { if (!_DisableReportingInfo) { PRINT_INFO("Info",__message__); ALERT_INFO("Info",__message__); } }
-#define EDebug(__message__) { PRINT_DEBUG("Debug",__message__); ALERT_DEBUG("Debug",__message__); }
+#define EFatal(__message__) { PRINT_FATAL("Fatal",__message__) ALERT_FATAL("Fatal",__message__) STOP_SOFTWARE }
+#define EError(__message__) { GETTING_ERROR if (!_DisableReportingError) { PRINT_ERROR("Error",__message__) ALERT_ERROR("Error",__message__) } }
+#define EWarning(__message__) { GETTING_WARNING if (!_DisableReportingWarning) { PRINT_WARNING("Warning",__message__) ALERT_WARNING("Warning",__message__) } }
+#define ENotice(__message__) { PRINT_NOTICE("Notice",__message__) ALERT_NOTICE("Notice",__message__) }
+#define EInfo(__message__) { if (!_DisableReportingInfo) { PRINT_INFO("Info",__message__); ALERT_INFO("Info",__message__) } }
+#define EDebug(__message__) { PRINT_DEBUG("Debug",__message__) ALERT_DEBUG("Debug",__message__) }
+
+#define ENoticeC(__message__) ENotice(Conc __message__)
 
 #define EFatal_ EFatal("")
 #define EError_ EError("")

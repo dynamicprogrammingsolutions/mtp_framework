@@ -19,7 +19,7 @@ public:
    bool failed;
 public:
    CJob() :
-      parameter(GetPointer(this)),
+      parameter(NULL),
       max_tries(3),
       sleep(1),
       delay(false),
@@ -39,7 +39,7 @@ public:
    CJob(CAppObject* in_callback, int in_callback_id, int in_max_tries, int in_sleep, bool in_delay=false) :
       callback(in_callback),
       callback_id(in_callback_id),
-      parameter(GetPointer(this)),
+      parameter(NULL),
       max_tries(in_max_tries),
       sleep(in_sleep),
       delay(in_delay),
@@ -56,7 +56,13 @@ public:
       if (failed) return true;
       if (tries > 0) {
          if (tries >= max_tries) { failed = true; return true; }
-         if (TimeCurrent()-last_try < delay) {
+         if (TimeCurrent()-last_try < sleep) {
+            return false;
+         }
+      }
+      if (tries == 0 && delay) {
+         if (last_try == 0) last_try = TimeCurrent();
+         if (TimeCurrent()-last_try < sleep) {
             return false;
          }
       }

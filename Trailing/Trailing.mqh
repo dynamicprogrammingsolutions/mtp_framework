@@ -1,6 +1,7 @@
 //
 
 #include "..\Loader.mqh"
+#include "..\Indicator\Loader.mqh"
 
 /*
 #ifdef __MQL5__
@@ -11,6 +12,14 @@
 */
 
 #include "..\OrderManager\StopsCalc.mqh"
+
+class CTrailingCalc : public CAppObject
+{
+   int Calc(int original, int profit)
+   {
+      return 0;
+   }
+};
 
 class CTrailing : public CAppObject
 {
@@ -79,7 +88,7 @@ public:
 
    virtual CStopsCalcInterface* Calc(COrderInterface* in_order)
    {
-      double sl_price = in_order.GetStopLoss();
+      /*double sl_price = in_order.GetStopLoss();
       double sl = sl_price==0?EMPTY_VALUE:in_order.GetStopLossTicks();
       double newsl = sl;
       double orderprofit = in_order.GetProfitTicks();
@@ -97,9 +106,32 @@ public:
          newsl = -orderprofit + trailingstop;
       }
       
+      if (newsl == sl) return NULL;*/
+      
+      double sl_price = in_order.GetStopLoss();
+      double sl = sl_price==0?EMPTY_VALUE:in_order.GetStopLossTicks();
+      double newsl = Calc(sl,in_order.GetProfitTicks());
       if (newsl == sl) return NULL;
+      
       return this.Prepare(new CStopLossTicks(newsl,false));
 
+   }
+   
+   double Calc(double sl, double orderprofit) {
+      double newsl = sl;
+      if (trailingstop_round && trailingstop > 0) {
+         double trailingstart = activate-trailingstop;
+         if (orderprofit >= trailingstart) {
+         	double profitfromstart = orderprofit-trailingstart;
+         	orderprofit = trailingstart+(MathFloor(profitfromstart/step)*step);
+         }	
+      }
+      
+      if ((trailingstop > 0) && (orderprofit >= activate) && ((sl == EMPTY_VALUE) || (sl >= -orderprofit + trailingstop + step))
+      && ((stoptrailing <= 0) || (orderprofit <= stoptrailing))) {
+         newsl = -orderprofit + trailingstop;
+      }
+      return newsl;
    }
 };
 
@@ -114,7 +146,7 @@ public:
    
    virtual CStopsCalcInterface* Calc(COrderInterface* in_order)
    {
-      double sl_price = in_order.GetStopLoss();
+      /*double sl_price = in_order.GetStopLoss();
       double sl = sl_price==0?EMPTY_VALUE:in_order.GetStopLossTicks();
       double newsl = sl;
       double orderprofit = in_order.GetProfitTicks();
@@ -123,9 +155,63 @@ public:
          newsl = -lockinprofit;
       }
       
+      if (newsl == sl) return NULL;*/
+      
+      
+      double sl_price = in_order.GetStopLoss();
+      double sl = sl_price==0?EMPTY_VALUE:in_order.GetStopLossTicks();
+      double newsl = Calc(sl,in_order.GetProfitTicks());
       if (newsl == sl) return NULL;
+      
       return this.Prepare(new CStopLossTicks(newsl,false));
+   }
+   
+   double Calc(double sl, double orderprofit) {
+      double newsl = sl;
+      if ((lockin > 0) && (orderprofit >= lockin) && (sl > -lockinprofit || sl == EMPTY_VALUE)) {
+         newsl = -lockinprofit;
+      }
+      return newsl;
    }
    
 };
 
+class CTrailingSLByIndicator : public CTrailingSL
+{
+public:
+   TraitAppAccess
+   TraitLoadSymbolFunction
+
+   shared_ptr<CIndicator> indicator;
+   int add;
+   int mindist;
+   int bar;
+
+   CTrailingSLByIndicator(CIndicator* indicator, int mindist, int add, int _bar) : indicator(indicator), mindist(mindist), add(add), bar(_bar) {}
+
+   virtual CStopsCalcInterface* Calc(COrderInterface* in_order)
+   {
+      double sl_price = in_order.GetStopLoss();
+      double newsl = sl_price;
+      double val = indicator.get().GetValue(0,bar);
+      if (in_order.GetType() == ORDER_TYPE_BUY && in_order.State() == ORDER_STATE_FILLED) {
+         loadsymbol(indicator.get().GetSymbol());
+         if (_symbol.InTicks(_symbol.Bid()-val) < mindist) return NULL;
+         val = val-add*_symbol.TickSize();
+         if (sl_price >= val) return NULL;
+         newsl = val;
+         
+      }
+      if (in_order.GetType() == ORDER_TYPE_SELL && in_order.State() == ORDER_STATE_FILLED) {
+         loadsymbol(indicator.get().GetSymbol());
+         val = val+_symbol.SpreadInPrice();
+         if (_symbol.InTicks(val-_symbol.Ask()) < mindist) return NULL;
+         val = val+add*_symbol.TickSize();
+         if (sl_price <= val) return NULL;
+         newsl = val;
+      }
+      if (newsl == sl_price) return NULL;      
+      return this.Prepare(new CStopLossPrice(newsl,false));
+   }
+   
+};

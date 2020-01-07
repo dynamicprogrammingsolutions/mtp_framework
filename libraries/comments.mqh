@@ -64,6 +64,26 @@ void addcomment(const T1 c1, const T2 c2, const T3 c3, const T4 c4)
    addcomment(Conc(c1,c2,c3,c4));
 }
 
+template<typename T1, typename T2, typename T3, typename T4, typename T5>
+void addcomment(const T1 c1, const T2 c2, const T3 c3, const T4 c4, const T5 c5)
+{
+   addcomment(Conc(c1,c2,c3,c4,c5));
+}
+
+template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+void addcomment(const T1 c1, const T2 c2, const T3 c3, const T4 c4, const T5 c5, const T6 c6)
+{
+   addcomment(Conc(c1,c2,c3,c4,c5,c6));
+}
+
+template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
+void addcomment(const T1 c1, const T2 c2, const T3 c3, const T4 c4, const T5 c5, const T6 c6, const T7 c7)
+{
+   addcomment(Conc(c1,c2,c3,c4,c5,c6,c7));
+}
+
+
+
 template<typename T1>
 void addcommentln(const T1 c1)
 {

@@ -168,6 +168,9 @@ public:
    
    virtual void SetStopLoss(const double value) { sl_set = true; if (executestate != ES_CANCELED) sl = value; else Print("Cannot change canceled order data (sl)"); }
    virtual void SetTakeProfit(const double value) { tp_set = true; if (executestate != ES_CANCELED) tp = value; else Print("Cannot change canceled order data (tp)"); }
+
+   virtual bool SetStopLoss(CStopsCalcInterface* _sl, bool checkchange = false, bool checkhigher = false);
+   virtual bool SetTakeProfit(CStopsCalcInterface* _tp, bool check = false);
    
    virtual bool Closed() { return State()==ORDER_STATE_FILLED && this.closed; }
    virtual bool Deleted() { return State()==ORDER_STATE_CANCELED && this.closed; }
@@ -567,3 +570,43 @@ void COrder::OnTick()
    }
    
 }
+
+bool COrder::SetStopLoss(CStopsCalcInterface* _sl, bool checkchange = false, bool checkhigher = false)
+{
+   loadsymbol(this.symbol);
+   _sl.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice());
+   _sl.Reset();
+   double thissl = _symbol.PriceRound(_sl.GetPrice());
+   double thisslticks = _sl.GetTicks();
+   if (
+      (checkchange && q(thissl,_symbol.PriceRound(this.GetStopLoss()))) ||
+      (checkhigher && lq(thisslticks,this.GetStopLossTicks()))
+   ) {
+      //DeleteIf(_sl);
+      return false;
+   }
+   SetStopLoss(thissl);
+   return true;
+}
+
+bool COrder::SetTakeProfit(CStopsCalcInterface* _tp, bool check = false)
+{
+   if (!check) {
+      SetTakeProfit(_tp.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice()).GetPrice());
+      //DeleteIf(_tp);
+      return true;
+   } else {
+      loadsymbol(this.symbol);
+      double thistp = _symbol.PriceRound(_tp.SetSymbol(this.symbol).SetOrderType(this.GetType()).SetEntryPrice(this.GetOpenPrice()).GetPrice());
+      if (thistp != _symbol.PriceRound(this.GetTakeProfit())) {
+         SetTakeProfit(thistp);
+         //DeleteIf(_tp);
+         return true;
+      } else {
+         //DeleteIf(_tp);
+         return false;
+      }
+   }
+}
+
+

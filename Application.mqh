@@ -6,7 +6,7 @@
 #define APPLICATION_H
 class CApplication : public CAppObject
 {
-private:
+public:
 
    CServiceContainer services;
 
@@ -41,7 +41,7 @@ public:
          Print("Registering Service type:",EnumToString(service.srv)," name:'",service.name,"' class:",EnumToString((ENUM_CLASS_NAMES)service.Type()));
                
          service.AppBase(GetPointer(this));
-         services.Add(service);
+         services.Register(service);
       }
 
       switch(service.srv) {
@@ -81,7 +81,7 @@ public:
    }
 
    virtual CServiceProvider* GetService(string name) {
-      return (CObject*)services.GetService(name);
+      return services.GetService(name);
    }
    
    virtual CServiceProvider* GetService(ENUM_APPLICATION_SERVICE srv) {
@@ -133,7 +133,7 @@ public:
    }
 
    int OnCalculate (const int rates_total,      // size of input time series
-                 const int prev_calculated,  // bars handled in previous call
+                 const int prev_calculated  // bars handled in previous call
    )
    {
       return services.OnCalculate(rates_total,prev_calculated);

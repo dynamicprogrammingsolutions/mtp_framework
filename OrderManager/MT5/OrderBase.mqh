@@ -388,7 +388,7 @@ bool COrderBase::WaitForExecute()
    if (executestate == ES_EXECUTED && ordertype_market(this.ordertype)) {
       for (int i = 0; i < waitforexecute_max; i++) {
          this.State();
-         if (event.Info ()) event.Info ("Waiting for execute: "+(string)this.id,__FUNCTION__);
+         if (event.Info ()) event.Info ("Waiting for execute: "+(string)this.id+" state: "+EnumToString(state),__FUNCTION__);
          if (state_filled(state)) return(true);
          if (state_canceled(state)) return(false);
          Sleep(waitforexecute_sleep);

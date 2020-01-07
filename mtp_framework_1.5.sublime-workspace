@@ -1,0 +1,539 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"comple",
+				"completion_1\t(completions.sublime-snippet)"
+			],
+			[
+				"comp",
+				"completion_"
+			],
+			[
+				"iATR",
+				"iATR_"
+			],
+			[
+				"iMA",
+				"iMA"
+			],
+			[
+				"array_chu",
+				"array_chunk"
+			],
+			[
+				"array",
+				"array_column"
+			],
+			[
+				"abs",
+				"abs"
+			],
+			[
+				"TIme",
+				"TimeSec\t(time.mqh)"
+			],
+			[
+				"jump",
+				"jump_forward"
+			],
+			[
+				"servl",
+				"servlet-class"
+			],
+			[
+				"ser",
+				"servlet-name"
+			],
+			[
+				"DiagramAc",
+				"DiagramCommand"
+			],
+			[
+				"CommandOpen",
+				"CommandOpenBuy"
+			],
+			[
+				"Diagr",
+				"DiagramItem"
+			],
+			[
+				"Diag",
+				"DiagramState"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "Signals/Signal.mqh",
+			"settings":
+			{
+				"buffer_size": 8973,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "Compile",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Compile",
+					""
+				],
+				[
+					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
+					""
+				]
+			],
+			[
+				"Compile",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/C++ Starting Kit/C++ - Starting Kit.sublime-build",
+					""
+				],
+				[
+					"Packages/C++ Starting Kit/C++ - Starting Kit.sublime-build",
+					"Run"
+				]
+			],
+			[
+				"Packages/C++ Starting Kit/C++ - Starting Kit.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					"Run"
+				]
+			],
+			[
+				"Packages/C++/C++ Single File.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/C++11/C++11.sublime-build",
+					""
+				],
+				[
+					"Packages/C++11/C++11.sublime-build",
+					"Run"
+				]
+			],
+			[
+				"Packages/C++11/C++11.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/Java/Ant.sublime-build",
+					""
+				],
+				[
+					"Packages/Java/JavaC.sublime-build",
+					""
+				],
+				[
+					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
+					""
+				]
+			],
+			[
+				"Packages/Java/JavaC.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/Java/JavaC.sublime-build",
+					""
+				],
+				[
+					"Packages/Java/JavaC.sublime-build",
+					"Java Lintter"
+				],
+				[
+					"Packages/Java/JavaC.sublime-build",
+					"Run Java"
+				]
+			],
+			[
+				"Packages/Java/JavaC.sublime-build",
+				"Run Java"
+			]
+		],
+		[
+			[
+				[
+					"Packages/Makefile/Make.sublime-build",
+					""
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					"Clean"
+				]
+			],
+			[
+				"Packages/Makefile/Make.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "Snippet",
+		"selected_items":
+		[
+			[
+				"Snippet",
+				"Snippet: #!/usr/bin/env"
+			],
+			[
+				"resou",
+				"PackageResourceViewer: Open Resource"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"pack",
+				"SublimeREPL: Racket"
+			],
+			[
+				"package con",
+				"Package Control: List Packages"
+			],
+			[
+				"Snippet: ",
+				"Snippet: class-..-(class)"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/ferenci84/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5"
+	],
+	"file_history":
+	[
+		"/home/ferenci84/dynamicprogrammingsolutions/mt4600_experts/MQL4/Indicators/Clickevents-ColorStreamV5-12thJuly16454-noalert.mq4",
+		"/home/ferenci84/dynamicprogrammingsolutions/mt4600_experts/MQL4/Indicators/Clickevents-ColorStream1stJulyfor16454withalert_old.mq4",
+		"/home/ferenci84/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/mtp_framework_1.5.sublime-project",
+		"/home/ferenci84/dynamicprogrammingsolutions/mt4600_experts/MQL4/Indicators/Clickevents-ColorStreamV5-12thJuly16454-alert.mq4",
+		"/home/ferenci84/dynamicprogrammingsolutions/mt4600_experts/MQL4/Indicators/Clickevents-ColorStream1stJulyfor16454withalert.mq4",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Experts/Kieran_Peckston_HighLowCountEA/Kieran_Peckston_HighLowCountEA.mq4",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Experts/Zabree_Fisher_EA/Zabree_Fisher_EA.mq4",
+		"/home/ferenci84/.config/sublime-text-3/Packages/MQL4/completions.sublime-completions",
+		"/home/ferenci84/.config/sublime-text-3/Packages/MQL4/MQL4.sublime-completions",
+		"/home/ferenci84/.config/sublime-text-3/Packages/MQL4/completion7.sublime-snippet",
+		"/home/ferenci84/.config/sublime-text-3/Packages/MQL4/completion6.sublime-snippet",
+		"/home/ferenci84/.config/sublime-text-3/Packages/MQL4/completion1.sublime-snippet",
+		"/home/ferenci84/.config/sublime-text-3/Packages/MQL4/completion2.sublime-snippet",
+		"/home/ferenci84/.config/sublime-text-3/Packages/MQL4/completion5.sublime-snippet",
+		"/home/ferenci84/.config/sublime-text-3/Packages/MQL4/completion4.sublime-snippet",
+		"/home/ferenci84/.config/sublime-text-3/Packages/MQL4/completion3.sublime-snippet",
+		"/home/ferenci84/.config/sublime-text-3/Packages/MQL4/completions.sublime-snippet__",
+		"/home/ferenci84/.config/sublime-text-3/Packages/MQL4/completions.sublime-snippet",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/mql4to5/technicalindicators.mqh",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Experts/Adesh_Pending_EA/Adesh_Pending_EA.mq4",
+		"/home/ferenci84/.config/sublime-text-3/Packages/MQL4/MQL4.sublime-syntax",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/libraries/time.mqh",
+		"/home/ferenci84/.config/sublime-text-3/Packages/CTags/CTags.sublime-settings",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/Commands/OrderCommandHandlerBase.mqh",
+		"/home/ferenci84/.config/sublime-text-3/Packages/Default/Default (Linux).sublime-mousemap",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/OrderManager/MoneyManagement.mqh",
+		"/home/ferenci84/.config/sublime-text-3/Packages/CTags/Default.sublime-mousemap",
+		"/home/ferenci84/.config/sublime-text-3/Packages/CTags/Context.sublime-menu",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/EntryMethod/EntryMethodSignal.mqh",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/Signals/Signal.mqh",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/AppObject.mqh",
+		"/home/ferenci84/.config/sublime-text-3/Packages/Default/Main.sublime-menu",
+		"/home/ferenci84/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/home/ferenci84/.config/sublime-text-3/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/ArrayObject.mqh",
+		"/home/ferenci84/.config/sublime-text-3/Packages/CTags/Default.sublime-keymap",
+		"/home/ferenci84/.config/sublime-text-3/Packages/Default/Context.sublime-menu",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/Template/template_premium_v3.2.mq4_",
+		"/home/ferenci84/.config/sublime-text-3/Packages/CTags/Main.sublime-menu",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/libraries/comments.mqh",
+		"/home/ferenci84/.config/sublime-text-3/Packages/CTags/Side Bar.sublime-menu",
+		"/home/ferenci84/.config/sublime-text-3/Packages/CTags/README.rst",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/Ptr.mqh",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/tags",
+		"/home/ferenci84/.ctags",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/OrderManager/MT5/Order.mqh",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Experts/Sarkis_B_NonRenko_EA/Sarkis_B_NonRenko_EA.mq4",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Experts/Sarkis_B_NonRenko_EA/mtp_framework/libraries/time.mqh",
+		"/home/ferenci84/Downloads/Clickevents-ColorStreamV512thJulyfor16454.mq4",
+		"/home/ferenci84/Downloads/Clickevents-ColorStream1stJulyfor16454withalert.mq4",
+		"/home/ferenci84/Downloads/Clickevents-ColorStreamV5-12thJuly16454-noalert.mq4",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Experts/Jason_MA_EA/Jason_MA_EA.mq4",
+		"/home/ferenci84/Dokumentumok/JEE/project1/src/Ch1Servlet.java",
+		"/home/ferenci84/Dokumentumok/JEE/project1/project1.sublime-project",
+		"/home/ferenci84/Dokumentumok/JEE/project1/etc/web.xml",
+		"/home/ferenci84/Dokumentumok/Java/helloworld/HelloWorld.java",
+		"/home/ferenci84/Dokumentumok/Java/HelloWorld/src/helloworld/HelloWorld.java",
+		"/home/ferenci84/Dokumentumok/CPP/ikozaeder3/makefile",
+		"/home/ferenci84/Dokumentumok/CPP/ikozaeder3/main.cpp",
+		"/home/ferenci84/Dokumentumok/CPP/ikozaeder3/kocka.cpp",
+		"/home/ferenci84/Dokumentumok/CPP/ikozaeder3/ikozaeder.sublime-workspace",
+		"/home/ferenci84/Dokumentumok/CPP/ikozaeder3/Makefile",
+		"/home/ferenci84/Downloads/daytracks_export_20170130103055.csv",
+		"/home/ferenci84/NetBeansProjects/HelloWorld/src/HelloWorld1/HelloWorld.java",
+		"/home/ferenci84/.config/sublime-text-3/Packages/My Color Scheme White/Solarized (Lighter).tmTheme",
+		"/home/ferenci84/.config/sublime-text-3/Packages/My Color Scheme White/Slush & Poppies (White).tmTheme",
+		"/var/www/html/flaw/app/Http/Classes/Http/Actions.php",
+		"/var/tmp/kdecache-ferenci84/krun/10367_0_C++11.sublime-settings",
+		"/home/ferenci84/Downloads/Könyvelés_2017-01-18_15:40.gnucash.20170130103921.log",
+		"/home/ferenci84/Downloads/%25f",
+		"/home/ferenci84/.config/sublime-text-3/Installed Packages/krarc",
+		"/home/ferenci84/.config/sublime-text-3/Installed Packages/%25f",
+		"/var/tmp/kdecache-ferenci84/krun/10090_0_Comments (C++11).tmPreferences",
+		"/home/ferenci84/NetBeansProjects/HelloWorld/src/helloworld/HelloWorld.java",
+		"/home/ferenci84/.config/sublime-text-3/Packages/Java/JavaC.sublime-build",
+		"/home/ferenci84/NetBeansProjects/HelloWorld/src/helloworld/javatar/example/emptyclass.java",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Experts/Kieran_Peckston_HighLowCountEA/Diagram.mqh",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Experts/Kieran_Peckston_HighLowCountEA/DiagramOutput.mqh",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Experts/Kieran_Peckston_HighLowCountEA/DiagramOutput.mq4",
+		"/home/ferenci84/Dokumentumok/dynamicprogrammingsolutions/mt4600_experts/MQL4/Experts/Kieran_Peckston_HighLowCountEA/Diagram.mq4",
+		"/var/www/html/flaw/flaw.sublime-workspace",
+		"/var/www/html/flaw/flaw.sublime-project",
+		"/var/www/html/flaw/artisan",
+		"/var/www/html/flaw/.env",
+		"/var/www/html/flaw/.env.example"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"signal_bar",
+			"\\i[A-Z]+",
+			"[",
+			"$[",
+			"\t\t{",
+			"c++",
+			"ctrl",
+			"alt+back",
+			"extra",
+			"import javax.servlet.*;",
+			"ctrl+shift",
+			"strl+shift+",
+			"'"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+			"bar",
+			"\""
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "Signals/Signal.mqh",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8973,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								651,
+								651
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/MQL4/MQL4.sublime-syntax",
+							"tab_size": 3,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 187.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.CppBuilder":
+	{
+		"height": 100.0
+	},
+	"output.exec":
+	{
+		"height": 100.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.unsaved_changes":
+	{
+		"height": 161.0
+	},
+	"pinned_build_system": "",
+	"project": "mtp_framework_1.5.sublime-project",
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"~/dynamicprogrammingsolutions/mt4600_experts/MQL4/Include/mtp_framework_1.5/mtp_framework_1.5.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"Time",
+				"TimeHour"
+			],
+			[
+				"",
+				"~CAppObjectArray"
+			]
+		],
+		"width": 467.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+		"xdebug":
+		{
+			"hide_conflict": false
+		}
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 307.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

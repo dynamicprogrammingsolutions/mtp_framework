@@ -38,7 +38,7 @@ public:
    }
    
    virtual int OnCalculate (const int rates_total,      // size of input time series
-                 const int prev_calculated,  // bars handled in previous call
+                 const int prev_calculated  // bars handled in previous call
    )
    {
       use_oncalculate = false;

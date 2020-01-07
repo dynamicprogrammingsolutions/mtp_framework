@@ -488,8 +488,9 @@ bool CArrayObject::Delete(const int index)
       if(index>=0)
          MemMove(index,index+1,m_data_total-index-1);
      }
-   else if(/*m_free_mode && */CheckPointer(m_data[index])==POINTER_DYNAMIC)
+   else if(/*m_free_mode && */CheckPointer(m_data[index])==POINTER_DYNAMIC) {
       delete m_data[index];
+   }
    m_data_total--;
 //--- successful
    return(true);
@@ -905,9 +906,9 @@ bool  CArrayObject::CreateElement(const int index, const ENUM_CLASS_NAMES type)
    if (!isset(newelement)) return false;
    if (newelement.Type() != classAppObjectArrayObj) {
       if (newelement.Type() == type) {
-         T *elem;
+         CObject *elem;
          newelement.callback(0,elem);
-         m_data[index] = new shared_ptr<T>(elem);
+         m_data[index] = new shared_ptr<T>((T*)elem);
          Prepare(m_data[index].get());
          return true;
       }
@@ -916,9 +917,9 @@ bool  CArrayObject::CreateElement(const int index, const ENUM_CLASS_NAMES type)
       for (int i = 0; i < list.Total(); i++) {
          CAppObject* thiselement = list.At(i);
          if (thiselement.Type() == type) {
-            T *elem1;
+            CObject *elem1;
             thiselement.callback(0,elem1);
-            m_data[index] = new shared_ptr<T>(elem1);
+            m_data[index] = new shared_ptr<T>((T*)elem1);
             Prepare(m_data[index].get());
             return true;
          }

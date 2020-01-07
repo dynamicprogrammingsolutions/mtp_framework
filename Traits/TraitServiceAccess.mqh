@@ -1,0 +1,2 @@
+#define TraitServiceAccess(__name__,__service__,__class__) __class__* __name__() { return APP.services.GetService(__service__); }
+#define SRVACCESS(__name__,__service__,__class__) __class__* __name__ = APP.services.GetService(__service__);

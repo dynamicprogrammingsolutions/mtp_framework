@@ -170,19 +170,19 @@ public:
    {
       return Assert(q(value,compare),name,(string)value+" == "+(string)compare);
    }
-   bool AssertIsSet(CAppObject*& object, string name)
+   bool AssertIsSet(CAppObject* object, string name)
    {
       return Assert(isset(object),name,name+" is set");
    }
-   bool AssertIsNotSet(CAppObject*& object, string name)
+   bool AssertIsNotSet(CAppObject* object, string name)
    {
       return Assert(!isset(object),name,name+" is not set");
    }
-   bool AssertIsNull(CAppObject*& object, string name)
+   bool AssertIsNull(CAppObject* object, string name)
    {
       return Assert(CheckPointer(object)==NULL,name,name+" is null");
    }
-   bool AssertIsNotNull(CAppObject*& object, string name)
+   bool AssertIsNotNull(CAppObject* object, string name)
    {
       return Assert(CheckPointer(object)!=NULL,name,name+" is not null");
    }

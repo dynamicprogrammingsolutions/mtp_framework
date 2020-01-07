@@ -4,6 +4,8 @@
 #define SERVICE_CONTAINER_H
 class CServiceContainer : public CArrayObject<CServiceProvider>
 {
+   CServiceProvider* services[];
+
 public:
    CServiceProvider* ServiceProvider(int i)
    {
@@ -47,10 +49,8 @@ public:
    
    CServiceProvider* GetService(ENUM_APPLICATION_SERVICE srv)
    {
-      int count = Total();
-      for (int i = 0; i < count; i++) {
-         CServiceProvider* service = ServiceProvider(i);
-         if (service.srv == srv) return service;
+      if (ArraySize(services) >= srv+1) {
+         return services[srv];
       }
       Print("not found: ",EnumToString(srv));
       return NULL;
@@ -67,6 +67,21 @@ public:
       return false;
    }
    
+   void AddToFastArray(CServiceProvider* service)
+   {
+      if (ArraySize(services) < service.srv+1) {
+         ArrayResize(services,service.srv+1);
+      }
+      services[service.srv] = service;
+   }
+   
+   void Register(CServiceProvider* service) {
+      if (service.srv != srvNone) {
+         AddToFastArray(service);
+      }
+      this.Add(service);
+   }
+   
    bool ReRegister(CServiceProvider* newservice)
    {
       if (newservice.srv == srvNone) return false;
@@ -76,6 +91,11 @@ public:
          if (service.srv == newservice.srv) {
             //delete service;
             this.m_data[i].reset(newservice);
+            
+            if (service.srv != srvNone) {
+               AddToFastArray(service);
+            }
+            
             return true;
          }
       }
@@ -118,7 +138,7 @@ public:
    }
    
    int OnCalculate (const int rates_total,      // size of input time series
-                 const int prev_calculated,  // bars handled in previous call
+                 const int prev_calculated  // bars handled in previous call
    )
    {
       int ret = -1;

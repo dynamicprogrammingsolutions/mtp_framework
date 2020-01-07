@@ -4,13 +4,13 @@
 #define ORDER_INTERFACE_H
 
 #ifdef __MQL4__
-#include "..\OrderManager\Enums\EnumOrderState.mqh"
+#include "Enums\EnumOrderState.mqh"
 #endif
 
-#include "..\OrderManager\Enums\EnumExecuteState.mqh"
-#include "..\OrderManager\Enums\EnumOrderSelect.mqh"
-#include "..\OrderManager\Enums\EnumStateSelect.mqh"
-#include "..\OrderManager\Enums\EnumActivity.mqh"
+#include "Enums\EnumExecuteState.mqh"
+#include "Enums\EnumOrderSelect.mqh"
+#include "Enums\EnumStateSelect.mqh"
+#include "Enums\EnumActivity.mqh"
 
 #define POrder shared_ptr<COrderInterface>
 #define NewPOrder(__object__) POrder::make_shared(__object__)

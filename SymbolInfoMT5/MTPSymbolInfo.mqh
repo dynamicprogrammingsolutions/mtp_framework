@@ -46,6 +46,7 @@ public:
       int MinTakeProfit() { return(StopsLevelInTicks()); }
       int MinStopLoss() { return(SpreadInTicks() + StopsLevelInTicks()); }
       int SpreadInTicks() { return(Spread()/TickSizeInPoints()); }
+      double SpreadInPrice() { return(Spread()*this.Point()); }
       double LotValue() { return(TickValue()/TickSize()); }
       bool IsFractional(double treshold = FRACTIONAL_TRESHOLD);
       virtual double ConvertFractional(double pips) { return IsFractional()?pips*10:pips; }
