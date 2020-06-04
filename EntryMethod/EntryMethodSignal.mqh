@@ -23,10 +23,10 @@ public:
       maxorders = 1;
       maxspread = -1;
    }
-
-   virtual void OnInit() {
+   
+   virtual void Initalize() {
       ((CSignalServiceProviderBase*)App().GetService(srvSignalServiceProvider)).AddObserver(GetPointer(this));
-      this.ordercommanddispatcher = App().GetService(srvOrderCommandDispatcher);     
+      this.ordercommanddispatcher = App().GetService(srvOrderCommandDispatcher);
    }
 
    virtual void EventCallback(const int event_id, CObject* event) {
@@ -36,7 +36,6 @@ public:
    
    void OpenSignal(CSignal* signal)
    {
-      Print("Processing open signal: "+signal.signal);
       switch (signal.signal) {
          case SIGNAL_BUY:
             if (close_opposite_order) ordercommanddispatcher.Dispatch(commandCloseSell);
@@ -72,23 +71,19 @@ public:
    virtual bool BuySignalFilter()
    {
       if (!enableopen) {
-         Print("open not enabled");
          return false;
       }
       if (!long_enabled) {
-         Print("long orders not enabled");
          return false;
       }
       if (maxspread >= 0) {
          loadsymbol(symbol);
          if (_symbol.SpreadInTicks() > maxspread) {
-            Print("max spread exceeded");
             return false;
          }
       }
       int cnt = App().orderrepository.CntOrders(ORDERSELECT_ANY,STATESELECT_FILLED);
       if (cnt >= maxorders) {
-         Print("orders count ("+cnt+") is more than allowed ("+maxorders);
          return false;
       }
       return true;
@@ -101,7 +96,6 @@ public:
       if (maxspread >= 0) {
          loadsymbol(symbol);
          if (_symbol.SpreadInTicks() > maxspread) {
-            Print("max spread exceeded");
             return false;
          }
       }

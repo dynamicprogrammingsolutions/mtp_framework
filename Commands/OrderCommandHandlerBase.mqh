@@ -66,9 +66,12 @@ public:
       }
       return true;
    }
-
+   virtual void BeforeOrder(ENUM_ORDER_TYPE cmd) {
+      return;
+   }
    virtual bool CommandOpenOrder(COrderCommand *command)
    {
+      this.BeforeOrder(command.cmd);
       PStopsCalc thisentry = entry;
       PStopsCalc thissl = sl;
       PStopsCalc thistp = tp;
@@ -87,12 +90,14 @@ public:
    
    virtual void CommandOpenBuy()
    {
+      this.BeforeOrder(ORDER_TYPE_BUY);
       COrderInterface* order = App().ordermanager.NewOrder(symbol,buy_cmd,mm,entry,sl,tp);
       this._callback_result = order;   
    }
 
    virtual void CommandOpenSell()
    {
+      this.BeforeOrder(ORDER_TYPE_SELL);
       COrderInterface* order = App().ordermanager.NewOrder(symbol,sell_cmd,mm,entry,sl,tp);
       this._callback_result = order;
    }

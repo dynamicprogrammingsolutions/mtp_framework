@@ -22,7 +22,10 @@ int _comment_window = 0;
 
 class CChartComment : public CServiceProvider
 {
+   bool m_use_timer;
 public:
+   CChartComment(): m_use_timer(false) {}
+   CChartComment(bool use_timer) : m_use_timer(use_timer) {}
    TraitAppAccess
    
    virtual void OnTick()
@@ -34,6 +37,12 @@ public:
          delcomment();
       } else {
          delcomment();
+      }
+   }
+   
+   virtual void OnTimer() {
+      if (m_use_timer) {
+         this.OnTick();
       }
    }
    

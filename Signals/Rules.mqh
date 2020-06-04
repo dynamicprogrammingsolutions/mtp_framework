@@ -35,6 +35,7 @@ public:
       if (lastsignal == SIGNAL_NONE || currentsignal == lastsignal) {
          return false;
       }
+      //Print("Signal changed from ",lastsignal," to ",currentsignal);
       return true;
    }
    virtual void OnSignal(CSignal* signal)
@@ -103,6 +104,7 @@ public:
       if (iTime(symbol,tf,0) == last_valid_signal) {
          return false;
       }
+      //Print("new signal, last valid signal: ",last_valid_signal);
       return true;
    }
    virtual void OnValidSignal(CSignal* signal)

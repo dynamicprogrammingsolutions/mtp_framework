@@ -54,13 +54,11 @@ public:
    virtual COrderInterface* Selected() { return selected; }  
    
    virtual void Add(COrderInterface* order) {
-      Print("add observer");
       order.AddObserver(GetPointer(this));
       this.orders.Add(order);
    }
    
    virtual void EventCallback(const int event_id, CObject* event) {
-      Print("dispatching event");
       this.Dispatch(event_id,event);
    }
 

@@ -8,6 +8,13 @@
 //CAccountInfo accountinfo;
 
 bool variables_initalized=false;
+enum ENUM_FRACT_MODE {
+   FRACT_MODE_DISABLED,
+   FRACT_MODE_ENABLED,
+   FRACT_MODE_AUTO
+};
+
+ENUM_FRACT_MODE _fract_mode = FRACT_MODE_AUTO;
 
 CMTPSymbolInfo* symbolinfo;
 
@@ -163,7 +170,14 @@ double inticksd(double price)
 
 int convertfract(double pips)
 {
-   return (int)(convertfract_enabled?symbolinfo.ConvertFractional(pips):pips);
+   switch(_fract_mode) {
+      case FRACT_MODE_DISABLED:
+         return pips;
+      case FRACT_MODE_ENABLED:
+         return pips*10.0;
+      default:
+         return (int)(convertfract_enabled?symbolinfo.ConvertFractional(pips):pips);
+   }
 }
 
 double priceround(double price)

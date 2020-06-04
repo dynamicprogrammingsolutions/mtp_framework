@@ -170,6 +170,31 @@ public:
    }
 };
 
+class CString : public CObject {
+private:
+   string m_val;
+public:
+   CString(string val): m_val(val) {
+   }
+   string GetValue() {
+      return m_val;
+   }
+   virtual int Type(void) const { return(1573847048);}
+   virtual int Compare(const CObject* node, const int mode = 0) const {
+      if (node.Type() == this.Type()) {
+         CString* other = (CString*)node;
+         if (this.m_val == other.m_val) return 0;
+         else if (this.m_val < other.m_val) return -1;
+         else return 1;
+      } else {
+         return EMPTY_VALUE;
+      }
+   }
+   virtual string ToString() {
+      return m_val;
+   }
+};
+
 template<typename T>
 class CPrimitive : public CObject {
 private:
@@ -179,10 +204,13 @@ public:
    T GetValue() {
       return m_val;
    }
+   void SetValue(T val) {
+      m_val = val;
+   }
    virtual int Type(void) const { return(1);}
    virtual int Compare(const CObject* node, const int mode = 0) const {
       if (node.Type() == this.Type()) {
-         CInt* other = (CInt*)node;
+         CPrimitive* other = (CPrimitive*)node;
          if (this.m_val == other.m_val) return 0;
          else if (this.m_val < other.m_val) return -1;
          else return 1;

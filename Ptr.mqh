@@ -495,6 +495,11 @@ public:
 
 };
 
+template<typename T>
+shared_ptr<T> make_shared(T* obj) {
+   return shared_ptr<T>::make_shared(obj);
+}
+
 /* unique_ptr can be safely initalized from : builtin pointer not owned by unique_ptr
  * it is not safe to initalize from: unique_ptr, shared_ptr, weak_ptr, builtin object
  */

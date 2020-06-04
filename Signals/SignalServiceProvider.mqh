@@ -21,12 +21,12 @@ public:
       
       if (mainsignal.get().valid) {
          if (validateopen.Validate(mainsignal.get())) {
-            Dispatch(OpenSignal,mainsignal.get());
             validateopen.OnValidSignal(mainsignal.get());
+            Dispatch(OpenSignal,mainsignal.get());
          }
          if (validateclose.Validate(mainsignal.get())) {
-            Dispatch(CloseSignal,mainsignal.get());
             validateclose.OnValidSignal(mainsignal.get());
+            Dispatch(CloseSignal,mainsignal.get());
          }
       }
       
